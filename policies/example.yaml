@@ -1,0 +1,13 @@
+# Hard ceilings cannot be overridden by a human approval.
+max_per_payment: 100
+max_per_day: 100
+require_approval_above: 20
+# The first $5 demo payment establishes successful history for this destination.
+new_merchant_max: 5
+expires_at: "2030-01-01T00:00:00Z"
+allowed_merchants:
+  - id: dataco
+    categories: [data, api]
+    # For a pinned recipient, add: address: "0x..."
+  - id: compute-co
+    categories: [compute]

@@ -1,0 +1,51 @@
+{
+  "name": "railgate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Policy-controlled testnet payments for AI agents",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "packageManager": "pnpm@10.20.0",
+  "scripts": {
+    "init:local": "tsx scripts/init-local.ts",
+    "dev": "tsx src/cli.ts serve",
+    "start": "node dist/src/cli.js serve",
+    "mcp": "tsx src/cli.ts mcp",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "tsx examples/overspend-demo/live.ts",
+    "demo:offline": "tsx examples/overspend-demo/offline.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "better-sqlite3": "12.4.1",
+    "dotenv": "^18.0.9",
+    "hono": "4.13.13",
+    "undici": "^6.29.1",
+    "viem": "2.57.11",
+    "yaml": "^2.9.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^20.19.43",
+    "eslint": "^10.13.0",
+    "tsx": "^4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.72.0",
+    "vitest": "4.0.18"
+  }
+}
