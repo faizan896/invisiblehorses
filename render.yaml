@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: railgate-backend
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    disk:
+      name: railgate-state
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_PATH
+        value: /var/data/railgate.sqlite
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: BASE_SEPOLIA_RPC_URL
+        value: https://sepolia.base.org
+      - key: RAILGATE_PRIVATE_KEY
+        sync: false
+      - key: APPROVAL_SECRET
+        sync: false
+      - key: OWNER_API_TOKEN
+        sync: false
+      - key: AGENT_API_TOKEN
+        sync: false
+      - key: NTFY_SERVER
+        value: https://ntfy.sh
+      - key: NTFY_TOPIC
+        sync: false
+      - key: DEMO_RECIPIENT_ADDRESS
+        sync: false
+      - key: RAILGATE_DATABASE_SNAPSHOT
+        sync: false
+      - key: RAILGATE_DATABASE_SHA256
+        sync: false
+      - key: RAILGATE_DATABASE_BOOTSTRAP
+        sync: false

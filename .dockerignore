@@ -1,0 +1,13 @@
+.git
+.env*
+**/.env*
+data
+*.sqlite*
+*.db*
+.pnpm-store
+node_modules
+dist
+coverage
+.vercel
+.codex
+.cursor

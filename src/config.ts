@@ -14,6 +14,7 @@ export const ConfigSchema = z.object({
   NTFY_TOKEN: z.string().optional(),
   HOST: z.string().default('127.0.0.1'), PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   DATABASE_PATH: z.string().min(1).default('./data/railgate.sqlite'),
+  RAILGATE_READ_ONLY: z.enum(['0','1']).default('0').transform((v) => v === '1'),
   POLICY_PATH: z.string().min(1).default('./policies/example.yaml'),
   COUNTERPARTY_PATH: z.string().min(1).default('./examples/counterparties.json'),
   WISE_SANDBOX_TOKEN: z.string().optional().transform((v) => v || undefined),

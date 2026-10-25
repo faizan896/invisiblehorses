@@ -14,6 +14,8 @@
     "dev": "tsx src/cli.ts serve",
     "start": "node dist/src/cli.js serve",
     "mcp": "tsx src/cli.ts mcp",
+    "setup:mcp": "node scripts/setup-mcp.mjs",
+    "export:hosting": "node scripts/export-hosting.mjs",
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

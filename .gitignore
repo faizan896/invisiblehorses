@@ -9,3 +9,6 @@ data/
 *.db*
 .pnpm-store/
 *.tsbuildinfo
+.codex/
+.cursor/
+.vercel/

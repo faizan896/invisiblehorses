@@ -8,7 +8,7 @@ import { AppError } from '../errors.js';
 import type { QuoteService } from '../rails/quotes.js';
 import type { RoutingService } from '../router/service.js';
 
-export type HttpConfig = { ownerToken: string; agentToken: string; agentId: string };
+export type HttpConfig = { ownerToken: string; agentToken: string; agentId: string; readOnly?: boolean };
 const same = (a: string, b: string) => timingSafeEqual(createHash('sha256').update(a).digest(), createHash('sha256').update(b).digest());
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g, (v) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[v]!);
 const page = (title: string, content: string) => `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escape(title)} · railgate</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#18222c}nav,a{color:#1646a0}article{border:1px solid #cbd5e1;border-radius:8px;padding:20px;margin:20px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}button{padding:10px 20px;margin:8px}form{display:inline}td,th{padding:10px;text-align:left;vertical-align:top}table{width:100%;border-collapse:collapse}tr{border-bottom:1px solid #ddd}</style><body><h1>railgate <small>TEST MONEY ONLY</small></h1><nav><a href="/approvals">Approvals</a> · <a href="/dashboard">Dashboard</a></nav><h2>${escape(title)}</h2>${content}</body></html>`;
@@ -35,13 +35,14 @@ export function createApp(service: PaymentService | UnifiedPaymentService, confi
     }
     return !!candidate && same(candidate, config.ownerToken);
   };
-  app.get('/health', (c) => c.json({ status: 'ok', network: 'Base Sepolia', chain_id: 84532, test_money_only: true }));
+  app.get('/health', (c) => c.json({ status: 'ok', network: 'Base Sepolia', chain_id: 84532, test_money_only: true, read_only: config.readOnly ?? false }));
   app.use('/api/*', async (c, next) => {
     const token = c.req.header('Authorization')?.replace(/^Bearer /, '') ?? '';
     if (!same(token, config.agentToken)) throw new AppError(401, 'Agent authentication required');
     await next();
   });
   app.post('/api/payments', async (c) => {
+    if (config.readOnly) throw new AppError(503, 'Payment writes are disabled during hosting verification');
     try { return c.json(await service.request(await c.req.json(), config.agentId), 202); }
     catch (error) {
       if (!(error instanceof AppError && error.status === 409)) service.store.audit(null, 'request_rejected', config.agentId, { reason: 'Invalid or unauthorized payment request' }, new Date().toISOString());
@@ -80,6 +81,7 @@ export function createApp(service: PaymentService | UnifiedPaymentService, confi
     return c.html(page('Pending approvals', entries.length ? entries.map(({ payment: p, notification: n }) => `<article><h3>${escape(p.summary.payer)} → ${escape(p.summary.recipient)}: ${escape(p.summary.amount)} ${escape(p.summary.currency)} (test funds); source cost $${escape(p.summary.source_cost_usd)} USD</h3><p>${escape(p.summary.purpose)}</p><p>Reasons: ${escape(p.evaluation.reasons.join('; '))}</p><p>Expires: ${escape(n.expiresAt)}</p>${(['Approve', 'Reject'] as const).map((action) => `<form method="post" action="${escape(action === 'Approve' ? n.approveUrl : n.rejectUrl)}"><button>${action}</button></form>`).join('')}</article>`).join('') : '<p>No pending approvals.</p>'));
   });
   app.post('/approval-actions', (c) => {
+    if (config.readOnly) throw new AppError(503, 'Approval actions are disabled during hosting verification');
     const query = z.strictObject({ token: z.string().min(1).max(1500) }).parse(c.req.query());
     const result = service.decide(query.token);
     return c.html(page('Approval recorded', `<p>Payment ${escape(result.id)}: ${escape(result.status)}</p><p>${escape(result.evaluation.reasons.join('; '))}</p>`));
@@ -88,6 +90,7 @@ export function createApp(service: PaymentService | UnifiedPaymentService, confi
   app.get('/approval-actions', (c) => c.text('Approval actions require POST', 405));
   app.get('/dashboard', (c) => c.html(page('Recent payments and audit log', `<table><thead><tr><th>When</th><th>Intent</th><th>Decision / status</th></tr></thead><tbody>${service.list().map((p) => `<tr><td>${escape(p.created_at)}</td><td>${escape(p.summary.payer)} → ${escape(p.summary.recipient)}<br>${escape(p.summary.amount)} ${escape(p.summary.currency)} (test funds); source cost $${escape(p.summary.source_cost_usd)} USD<br>${escape(p.summary.purpose)}</td><td>${escape(p.status)}<br>${escape(p.evaluation.reasons.join('; '))}<br>${escape('explanation' in p ? p.explanation : '')}<br>${escape(p.transaction_hash ?? '')}</td></tr>`).join('')}</tbody></table><h2>Append-only audit log</h2><pre>${escape(JSON.stringify(service.store.events(), null, 2))}</pre>`)));
   app.post('/owner/payments/:id/return', async (c) => {
+    if (config.readOnly) throw new AppError(503, 'Payment returns are disabled during hosting verification');
     if (!('reverse' in service)) throw new AppError(503, 'Multi-rail returns unavailable');
     if (!c.req.header('Content-Type')?.startsWith('application/json')) throw new AppError(415, 'JSON body required');
     z.strictObject({}).parse(await c.req.json());

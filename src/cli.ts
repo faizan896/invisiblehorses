@@ -48,11 +48,12 @@ async function main() {
   const routing = new RoutingService(store, profiles, quotes, policy);
   const service = new UnifiedPaymentService(store, legacy, profiles, routing, runtime, policy, new ApprovalTokens(cfg.APPROVAL_SECRET), new NtfyNotifier(cfg.NTFY_SERVER, cfg.NTFY_TOPIC, cfg.NTFY_TOKEN), cfg.PUBLIC_BASE_URL);
   await service.initialize();
-  const app = createApp(service, { ownerToken: cfg.OWNER_API_TOKEN, agentToken: cfg.AGENT_API_TOKEN, agentId: cfg.AGENT_ID }, quotes, routing);
+  const app = createApp(service, { ownerToken: cfg.OWNER_API_TOKEN, agentToken: cfg.AGENT_API_TOKEN, agentId: cfg.AGENT_ID, readOnly: cfg.RAILGATE_READ_ONLY }, quotes, routing);
   const server = serve({ fetch: app.fetch, hostname: cfg.HOST, port: cfg.PORT }, () => console.error(`railgate listening on port ${cfg.PORT}; Base Sepolia TEST MONEY ONLY`));
   server.on('error', () => { console.error('Unable to bind HTTP server'); process.exitCode = 1; clearInterval(timer); store.close(); });
   let running: Promise<void> | undefined;
   const timer = setInterval(() => {
+    if (cfg.RAILGATE_READ_ONLY) return;
     if (running) return;
     running = service.tick().catch(() => { console.error('Payment worker unavailable; funds remain reserved'); }).finally(() => { running = undefined; });
   }, 1000);

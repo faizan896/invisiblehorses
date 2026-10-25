@@ -1,0 +1,11 @@
+.env*
+**/.env*
+data/
+*.sqlite*
+*.db*
+.git/
+.codex/
+.cursor/
+node_modules/
+dist/
+coverage/

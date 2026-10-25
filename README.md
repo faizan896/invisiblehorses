@@ -78,6 +78,8 @@ Start the HTTP daemon and run `pnpm build`. Add this server to Claude Desktop's 
 
 The stdio process **does not load `.env`**. Supply only the limited agent credential and API origin. Keep wallet keys, HMAC material and owner credentials out of its environment. Remote APIs require HTTPS; HTTP is allowed only on loopback.
 
+To configure local clients automatically after building, run `pnpm setup:mcp` from the owner terminal. It creates a private, ignored `.env.mcp` with only the agent token/API origin, plus local Codex and Cursor configuration files. Existing client files are preserved. Register with Codex using `codex mcp add railgate -- node /absolute/path/to/railgate/scripts/mcp-launch.mjs`, then reload the client. The launcher opens only `.env.mcp` and removes owner/wallet/unrelated credentials from its child process environment. For the hosted API use `pnpm setup:mcp --api-url https://your-project.vercel.app`. Claude Desktop can use the launcher entry printed by setup.
+
 | MCP tool | HTTP equivalent | Effect |
 | --- | --- | --- |
 | `request_payment` | `POST /api/payments` | Create/retry an idempotent payment |
@@ -176,3 +178,7 @@ The owner file reloads on evaluation; invalid rules fail closed. Daily accountin
 5. Quickstart, architecture, recording guide, read-only dashboard, MIT license and CI: **implemented**. [Record the overspend clip](examples/overspend-demo/README.md).
 
 Milestones were tested and committed in order. Current-instance checks do not establish remote CI execution, cloud publication or restoration in a fresh task.
+
+## Vercel + persistent backend hosting
+
+The repository includes a stateless Vercel gateway, a Render Docker backend with a persistent SQLite disk, a guarded history-preserving cutover, and private MCP client setup. See [the deployment guide](docs/deployment.md). The Vercel project receives only `RAILGATE_BACKEND_ORIGIN`; wallet/owner/ntfy secrets stay on the backend. Hosting account authorization and public deployment verification are separate from the local build/tests.
