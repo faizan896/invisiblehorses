@@ -1,13 +1,13 @@
 import { PaymentIntentV2Schema } from '../intent/routing.js';
 import { Counterparties } from '../counterparty/profiles.js';
 import { AppError } from '../errors.js';
-import { RouteQuoteSchema, type RailAdapter, type RailId } from './adapter.js';
+import { RouteQuoteSchema, type RailAdapter, type RailId, type RailExecutionBackend } from './adapter.js';
 import { LedgerAdapter } from './ledger.js';
 import { AchMockAdapter } from './ach-mock.js';
 import { UsdcQuoteAdapter } from './usdc-quote.js';
 import { wiseAdapter } from './wise-quote.js';
-export function defaultAdapters(wiseToken?: string, wiseProfileId?: string): RailAdapter[] {
-  return [new LedgerAdapter(), new AchMockAdapter(), new UsdcQuoteAdapter(), wiseAdapter(wiseToken, wiseProfileId)];
+export function defaultAdapters(wiseToken?: string, wiseProfileId?: string, backend?: RailExecutionBackend): RailAdapter[] {
+  return [new LedgerAdapter(backend), new AchMockAdapter(backend), new UsdcQuoteAdapter(backend), wiseAdapter(wiseToken, wiseProfileId, backend)];
 }
 export class QuoteService {
   constructor(private readonly profiles: Counterparties, private readonly adapters: RailAdapter[] = defaultAdapters(), private readonly clock: () => Date = () => new Date()) {}

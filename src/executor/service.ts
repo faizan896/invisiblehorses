@@ -1,4 +1,5 @@
-import { createHash, randomBytes, randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
+import { fingerprint } from '../intent/fingerprint.js';
 import type { Hex } from 'viem';
 import { Store, type PaymentRow } from '../audit/store.js';
 import { PaymentIntentSchema, decimal, minor, type PaymentIntent } from '../intent/schema.js';
@@ -8,12 +9,6 @@ import { ApprovalTokens } from '../approval/tokens.js';
 import type { Notifier, ApprovalNotification } from '../approval/notifier.js';
 import type { TestnetExecutor } from '../rails/testnet.js';
 import { AppError } from '../errors.js';
-
-function canonical(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([k, v]) => [k, canonical(v)]));
-  return value;
-}
 
 export class PaymentService {
   private ticking = false;
@@ -38,19 +33,19 @@ export class PaymentService {
     const intent = PaymentIntentSchema.parse(input);
     if (intent.payer !== authenticatedPayer) throw new AppError(403, 'Payer does not match the authenticated agent');
     intent.amount = decimal(minor(intent.amount));
-    const fingerprint = createHash('sha256').update(JSON.stringify(canonical(intent))).digest('hex');
+    const digest = fingerprint(intent);
     const result = this.store.transaction(() => {
       const now = this.now(); this.store.expire(now);
       const old = this.store.byKey(authenticatedPayer, intent.idempotency_key);
       if (old) {
-        this.store.audit(old.id, 'request_retried', authenticatedPayer, { intent, conflicting_payload: old.fingerprint !== fingerprint }, now);
-        if (old.fingerprint !== fingerprint) return { conflict: true as const, row: old, fresh: false };
+        this.store.audit(old.id, 'request_retried', authenticatedPayer, { intent, conflicting_payload: old.fingerprint !== digest }, now);
+        if (old.fingerprint !== digest) return { conflict: true as const, row: old, fresh: false };
         return { conflict: false as const, row: old, fresh: false };
       }
       const evaluation = evaluate(intent, this.policy(), this.store.history(now));
       const id = randomUUID();
       const row: PaymentRow = {
-        id, payer: intent.payer, idempotency_key: intent.idempotency_key, fingerprint,
+        id, payer: intent.payer, idempotency_key: intent.idempotency_key, fingerprint: digest,
         intent: JSON.stringify(intent), amount_minor: minor(intent.amount),
         status: evaluation.decision === 'deny' ? 'denied' : evaluation.decision === 'needs_approval' ? 'pending_approval' : 'queued',
         evaluation: JSON.stringify(evaluation), created_at: now, reserved_at: now, updated_at: now,
@@ -109,11 +104,13 @@ export class PaymentService {
   }
   view(row: PaymentRow) {
     const approval = this.store.approval(row.id);
+    const intent = JSON.parse(row.intent) as PaymentIntent;
     return {
       id: row.id, intent: JSON.parse(row.intent) as PaymentIntent, status: row.status,
       evaluation: JSON.parse(row.evaluation) as { decision: string; reasons: string[] },
       transaction_hash: row.transaction_hash, created_at: row.created_at, updated_at: row.updated_at,
       approval: approval ? { state: approval.state, expires_at: approval.expires_at, approved_by: approval.actor } : null,
+      summary: { payer: row.payer, recipient: intent.recipient.name, amount: intent.amount, currency: 'USD', source_cost_usd: intent.amount, purpose: intent.purpose },
       network: 'Base Sepolia TEST ONLY',
     };
   }

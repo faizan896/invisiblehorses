@@ -2,6 +2,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { z, ZodError } from 'zod';
+import type { UnifiedPaymentService } from '../executor/unified.js';
 import type { PaymentService } from '../executor/service.js';
 import { AppError } from '../errors.js';
 import type { QuoteService } from '../rails/quotes.js';
@@ -12,7 +13,7 @@ const same = (a: string, b: string) => timingSafeEqual(createHash('sha256').upda
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g, (v) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[v]!);
 const page = (title: string, content: string) => `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escape(title)} · railgate</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#18222c}nav,a{color:#1646a0}article{border:1px solid #cbd5e1;border-radius:8px;padding:20px;margin:20px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}button{padding:10px 20px;margin:8px}form{display:inline}td,th{padding:10px;text-align:left;vertical-align:top}table{width:100%;border-collapse:collapse}tr{border-bottom:1px solid #ddd}</style><body><h1>railgate <small>TEST MONEY ONLY</small></h1><nav><a href="/approvals">Approvals</a> · <a href="/dashboard">Dashboard</a></nav><h2>${escape(title)}</h2>${content}</body></html>`;
 
-export function createApp(service: PaymentService, config: HttpConfig, quotes?: QuoteService, routing?: RoutingService) {
+export function createApp(service: PaymentService | UnifiedPaymentService, config: HttpConfig, quotes?: QuoteService, routing?: RoutingService) {
   const app = new Hono();
   app.use('*', bodyLimit({ maxSize: 16 * 1024, onError: (c) => c.json({ error: 'Request body exceeds 16 KiB' }, 413) }));
   app.use('*', async (c, next) => {
@@ -76,7 +77,7 @@ export function createApp(service: PaymentService, config: HttpConfig, quotes?: 
   });
   app.get('/approvals', (c) => {
     const entries = service.pending();
-    return c.html(page('Pending approvals', entries.length ? entries.map(({ payment: p, notification: n }) => `<article><h3>${escape(p.intent.payer)} → ${escape(p.intent.recipient.name)}: $${escape(p.intent.amount)} test USDC</h3><p>${escape(p.intent.purpose)}</p><p>Recipient: ${escape(p.intent.recipient.address)}</p><p>Reasons: ${escape(p.evaluation.reasons.join('; '))}</p><p>Expires: ${escape(n.expiresAt)}</p>${(['Approve', 'Reject'] as const).map((action) => `<form method="post" action="${escape(action === 'Approve' ? n.approveUrl : n.rejectUrl)}"><button>${action}</button></form>`).join('')}</article>`).join('') : '<p>No pending approvals.</p>'));
+    return c.html(page('Pending approvals', entries.length ? entries.map(({ payment: p, notification: n }) => `<article><h3>${escape(p.summary.payer)} → ${escape(p.summary.recipient)}: ${escape(p.summary.amount)} ${escape(p.summary.currency)} (test funds); source cost $${escape(p.summary.source_cost_usd)} USD</h3><p>${escape(p.summary.purpose)}</p><p>Reasons: ${escape(p.evaluation.reasons.join('; '))}</p><p>Expires: ${escape(n.expiresAt)}</p>${(['Approve', 'Reject'] as const).map((action) => `<form method="post" action="${escape(action === 'Approve' ? n.approveUrl : n.rejectUrl)}"><button>${action}</button></form>`).join('')}</article>`).join('') : '<p>No pending approvals.</p>'));
   });
   app.post('/approval-actions', (c) => {
     const query = z.strictObject({ token: z.string().min(1).max(1500) }).parse(c.req.query());
@@ -85,7 +86,13 @@ export function createApp(service: PaymentService, config: HttpConfig, quotes?: 
   });
   // GET never changes state: link scanners cannot approve/reject a payment.
   app.get('/approval-actions', (c) => c.text('Approval actions require POST', 405));
-  app.get('/dashboard', (c) => c.html(page('Recent payments and audit log', `<table><thead><tr><th>When</th><th>Intent</th><th>Decision / status</th></tr></thead><tbody>${service.list().map((p) => `<tr><td>${escape(p.created_at)}</td><td>${escape(p.intent.payer)} → ${escape(p.intent.recipient.name)}<br>$${escape(p.intent.amount)} test USDC<br>${escape(p.intent.purpose)}</td><td>${escape(p.status)}<br>${escape(p.evaluation.reasons.join('; '))}<br>${escape(p.transaction_hash ?? '')}</td></tr>`).join('')}</tbody></table><h2>Append-only audit log</h2><pre>${escape(JSON.stringify(service.store.events(), null, 2))}</pre>`)));
+  app.get('/dashboard', (c) => c.html(page('Recent payments and audit log', `<table><thead><tr><th>When</th><th>Intent</th><th>Decision / status</th></tr></thead><tbody>${service.list().map((p) => `<tr><td>${escape(p.created_at)}</td><td>${escape(p.summary.payer)} → ${escape(p.summary.recipient)}<br>${escape(p.summary.amount)} ${escape(p.summary.currency)} (test funds); source cost $${escape(p.summary.source_cost_usd)} USD<br>${escape(p.summary.purpose)}</td><td>${escape(p.status)}<br>${escape(p.evaluation.reasons.join('; '))}<br>${escape(p.transaction_hash ?? '')}</td></tr>`).join('')}</tbody></table><h2>Append-only audit log</h2><pre>${escape(JSON.stringify(service.store.events(), null, 2))}</pre>`)));
+  app.post('/owner/payments/:id/return', async (c) => {
+    if (!('reverse' in service)) throw new AppError(503, 'Multi-rail returns unavailable');
+    if (!c.req.header('Content-Type')?.startsWith('application/json')) throw new AppError(415, 'JSON body required');
+    z.strictObject({}).parse(await c.req.json());
+    return c.json(await service.reverse(z.uuid().parse(c.req.param('id'))));
+  });
   app.get('/owner/audit', (c) => c.json(service.store.events()));
   app.notFound((c) => c.json({ error: 'Not found' }, 404));
   return app;

@@ -9,12 +9,12 @@ export class AchMockAdapter extends QuoteOnlyAdapter {
     if (!c.payer.bank_accounts.some((b) => b.country === 'US' && b.currency === 'USD') || !c.recipient.bank_accounts.some((b) => b.country === 'US' && b.currency === 'USD')) return null;
     const window = bankWindow(c.now);
     const fee = Math.min(500, 25 + ceilRatio(principalUsd(c), 10n, 10000n));
-    return modeledQuote(this.id, c, {
+    return this.bounded(modeledQuote(this.id, c, {
       pricing: 'mock', execution: 'simulated', form: 'bank', expected: window.expected_at, latest: window.latest_at,
       certainty: 0.9, reversibility: 'conditional', acceptingNow: window.accepting_now,
       fees: [{ kind: 'bank', cents: fee, description: 'Simulated US ACH fee' }],
       steps: [{ kind: 'bank', description: `SIMULATED ACH; processing ${window.processing_at}; 1–2 US banking days`, simulated: true, fee_usd: decimal(fee) }],
       explanation: 'SIMULATED US-only ACH. 16:00 America/New_York cutoff; weekends and US banking holidays excluded. This rail cannot directly deliver MXN to Mexico.',
-    });
+    }), c);
   }
 }

@@ -4,7 +4,7 @@ import { decimal } from '../intent/schema.js';
 import { bankWindow } from './calendar.js';
 import { z } from 'zod';
 import { minor } from '../intent/schema.js';
-import { RouteQuoteSchema } from './adapter.js';
+import { RouteQuoteSchema, type RailExecutionBackend } from './adapter.js';
 
 /** Credential-free, labelled quote model. Sandbox support is enabled only against verified API docs. */
 export class WiseMockQuoteAdapter extends QuoteOnlyAdapter {
@@ -15,7 +15,7 @@ export class WiseMockQuoteAdapter extends QuoteOnlyAdapter {
     const service = 50 + ceilRatio(p, 5n, 10000n);
     const spread = c.intent.destination_currency === 'USD' ? 0 : ceilRatio(p, 5n, 10000n);
     const window = bankWindow(c.now);
-    return modeledQuote(this.id, c, {
+    return this.bounded(modeledQuote(this.id, c, {
       pricing: 'mock', execution: 'simulated', form: 'bank', expected: window.expected_at, latest: window.latest_at,
       certainty: 0.96, reversibility: 'conditional', acceptingNow: window.accepting_now,
       fees: [
@@ -27,7 +27,7 @@ export class WiseMockQuoteAdapter extends QuoteOnlyAdapter {
         { kind: 'bank', description: 'MOCK bank payout, including MXN to a Mexican test bank profile', simulated: true, fee_usd: decimal(service) },
       ],
       explanation: 'MOCK Wise-style quote: no sandbox token configured. All FX, fees and bank delivery are simulated; no Wise payment API is called.',
-    });
+    }), c);
   }
 }
 
@@ -80,8 +80,8 @@ export class WiseSandboxQuoteAdapter extends QuoteOnlyAdapter {
   }
 }
 
-export function wiseAdapter(token?: string, profileId?: string) {
-  if (!token) return new WiseMockQuoteAdapter();
+export function wiseAdapter(token?: string, profileId?: string, backend?: RailExecutionBackend) {
+  if (!token) return new WiseMockQuoteAdapter(backend);
   if (!profileId) throw new Error('WISE_SANDBOX_PROFILE_ID is required when a sandbox token is configured');
   return new WiseSandboxQuoteAdapter(token, profileId);
 }

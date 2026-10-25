@@ -16,7 +16,7 @@ export class UsdcQuoteAdapter extends QuoteOnlyAdapter {
     const spread = c.intent.destination_currency === 'USD' ? 0 : ceilRatio(principal, 10n, 10000n);
     const network = 2;
     const confirmed = new Date(Date.parse(c.now) + 12000).toISOString();
-    return modeledQuote(this.id, c, {
+    return this.bounded(modeledQuote(this.id, c, {
       pricing: 'modeled', execution: 'base-sepolia', form: bank ? 'bank' : 'wallet',
       expected: bank ? nextPayout(confirmed) : confirmed,
       certainty: bank ? 0.94 : 0.99, reversibility: 'irreversible',
@@ -35,6 +35,6 @@ export class UsdcQuoteAdapter extends QuoteOnlyAdapter {
         ] : []),
       ],
       explanation: bank ? 'Testnet USDC transfer plus explicitly MODELED onramp, FX, offramp and bank availability. Chain confirmation alone is not delivery of bank funds.' : 'Base Sepolia test USDC wallet delivery; onramp and gas pricing are explicitly MODELED.',
-    });
+    }), c);
   }
 }

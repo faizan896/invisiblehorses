@@ -8,6 +8,8 @@ import { ApprovalTokens } from './approval/tokens.js';
 import { NtfyNotifier } from './approval/notifier.js';
 import { BaseSepoliaExecutor } from './rails/usdc-base-sepolia.js';
 import { loadPolicy } from './policy/loader.js';
+import { RailRuntime } from './executor/rail-runtime.js';
+import { UnifiedPaymentService } from './executor/unified.js';
 import { PaymentService } from './executor/service.js';
 import { createApp } from './http/app.js';
 import { createMcpServer } from './mcp/server.js';
@@ -37,11 +39,15 @@ async function main() {
   // This runs BEFORE opening HTTP or accepting any agent requests.
   await executor.assertTestnet(); await executor.verifyToken();
   const store = new Store(cfg.DATABASE_PATH);
-  const service = new PaymentService(store, policy, new ApprovalTokens(cfg.APPROVAL_SECRET), new NtfyNotifier(cfg.NTFY_SERVER, cfg.NTFY_TOPIC, cfg.NTFY_TOKEN), executor, cfg.PUBLIC_BASE_URL);
-  await service.initialize();
-  const profiles = Counterparties.load(cfg.COUNTERPARTY_PATH);
-  const quotes = new QuoteService(profiles, defaultAdapters(cfg.WISE_SANDBOX_TOKEN, cfg.WISE_SANDBOX_PROFILE_ID));
+  const legacy = new PaymentService(store, policy, new ApprovalTokens(cfg.APPROVAL_SECRET), new NtfyNotifier(cfg.NTFY_SERVER, cfg.NTFY_TOPIC, cfg.NTFY_TOKEN), executor, cfg.PUBLIC_BASE_URL);
+  const profiles = Counterparties.load(cfg.COUNTERPARTY_PATH).withWallets({ [cfg.AGENT_ID]: executor.walletAddress, ...(cfg.DEMO_RECIPIENT_ADDRESS ? { dataco: cfg.DEMO_RECIPIENT_ADDRESS } : {}) });
+  const returnExecutor = cfg.DEMO_RECIPIENT_PRIVATE_KEY ? new BaseSepoliaExecutor(cfg.BASE_SEPOLIA_RPC_URL, cfg.DEMO_RECIPIENT_PRIVATE_KEY as Hex) : undefined;
+  if (returnExecutor) { await returnExecutor.assertTestnet(); await returnExecutor.verifyToken(); }
+  const runtime = new RailRuntime(store, profiles, cfg.AGENT_ID, { executor, address: executor.walletAddress, balanceMinor: () => executor.balanceMinor(), returnExecutor, returnAddress: returnExecutor?.walletAddress });
+  const quotes = new QuoteService(profiles, defaultAdapters(cfg.WISE_SANDBOX_TOKEN, cfg.WISE_SANDBOX_PROFILE_ID, runtime));
   const routing = new RoutingService(store, profiles, quotes, policy);
+  const service = new UnifiedPaymentService(store, legacy, profiles, routing, runtime, policy, new ApprovalTokens(cfg.APPROVAL_SECRET), new NtfyNotifier(cfg.NTFY_SERVER, cfg.NTFY_TOPIC, cfg.NTFY_TOKEN), cfg.PUBLIC_BASE_URL);
+  await service.initialize();
   const app = createApp(service, { ownerToken: cfg.OWNER_API_TOKEN, agentToken: cfg.AGENT_API_TOKEN, agentId: cfg.AGENT_ID }, quotes, routing);
   const server = serve({ fetch: app.fetch, hostname: cfg.HOST, port: cfg.PORT }, () => console.error(`railgate listening on port ${cfg.PORT}; Base Sepolia TEST MONEY ONLY`));
   server.on('error', () => { console.error('Unable to bind HTTP server'); process.exitCode = 1; clearInterval(timer); store.close(); });

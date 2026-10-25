@@ -25,6 +25,13 @@ export class BaseSepoliaExecutor implements TestnetExecutor {
     this.wallet = createWalletClient({ account: this.account, chain: baseSepolia, transport: http(rpcUrl, { retryCount: 0, timeout: 15_000 }) });
   }
   async assertTestnet() { assertChainId(await this.publicClient.getChainId()); }
+  get walletAddress() { return this.account.address; }
+  async balanceMinor() {
+    await this.assertTestnet();
+    const balance = await this.publicClient.readContract({ address: TEST_USDC, abi: erc20Abi, functionName: 'balanceOf', args: [this.account.address] });
+    if (balance / 10000n > BigInt(Number.MAX_SAFE_INTEGER)) throw new Error('Balance exceeds the exact integer range');
+    return Number(balance / 10000n);
+  }
   async verifyToken() {
     await this.assertTestnet();
     const [symbol, decimals, code] = await Promise.all([

@@ -9,6 +9,8 @@ export const ConfigSchema = z.object({
   PUBLIC_BASE_URL: httpsUrl.refine((s) => { const u = new URL(s); return u.pathname === '/' && !u.hostname.endsWith('.example'); }, 'Set the real public HTTPS approval origin'),
   NTFY_SERVER: httpsUrl.refine((s) => new URL(s).pathname === '/').default('https://ntfy.sh'),
   NTFY_TOPIC: z.string().regex(/^[a-zA-Z0-9_-]{20,100}$/).refine((s) => !s.startsWith('replace_')),
+  DEMO_RECIPIENT_ADDRESS: z.preprocess((v) => v === '' ? undefined : v, z.string().regex(/^0x[0-9a-fA-F]{40}$/).optional()),
+  DEMO_RECIPIENT_PRIVATE_KEY: z.preprocess((v) => v === '' ? undefined : v, z.string().regex(/^0x[0-9a-fA-F]{64}$/).optional()),
   NTFY_TOKEN: z.string().optional(),
   HOST: z.string().default('127.0.0.1'), PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   DATABASE_PATH: z.string().min(1).default('./data/railgate.sqlite'),

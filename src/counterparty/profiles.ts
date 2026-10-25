@@ -21,12 +21,18 @@ export type Counterparty = z.infer<typeof CounterpartySchema>;
 const Catalog = z.array(CounterpartySchema).min(1).refine((p) => new Set(p.map((v) => v.id)).size === p.length, 'Duplicate counterparty IDs');
 export class Counterparties {
   private readonly profiles: Counterparty[];
-  constructor(input: unknown) { this.profiles = Catalog.parse(input); }
-  static load(path: string) { return new Counterparties(JSON.parse(readFileSync(path, 'utf8')) as unknown); }
+  constructor(input: unknown, private readonly reload?: () => unknown) { this.profiles = Catalog.parse(input); }
+  static from(loader: () => unknown) { return new Counterparties(loader(), loader); }
+  static load(path: string) { return Counterparties.from(() => JSON.parse(readFileSync(path, 'utf8')) as unknown); }
+  private current() { return this.reload ? Catalog.parse(this.reload()) : this.profiles; }
+  withWallets(input: Record<string, string>) {
+    const wallets = z.record(IdSchema, AddressSchema).parse(input);
+    return Counterparties.from(() => this.list().map((p) => wallets[p.id] ? { ...p, stablecoin_wallets: [{ chain_id: 84532, address: wallets[p.id] }] } : p));
+  }
   get(id: string): Counterparty {
-    const result = this.profiles.find((p) => p.id === IdSchema.parse(id));
+    const result = this.current().find((p) => p.id === IdSchema.parse(id));
     if (!result) throw new AppError(404, 'Counterparty not found in the owner catalog');
     return structuredClone(result);
   }
-  list() { return structuredClone(this.profiles); }
+  list() { return structuredClone(this.current()); }
 }

@@ -4,6 +4,7 @@ import { Store } from '../audit/store.js';
 import { Counterparties } from '../counterparty/profiles.js';
 import { PaymentIntentV2Schema } from '../intent/routing.js';
 import type { Policy } from '../policy/schema.js';
+import type { RailId } from '../rails/adapter.js';
 import { QuoteService } from '../rails/quotes.js';
 import { AppError } from '../errors.js';
 import { planRoutes, preflight, type RoutePlan } from './engine.js';
@@ -16,20 +17,21 @@ export class RoutingService {
       policy_hash TEXT NOT NULL, created_at TEXT NOT NULL
     ); CREATE INDEX IF NOT EXISTS route_plans_payer ON route_plans(payer, created_at);`);
   }
-  async plan(input: unknown, authenticatedPayer: string) {
+  async plan(input: unknown, authenticatedPayer: string, options: { excludePayment?: string; failedRails?: RailId[] } = {}) {
     const intent = PaymentIntentV2Schema.parse(input);
     if (intent.payer !== authenticatedPayer) throw new AppError(403, 'Payer does not match the authenticated agent');
     const payer = this.profiles.get(intent.payer), recipient = this.profiles.get(intent.recipient);
     const policy = this.policy(); const now = this.clock().toISOString();
-    const history = this.store.history(now);
+    const history = this.store.history(now, options.excludePayment);
     const context = { intent, payer, recipient, policy, history };
     // Never call a quote provider for an identity/compliance/expiry denial.
     const gate = preflight(context);
     const result = gate.length ? { quotes: [], unavailable: this.quotes.railIds().map((rail) => ({ rail, reason: gate.join('; ') })) } : await this.quotes.quotes(intent, authenticatedPayer);
     // Quotes may take time, cross midnight, or span an owner policy edit. Decide on fresh state.
     const decidedAt = this.clock().toISOString(), currentPolicy = this.policy();
-    const currentHistory = this.store.transaction(() => { this.store.expire(decidedAt); return this.store.history(decidedAt); });
-    const plan = planRoutes({ ...context, policy: currentPolicy, history: currentHistory, quotes: result.quotes, unavailable: result.unavailable });
+    const currentHistory = this.store.transaction(() => { this.store.expire(decidedAt); return this.store.history(decidedAt, options.excludePayment); });
+    const excluded = result.quotes.filter((q) => options.failedRails?.includes(q.rail));
+    const plan = planRoutes({ ...context, payer: this.profiles.get(intent.payer), recipient: this.profiles.get(intent.recipient), policy: currentPolicy, history: currentHistory, quotes: result.quotes.filter((q) => !options.failedRails?.includes(q.rail)), unavailable: [...result.unavailable, ...excluded.map((q) => ({ rail: q.rail, reason: 'Previous attempt on this rail failed safely; excluded from fallback' }))] });
     const id = randomUUID(), digest = createHash('sha256').update(JSON.stringify(currentPolicy)).digest('hex');
     this.store.transaction(() => {
       this.store.db.prepare('INSERT INTO route_plans(id,payer,intent,plan,policy_hash,created_at) VALUES(?,?,?,?,?,?)').run(id, authenticatedPayer, JSON.stringify(intent), JSON.stringify(plan), digest, decidedAt);

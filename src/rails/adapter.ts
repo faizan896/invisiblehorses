@@ -28,7 +28,13 @@ export const RouteQuoteSchema = z.strictObject({
 });
 export type RouteQuote = z.infer<typeof RouteQuoteSchema>;
 export type QuoteContext = { intent: RoutingIntent; payer: Counterparty; recipient: Counterparty; now: string };
-export type RailExecution = { id: string; status: 'pending' | 'settled' | 'failed' | 'returned'; irreversible: boolean; recipient_usable: boolean };
+export type RailExecution = { id: string; status: 'pending' | 'settled' | 'failed' | 'returned'; irreversible: boolean; recipient_usable: boolean; funds_may_have_left?: boolean; fx_exposure?: boolean; destination_rejected?: boolean; reason?: string; refunded_usd?: string; charged_fee_usd?: string; transaction_hash?: `0x${string}`; return_pending?: boolean };
+export interface RailExecutionBackend {
+  liquidity(rail: RailId, context: QuoteContext): Promise<string>;
+  execute(rail: RailId, key: string, context: QuoteContext, quote: RouteQuote): Promise<RailExecution>;
+  status(rail: RailId, id: string): Promise<RailExecution>;
+  reverse(rail: RailId, id: string): Promise<RailExecution>;
+}
 export interface RailAdapter {
   readonly id: RailId;
   quote(context: QuoteContext): Promise<RouteQuote | null>;
@@ -38,9 +44,14 @@ export interface RailAdapter {
 }
 /** New adapters expose quotes first. The lifecycle milestone explicitly enables execution. */
 export abstract class QuoteOnlyAdapter implements RailAdapter {
+  constructor(protected readonly backend?: RailExecutionBackend) {}
   abstract readonly id: RailId;
   abstract quote(context: QuoteContext): Promise<RouteQuote | null>;
-  async execute(_key: string, _context: QuoteContext, _quote: RouteQuote): Promise<RailExecution> { void _key; void _context; void _quote; throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); }
-  async status(_id: string): Promise<RailExecution> { void _id; throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); }
-  async reverse(_id: string): Promise<RailExecution> { void _id; throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); }
+  async execute(key: string, context: QuoteContext, quote: RouteQuote): Promise<RailExecution> { if (!this.backend) throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); return this.backend.execute(this.id, key, context, quote); }
+  async status(id: string): Promise<RailExecution> { if (!this.backend) throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); return this.backend.status(this.id, id); }
+  async reverse(id: string): Promise<RailExecution> { if (!this.backend) throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); return this.backend.reverse(this.id, id); }
+  protected async bounded(quote: RouteQuote, context: QuoteContext) {
+    if (this.backend) quote.constraints.liquidity_usd = await this.backend.liquidity(this.id, context);
+    return quote;
+  }
 }
