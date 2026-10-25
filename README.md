@@ -131,10 +131,10 @@ The policy is checked at request time, after human approval, before preparation,
 
 ## Milestones
 
-1. **Implemented; live acceptance awaits funded test wallet and phone setup:** deterministic policy, atomic idempotency, ntfy approvals, SQLite audit, MCP, test USDC adapter and read-only dashboard. Automated tests use explicitly labelled mocks for chain transfers and notification delivery; the official MCP client, Hono server and SQLite are exercised directly.
+1. **Implemented and live rejection-path acceptance passed:** deterministic policy, atomic idempotency, ntfy approvals, SQLite audit, MCP, test USDC adapter and read-only dashboard. A real $5 Base Sepolia transfer completed, ntfy accepted the $45 approval notification, the owner rejected it through the public approval page, overspending was denied, and retrying returned the same payment/transaction. See [validation evidence](docs/milestone-1.md). Native ntfy app delivery has not been independently confirmed.
 2. Next: full payment intent/counterparty model and normalized ledger, ACH simulation, USDC and Wise sandbox/mock quotes.
 3. Then: eligibility gates, route scoring/explanations and the Monday-night/Tuesday-morning corridor test (router tests first).
 4. Then: common lifecycle, safe fallback, funds availability and returns.
 5. Final documentation/demo polish after the earlier milestones pass.
 
-Milestones are tested and committed in order. Later implementations do not begin until Milestone 1's live acceptance is resolved. See the [overspend recording guide](examples/overspend-demo/README.md).
+Milestones are tested and committed in order. See the [overspend recording guide](examples/overspend-demo/README.md).
