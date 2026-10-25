@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { Store } from '../audit/store.js';
+import { StoreCore as Store } from '../audit/store-core.js';
 import { Counterparties } from '../counterparty/profiles.js';
 import { PaymentIntentV2Schema } from '../intent/routing.js';
 import type { Policy } from '../policy/schema.js';

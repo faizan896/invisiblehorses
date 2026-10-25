@@ -11,3 +11,5 @@ coverage
 .vercel
 .codex
 .cursor
+.wrangler
+worker-dist

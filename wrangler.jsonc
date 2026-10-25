@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "railgate-backend",
+  "main": "src/workers/entry.ts",
+  "compatibility_date": "2026-07-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "durable_objects": { "bindings": [{ "name": "OWNER", "class_name": "RailgateOwner" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RailgateOwner"] }],
+  "rules": [{ "type": "Text", "globs": ["**/*.yaml"], "fallthrough": true }]
+}

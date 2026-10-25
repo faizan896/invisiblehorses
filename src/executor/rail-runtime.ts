@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { keccak256, type Hex } from 'viem';
-import { Store } from '../audit/store.js';
+import { StoreCore as Store } from '../audit/store-core.js';
 import { Counterparties, CounterpartySchema } from '../counterparty/profiles.js';
 import { PaymentIntentV2Schema } from '../intent/routing.js';
 import { decimal, minor, type PaymentIntent } from '../intent/schema.js';

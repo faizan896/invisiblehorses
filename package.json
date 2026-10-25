@@ -24,12 +24,17 @@
     "demo": "tsx examples/overspend-demo/live.ts",
     "demo:offline": "tsx examples/overspend-demo/offline.ts",
     "demo:quotes": "tsx examples/quotes-demo.ts",
-    "demo:routing": "tsx examples/routing-demo.ts"
+    "demo:routing": "tsx examples/routing-demo.ts",
+    "build:worker": "wrangler deploy --dry-run --outdir worker-dist/production",
+    "test:worker": "pnpm build && wrangler deploy --config wrangler.test.jsonc --dry-run --outdir worker-dist/test && vitest run --config vitest.cloudflare.config.ts",
+    "deploy:worker": "wrangler deploy",
+    "export:cloudflare": "node scripts/export-cloudflare.mjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "better-sqlite3",
-      "esbuild"
+      "esbuild",
+      "workerd"
     ]
   },
   "dependencies": {
@@ -47,9 +52,11 @@
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^20.19.43",
     "eslint": "^10.13.0",
+    "miniflare": "4.20260730.0",
     "tsx": "^4.23.15",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.72.0",
-    "vitest": "4.0.18"
+    "vitest": "4.0.18",
+    "wrangler": "4.152.0"
   }
 }

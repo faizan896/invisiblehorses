@@ -32,3 +32,15 @@ jobs:
           node-version: 24
       - run: docker build -t railgate-hosting:test .
       - run: node scripts/smoke-container.mjs railgate-hosting:test
+  cloudflare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:worker
+      - run: pnpm test:worker

@@ -1,7 +1,7 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { fingerprint } from '../intent/fingerprint.js';
 import type { Hex } from 'viem';
-import { Store, type PaymentRow } from '../audit/store.js';
+import { StoreCore as Store, type PaymentRow } from '../audit/store-core.js';
 import { PaymentIntentSchema, decimal, minor, type PaymentIntent } from '../intent/schema.js';
 import { evaluate } from '../policy/engine.js';
 import type { Policy } from '../policy/schema.js';

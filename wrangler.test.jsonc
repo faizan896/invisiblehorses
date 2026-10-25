@@ -1,0 +1,9 @@
+{
+  "name": "railgate-test",
+  "main": "cloudflare-test/entry.ts",
+  "compatibility_date": "2026-07-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": { "bindings": [{ "name": "OWNER", "class_name": "TestRailgateOwner" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TestRailgateOwner"] }],
+  "rules": [{ "type": "Text", "globs": ["**/*.yaml"], "fallthrough": true }]
+}

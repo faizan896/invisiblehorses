@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 const Origin = z.url().refine((s) => {
   const u = new URL(s);
-  return u.protocol === 'https:' && /^[a-z0-9-]+\.onrender\.com$/.test(u.hostname) && !u.port && !u.username && !u.password && !u.search && !u.hash && u.pathname === '/';
-}, 'Use the HTTPS origin of the Render backend');
+  return u.protocol === 'https:' && /^(?:[a-z0-9-]+\.onrender\.com|[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev)$/.test(u.hostname) && !u.port && !u.username && !u.password && !u.search && !u.hash && u.pathname === '/';
+}, 'Use the HTTPS origin of the configured payment backend');
 const paths = /^(?:\/health|\/dashboard|\/approvals|\/approval-actions|\/owner\/audit|\/owner\/payments\/[a-f0-9-]+\/return|\/api\/(?:limits|quotes|routes(?:\/[a-f0-9-]+)?|payments(?:\/[a-f0-9-]+)?))$/i;
 const responseHeaders = ['content-type', 'www-authenticate', 'content-security-policy', 'referrer-policy', 'x-frame-options', 'x-content-type-options', 'allow'];
 const unavailable = () => Response.json({ error: 'Payment backend unavailable; retry with the SAME idempotency key.' }, { status: 503, headers: { 'Cache-Control': 'no-store' } });

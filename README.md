@@ -179,6 +179,8 @@ The owner file reloads on evaluation; invalid rules fail closed. Daily accountin
 
 Milestones were tested and committed in order. Current-instance checks do not establish remote CI execution, cloud publication or restoration in a fresh task.
 
-## Vercel + persistent backend hosting
+## Free Vercel + persistent Cloudflare hosting
 
-The repository includes a stateless Vercel gateway, a Render Docker backend with a persistent SQLite disk, a guarded history-preserving cutover, and private MCP client setup. See [the deployment guide](docs/deployment.md). The Vercel project receives only `RAILGATE_BACKEND_ORIGIN`; wallet/owner/ntfy secrets stay on the backend. Hosting account authorization and public deployment verification are separate from the local build/tests.
+The free hosting path uses the existing Vercel gateway plus a **Cloudflare Workers Free** backend: one SQLite-backed Durable Object stores payment history and native alarms resume execution without an always-running server. See [the free deployment guide](docs/deployment-free.md). The Vercel project receives only `RAILGATE_BACKEND_ORIGIN`; wallet/owner/ntfy secrets stay on the backend. Cloudflare's free quotas are finite: exceeding them produces errors and requires waiting for reset or reducing usage. This setup never enables a paid plan automatically.
+
+Use Node **22+** for Wrangler/Miniflare worker tooling (Node 24 recommended). The Node CLI/core test workflow remains supported on Node 20.19+. Run `pnpm build:worker` and `pnpm test:worker` for the production bundle and actual workerd/SQLite integration tests. The optional [Render/Docker deployment](docs/deployment.md) requires paid persistent storage and is not used for the selected free setup.

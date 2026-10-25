@@ -12,3 +12,6 @@ data/
 .codex/
 .cursor/
 .vercel/
+.wrangler/
+worker-dist/
+.dev.vars*

@@ -1,5 +1,7 @@
 # Vercel gateway and persistent payment backend
 
+The selected default is now the [free Cloudflare deployment](deployment-free.md). This document retains the optional **paid** Render variant. No Render service is created by building or testing the repository.
+
 The public dashboard/API/approval URLs live on Vercel. A Node function forwards only known Railgate routes to the configured HTTPS `*.onrender.com` backend. The Render service owns the wallet, continuous worker and SQLite database on a persistent disk. The gateway has no wallet key, owner token, database or worker; it forwards the caller's existing authentication to the backend. The root redirects to `/dashboard`.
 
 ```mermaid

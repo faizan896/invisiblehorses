@@ -11,6 +11,7 @@ RUN --mount=type=secret,id=railgate_build_ca \
     pnpm install --frozen-lockfile
 COPY tsconfig.json tsconfig.build.json ./
 COPY src ./src
+COPY examples/counterparties.json ./examples/counterparties.json
 RUN pnpm build && pnpm prune --prod
 
 FROM node:24-bookworm-slim

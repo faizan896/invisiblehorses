@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { Store, type PaymentRow, type PaymentStatus } from '../audit/store.js';
+import { StoreCore as Store, type PaymentRow, type PaymentStatus } from '../audit/store-core.js';
 import { ApprovalTokens } from '../approval/tokens.js';
 import type { ApprovalNotification, Notifier } from '../approval/notifier.js';
 import { Counterparties, CounterpartySchema } from '../counterparty/profiles.js';

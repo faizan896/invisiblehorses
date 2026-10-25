@@ -9,6 +9,12 @@ const origin = 'https://railgate-test.onrender.com';
 const closed: (() => void | Promise<void>)[] = [];
 afterEach(async () => { for (const c of closed.splice(0).reverse()) await c(); vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 describe('Vercel gateway', () => {
+  it('accepts the selected free Worker origin but keeps migration controls off the public gateway',async()=>{
+    let calls=0;const gateway=createGateway('https://railgate.account.workers.dev',async(url)=>{calls++;expect(String(url)).toBe('https://railgate.account.workers.dev/health');return Response.json({chain_id:84532});});
+    expect((await gateway(new Request('https://railgate.vercel.app/health'))).status).toBe(200);
+    expect((await gateway(new Request('https://railgate.vercel.app/owner/bootstrap',{method:'POST',body:'{}'}))).status).toBe(404);
+    expect((await gateway(new Request('https://railgate.vercel.app/owner/activate',{method:'POST',body:'{}'}))).status).toBe(404);expect(calls).toBe(1);
+  });
   it('preserves payment JSON, the idempotency key and only necessary authentication headers', async () => {
     let target: Request | undefined;
     const fetcher: typeof fetch = async (input, init) => { target = new Request(input, init); return Response.json({ status: 'created' }, { status: 202 }); };
