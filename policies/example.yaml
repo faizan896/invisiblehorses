@@ -2,8 +2,8 @@
 max_per_payment: 100
 max_per_day: 100
 require_approval_above: 20
-# The first $5 demo payment establishes successful history for this destination.
-new_merchant_max: 5
+# All-in USD cost: allows the first $5 wallet demo plus its modeled $0.03 fees.
+new_merchant_max: 5.10
 expires_at: "2030-01-01T00:00:00Z"
 allowed_merchants:
   - id: dataco

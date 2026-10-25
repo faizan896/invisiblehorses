@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { RoutingRulesSchema } from '../src/policy/routing.js';
+import { loadPolicy } from '../src/policy/loader.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { serve } from '@hono/node-server';
@@ -188,6 +190,25 @@ function rowCount(f: F, table: string) { return (f.store.db.prepare(`SELECT COUN
     expect(status(f,p.id)).toBe('completed'); await f.service.reverse(p.id);
     expect(status(f,p.id)).not.toBe('returned'); expect(f.returns.prepared).toBe(1); await ticks(f,2);
     expect(status(f,p.id)).toBe('returned'); expect(f.service.limits().spent_or_reserved_today).toBe('0.03'); expect(f.returns.prepared).toBe(1);
+    expect(f.returns.preparedIntents[0]).toMatchObject({ amount: '5.00', recipient: { address: f.runtime.native.address } });
+    expect(f.executor.preparedIntents[0]!.recipient.address).toBe(f.profiles.get('dataco').stablecoin_wallets[0]!.address);
+    expect([...f.returns.broadcasts][0]).not.toBe(f.store.get(p.id)!.transaction_hash);
+  });
+  it('a fresh wallet demo fits the example new-merchant cap including modeled fees', async () => {
+    const f=setup(); Object.assign(f.policy,loadPolicy('policies/example.yaml'));
+    const p=await f.service.request(intent('5','fresh-wallet','wallet'),agentId); await ticks(f,7);
+    expect(status(f,p.id)).toBe('completed'); expect(f.service.limits().spent_or_reserved_today).toBe('5.03');
+  });
+  it('chain settlement cannot complete bank delivery, and cooperative return removes the modeled payout only after confirmation', async () => {
+    const f=setup(); f.policy.routing=RoutingRulesSchema.parse({allowed_rails:['usdc-base-sepolia']});
+    const p=await f.service.request(intent('5','chain-to-bank','bank'),agentId); await ticks(f,5);
+    expect(status(f,p.id)).toBe('settled'); expect(f.runtime.balance('bank:TEST-US-DATACO')).toBe(0);
+    await ticks(f,3); expect(status(f,p.id)).toBe('settled');
+    const q=JSON.parse((f.store.db.prepare('SELECT quote FROM rail_operations').get() as {quote:string}).quote) as RouteQuote;
+    f.setNow(q.expected_available_at); await ticks(f); expect(status(f,p.id)).toBe('completed'); expect(f.runtime.balance('bank:TEST-US-DATACO')).toBe(500);
+    await f.service.reverse(p.id); expect(status(f,p.id)).toBe('settled'); expect(f.runtime.balance('bank:TEST-US-DATACO')).toBe(500);
+    await ticks(f); expect(status(f,p.id)).toBe('returned'); expect(f.runtime.balance('bank:TEST-US-DATACO')).toBe(0);
+    expect(f.returns.prepared).toBe(1);
   });
   it('bank settlement precedes usable funds; a closed destination returns principal and retains fees', async () => {
     const f = setup(), p = await f.service.request(intent('5','bank','bank'),agentId); await ticks(f,4);

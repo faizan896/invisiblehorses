@@ -6,6 +6,7 @@ import type { Notifier, ApprovalNotification } from '../../src/approval/notifier
 /** OFFLINE MOCK ONLY. Never instantiated by the production CLI. No chain/notification I/O. */
 export class MockTestnetExecutor implements TestnetExecutor {
   prepared = 0;
+  readonly preparedIntents: PaymentIntent[] = [];
   readonly broadcasts = new Set<Hex>();
   failPrepare = false;
   ambiguousBroadcast = false;
@@ -14,7 +15,8 @@ export class MockTestnetExecutor implements TestnetExecutor {
   async prepare(intent: PaymentIntent) {
     if (this.failPrepare) throw new Error('Simulated gas estimation failure');
     this.prepared++;
-    const raw = toHex(JSON.stringify({ key: intent.idempotency_key, sequence: this.prepared }));
+    this.preparedIntents.push(structuredClone(intent));
+    const raw = toHex(JSON.stringify({ intent, sequence: this.prepared }));
     return { raw, hash: keccak256(raw) };
   }
   async broadcast(raw: Hex) {

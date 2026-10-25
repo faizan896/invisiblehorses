@@ -37,7 +37,7 @@ const approval = await api('/api/payments', input('45', 'approval'));
 console.log('(b) Check ntfy and Approve or Reject; /approvals is the owner fallback.');
 const decision = await wait(approval, 15 * 60_000 + 5000);
 if (!['completed', 'rejected'].includes(decision.status)) throw new Error(`Approval example did not finish: ${decision.status}`);
-const denied = await api('/api/payments', input('100', 'overspend'));
+const denied = await wait(await api('/api/payments', input('100', 'overspend')), 30_000);
 if (denied.status !== 'denied' || !denied.evaluation.reasons.some((r) => /daily/i.test(r))) throw new Error('Expected a daily-limit denial');
 console.log('(c) Attempt exceeding daily budget denied:', denied.evaluation.reasons.join('; '));
 const retry = await api('/api/payments', input('5', 'allowed'));

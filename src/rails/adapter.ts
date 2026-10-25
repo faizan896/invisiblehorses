@@ -42,14 +42,14 @@ export interface RailAdapter {
   status(id: string): Promise<RailExecution>;
   reverse(id: string): Promise<RailExecution>;
 }
-/** New adapters expose quotes first. The lifecycle milestone explicitly enables execution. */
+/** Quote adapters delegate execution only when a guarded runtime backend is configured. */
 export abstract class QuoteOnlyAdapter implements RailAdapter {
   constructor(protected readonly backend?: RailExecutionBackend) {}
   abstract readonly id: RailId;
   abstract quote(context: QuoteContext): Promise<RouteQuote | null>;
-  async execute(key: string, context: QuoteContext, quote: RouteQuote): Promise<RailExecution> { if (!this.backend) throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); return this.backend.execute(this.id, key, context, quote); }
-  async status(id: string): Promise<RailExecution> { if (!this.backend) throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); return this.backend.status(this.id, id); }
-  async reverse(id: string): Promise<RailExecution> { if (!this.backend) throw new Error('Multi-rail execution is not enabled until the lifecycle milestone'); return this.backend.reverse(this.id, id); }
+  async execute(key: string, context: QuoteContext, quote: RouteQuote): Promise<RailExecution> { if (!this.backend) throw new Error('Execution is not enabled for this quote-only adapter instance; no runtime backend configured'); return this.backend.execute(this.id, key, context, quote); }
+  async status(id: string): Promise<RailExecution> { if (!this.backend) throw new Error('Execution is not enabled for this quote-only adapter instance; no runtime backend configured'); return this.backend.status(this.id, id); }
+  async reverse(id: string): Promise<RailExecution> { if (!this.backend) throw new Error('Execution is not enabled for this quote-only adapter instance; no runtime backend configured'); return this.backend.reverse(this.id, id); }
   protected async bounded(quote: RouteQuote, context: QuoteContext) {
     if (this.backend) quote.constraints.liquidity_usd = await this.backend.liquidity(this.id, context);
     return quote;

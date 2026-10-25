@@ -86,7 +86,7 @@ describe('normalized multi-rail quotes', () => {
     expect(() => RouteQuoteSchema.parse({ ...q, total_all_in_cost: { amount: '10', currency: 'USD' } })).toThrow(/reconcile/);
     expect(() => RouteQuoteSchema.parse({ ...q, latest_available_at: now })).toThrow(/window/);
   });
-  it('keeps execution blocked until the lifecycle milestone wires it safely', async () => {
+  it('keeps isolated quote-only adapters blocked without a runtime backend', async () => {
     const rail = new LedgerAdapter(); const c = context(); const quote = (await rail.quote(c))!;
     await expect(rail.execute('key', c, quote)).rejects.toThrow(/not enabled/);
     await expect(rail.status('unknown')).rejects.toThrow(/not enabled/);

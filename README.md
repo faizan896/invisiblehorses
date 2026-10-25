@@ -1,69 +1,65 @@
 # railgate
 
-railgate is an open-source payment layer for AI agents: an agent requests a payment, deterministic owner rules decide whether it is allowed, a human approves when required, and every step is recorded. Inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural), the goal is for agents to say what they want to pay while railgate decides how money moves. **The current version supports policy-controlled test USDC payments, normalized multi-rail quotes and deterministic route plans. The common multi-rail execution lifecycle is the next milestone. Test money only.**
+railgate is an open-source payment layer for AI agents, inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural). An agent describes a payment; deterministic owner rules and human approvals control spending, a router chooses how to deliver the requested funds, and an append-only log records the result. It supports a common lifecycle across an internal test ledger, simulated banking and real **Base Sepolia test USDC**. **Test money only.**
 
 ```mermaid
 flowchart LR
-  Agent[Claude / Cursor / Codex] --> MCP[MCP tools: agent credential]
-  MCP --> API[Hono payment API]
-  API --> Rules[Deterministic policy + atomic reservation]
-  Rules -->|deny| Audit[Append-only SQLite audit]
-  Rules -->|approval required| Ntfy[ntfy push]
-  Ntfy --> Human[Owner phone / approvals page]
-  Human -->|single-use HMAC token| Approval[Approval + fresh policy check]
-  Rules -->|allow| Worker[Durable executor]
-  Approval --> Worker
-  Worker --> Guard[Assert chain 84532]
-  Guard --> USDC[Base Sepolia test USDC]
-  API --> DB[(SQLite intents / approvals / reservations)]
-  Worker --> DB
-  Approval --> Audit
-  Worker --> Audit
+  Agent[Claude / Cursor / Codex] --> MCP[MCP: limited agent credential]
+  MCP --> API[Hono intent API]
+  API --> Profiles[Owner counterparty catalog]
+  Profiles --> Gates[Policy + KYB + delivery gates]
+  Gates --> Router[Quotes, scoring, explanation]
+  Router --> Reserve[Atomic source and budget reservation]
+  Reserve -->|approval required| Push[ntfy / owner approvals page]
+  Push -->|single-use HMAC token| Recheck[Fresh authorization]
+  Reserve -->|allowed| Execute[Durable executor]
+  Recheck --> Execute
+  Execute --> Ledger[Internal test ledger]
+  Execute --> Bank[Simulated ACH / Wise-style bank]
+  Execute --> Chain[Guarded Base Sepolia USDC]
+  Execute --> Available[Settled → usable funds → completed]
+  Execute --> Return[Destination rejection → confirmed return]
+  Execute --> DB[(SQLite intents, holds, operations, audit)]
+  Gates --> DB
+  Router --> DB
 ```
 
-## 5-minute quickstart
+## Five-minute local quickstart
 
-Use Node **20.19+** (Node 22.13+ or Node 24 also supported) and **pnpm 10.20.0**. Install that pnpm version with Corepack or `npm install --global pnpm@10.20.0` if needed. Commands run from the repository root.
+Use **Node 20.19+, 22.13+ or 24** and **pnpm 10.20.0**. Install that pnpm version with Corepack or `npm install --global pnpm@10.20.0`. From the checkout:
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm test
 pnpm demo:offline
-```
-
-The offline demo explicitly mocks chain execution and ntfy. It proves the local policy/approval/idempotency workflow: `$5` is allowed, `$45` awaits approval, a cumulative `$150` attempt is denied, and retrying the first request creates no second transfer. It does **not** prove phone delivery or live testnet execution.
-
-```sh
+pnpm demo:quotes
+pnpm demo:routing
 pnpm lint
 pnpm typecheck
 pnpm build
 ```
 
-CI runs these checks and the offline demo on Node 20, 22 and 24. The tests need no keys, notifications or external RPC calls.
+The offline overspend demo exercises the actual lifecycle with an in-memory test ledger and a mock notifier: $5 completes, $45 requires approval, a cumulative $150 attempt is denied, and retrying creates no second debit. It makes no external calls. Quote/routing demos label simulated prices and use fictional profiles. The routing demo sends the **identical hypothetical 250,000 MXN intent** through USDC Monday after cutoff and a cheaper bank quote Tuesday morning; neither plan executes a payment.
 
-## Run with real Base Sepolia test USDC
+Tests use real SQLite, Hono, official MCP clients (including stdio) and local HTTP/RPC fixtures. External chains, notifications and Wise responses are mocked. CI runs lint, typecheck, tests, build and all offline demos on Node 20, 22 and 24.
 
-1. Run `pnpm init:local`. It creates a **git-ignored, mode 0600 `.env`** with two fresh testnet wallets, independent owner/agent/HMAC secrets, and a random ntfy topic. It prints only the payer's public address and preserves an existing `.env`. `.env.example` contains placeholders only. Never reuse a funded mainnet private key.
-2. Fund the generated payer with **at least 50 test USDC** for the approve path and some **Base Sepolia ETH** for gas. Get test USDC at [Circle's faucet](https://faucet.circle.com/), selecting **Base Sepolia**, and use the [Base testnet faucet directory](https://docs.base.org/base-chain/tools/network-faucets) for gas. Faucet quotas or access requirements may make this take longer than five minutes. The merchant address and its test-only recovery key are also in `.env`.
-3. Install the [ntfy app](https://ntfy.sh/), then subscribe to `NTFY_SERVER` / `NTFY_TOPIC` from your private `.env`. A random topic is a bearer secret; protect subscription access. For authenticated private topics, set `NTFY_TOKEN` too. Do not share the topic, approval links, `.env`, or dashboard credentials in a recording.
-4. Put an HTTPS reverse proxy in front of the loopback service on port 3000. Set **`PUBLIC_BASE_URL` to that public HTTPS origin**, reachable from your phone. Forward the paths unchanged; disable or redact query-string access logging because approval URLs contain secrets. The app binds `127.0.0.1` by default. A loopback URL cannot receive a phone's approval callback.
-5. Run the service and live demo in two terminals:
+## Run the testnet service
 
-   ```sh
-   pnpm dev
-   # In the other terminal:
-   pnpm demo
-   ```
+1. Run `pnpm init:local`. It preserves an existing `.env`; otherwise it generates dedicated test-only payer/merchant wallets, independent owner/agent/HMAC credentials and a random ntfy topic in a git-ignored **mode 0600** file. It prints only the payer's public address. `.env.example` contains placeholders.
+2. Fund the payer with **at least 55 test USDC** for the $5 + $45 approve path, and **Base Sepolia ETH** for gas. Use [Circle's faucet](https://faucet.circle.com/) with **Base Sepolia** selected and the [Base faucet directory](https://docs.base.org/base-chain/tools/network-faucets). Faucet quotas can take longer than five minutes. A full routing quote reserves its all-in modeled USD cost; exactly 50 test USDC may be insufficient for both payments plus fee allowances.
+3. Install [ntfy](https://ntfy.sh/) and subscribe to the private `NTFY_SERVER` / `NTFY_TOPIC` from `.env`. An authenticated topic can additionally use `NTFY_TOKEN`. Topic names and approval URLs are secrets.
+4. Set `PUBLIC_BASE_URL` to an actual public HTTPS origin forwarding to this service on port 3000, reachable from the owner's phone. Redact query-string access logs: approval links contain capabilities. Keep the default loopback bind behind your proxy.
+5. Start `pnpm dev` (or `pnpm build` then `pnpm start`). In another terminal run `pnpm demo`. Keep **`DEMO_RUN_ID` unchanged on retries**. The script waits for the human to approve/reject $45; it never approves for the owner. New requests pass through the common asynchronous lifecycle, so a POST acknowledgement may initially say `created`.
 
-Startup checks the actual RPC chain ID and fixed test USDC contract **before accepting requests**. Any chain other than `84532` is rejected, including mainnets and other testnets. The RPC is checked again before preparation, broadcasting and receipt checks. TLS verification stays enabled. The service honors `HTTPS_PROXY`, `HTTP_PROXY` and `NO_PROXY` through Undici, with loopback traffic kept local.
+Startup validates the actual RPC chain ID **84532** and fixed Circle test USDC contract before accepting requests. Chain checks repeat before signing, broadcasting and receipt reads. Other networks, including mainnets, are refused. There is no mainnet mode. `HTTPS_PROXY`, `HTTP_PROXY` and `NO_PROXY` are honored with loopback kept local and TLS verification enabled.
 
-The live demo uses `DEMO_RECIPIENT_ADDRESS`, `DEMO_RUN_ID`, and the agent credential from `.env`. **Keep `DEMO_RUN_ID` unchanged for retries**; changing it creates new intents. After `$5` completes, approve or reject `$45` on your phone within 15 minutes. Approving makes the subsequent `$100` request a cumulative `$150` attempt. Rejecting also leaves insufficient daily allowance for that request. An ambiguous network result keeps the original reservation and transaction hash. Do not delete the database or create a replacement intent to work around it.
+The CLI binds the configured payer's catalog wallet to the signing wallet and DataCo's wallet to `DEMO_RECIPIENT_ADDRESS`. Other recipient wallets/accounts come from the owner-maintained `COUNTERPARTY_PATH`, defaulting to [examples/counterparties.json](examples/counterparties.json). Its bank references and KYB flags are explicitly fictional test data. Agents cannot edit the catalog.
 
-Owner pages: `/approvals` lists pending actions; `/dashboard` shows recent payments, decisions, transaction hashes and audit records. Both require HTTP Basic authentication: username **`owner`**, password **`OWNER_API_TOKEN`**. Protect the public endpoint with HTTPS. The dashboard has no payment or policy editing controls. `/owner/audit` also accepts the owner bearer token. `/health` is public and contains no secrets.
+Owner pages `/approvals` and `/dashboard` require Basic username **`owner`**, password **`OWNER_API_TOKEN`**. `/approvals` provides Approve/Reject when a push is missed. The dashboard is read-only and shows decisions, reasons, hashes and audit events. `/owner/audit` accepts owner authentication; `/health` is public. Serve these routes over HTTPS. Run one payment daemon per database/signing wallet; do not run another process using that wallet's nonce or mutate payment state manually.
 
-## Connect Claude Desktop or Cursor over MCP
+## Connect Claude Desktop, Cursor or Codex
 
-Start the HTTP service first and run `pnpm build`. Add this to Claude Desktop's MCP configuration or Cursor's `.cursor/mcp.json`, replacing the path and the placeholder **locally**:
+Start the HTTP daemon and run `pnpm build`. Add this server to Claude Desktop's MCP configuration, Cursor's `.cursor/mcp.json`, or the equivalent Codex MCP configuration:
 
 ```json
 {
@@ -80,102 +76,103 @@ Start the HTTP service first and run `pnpm build`. Add this to Claude Desktop's 
 }
 ```
 
-The stdio MCP process deliberately **does not load `.env`**. Give it only the limited agent token and API origin. Keep owner credentials, HMAC material and wallet keys out of the agent's MCP environment. A remote MCP API must use HTTPS; HTTP is permitted only for loopback.
+The stdio process **does not load `.env`**. Supply only the limited agent credential and API origin. Keep wallet keys, HMAC material and owner credentials out of its environment. Remote APIs require HTTPS; HTTP is allowed only on loopback.
 
-Tools: `request_payment`, `get_payment_status`, `list_payments`, `get_my_limits`, and read-only `quote_payment` / `plan_payment`. No tool can edit policy, approve a payment, select a rail, or bypass evaluation. A USD-only payment request looks like:
+| MCP tool | HTTP equivalent | Effect |
+| --- | --- | --- |
+| `request_payment` | `POST /api/payments` | Create/retry an idempotent payment |
+| `get_payment_status` | `GET /api/payments/:id` | Read this payer's logical status |
+| `list_payments` | `GET /api/payments?limit=100` | List this payer's payments |
+| `get_my_limits` | `GET /api/limits` | Read owner limits and daily allowance |
+| `quote_payment` | `POST /api/quotes` | Read normalized estimates |
+| `plan_payment` | `POST /api/routes` | Persist a read-only route explanation |
+
+`GET /api/routes/:id` retrieves the payer's stored plan. HTTP agent routes require the agent bearer token. There is no MCP tool for policy changes, approval, returns or rail selection.
+
+A full payment intent says **what the recipient receives**:
 
 ```json
 {
   "idempotency_key": "invoice-dataco-001",
   "payer": "research-agent-07",
-  "recipient": {
-    "id": "dataco",
-    "name": "DataCo",
-    "address": "YOUR_BASE_SEPOLIA_MERCHANT_ADDRESS",
-    "category": "data"
-  },
+  "recipient": "dataco",
   "amount": "5.00",
-  "purpose": "dataset access",
-  "metadata": { "invoice_id": "001" }
-}
-```
-
-Amounts are positive USD decimal **strings**, at most two decimal places. This milestone pays the same nominal amount in test USDC; it makes no live FX or USD redemption claim. The payer must match the authenticated `AGENT_ID`. An identical normalized intent with the same payer/idempotency key returns the existing payment. Reusing a key for a different payload returns HTTP 409.
-
-The authenticated HTTP API mirrors these tools: `POST /api/payments`, `GET /api/payments/:id`, `GET /api/payments?limit=100`, `GET /api/limits`. Use the **agent** bearer token. Agents cannot read other payers' payments, the owner audit endpoint, or pending approval capabilities.
-
-## Multi-rail quote model
-
-Run `pnpm demo:quotes` for a credential-free demonstration of comparable quotes for DataCo and **Norte Manufacturing** (Mexico, MXN bank preference, also accepts a Base Sepolia wallet). The owner catalog is [examples/counterparties.json](examples/counterparties.json); these are explicitly fictional test profiles, test bank references and simulated KYB statuses. Set `COUNTERPARTY_PATH` to another owner-controlled catalog. The API/MCP cannot edit it.
-
-`quote_payment` and `POST /api/quotes` accept the full destination-denominated intent:
-
-```json
-{
-  "idempotency_key": "norte-invoice-001",
-  "payer": "research-agent-07",
-  "recipient": "norte",
-  "amount": "250000",
-  "destination_currency": "MXN",
+  "destination_currency": "USD",
   "deadline": "2026-11-06T23:00:00Z",
-  "purpose": "manufacturing invoice",
-  "max_fee": "1000",
+  "purpose": "dataset access",
+  "max_fee": "1.00",
   "reversibility_requirement": "none",
-  "recipient_preferences": { "delivery": "bank", "avoid_stablecoins": false },
+  "recipient_preferences": { "delivery": "internal", "avoid_stablecoins": false },
   "metadata": { "invoice_id": "001" }
 }
 ```
 
-Amount is what the recipient should receive in `destination_currency` (currently USD, MXN, EUR). `max_fee` is a USD decimal string. The payer funds in USD in this prototype. There is no rail field. Quotes contain all-in USD cost, reconciled fee/step breakdowns, expected/latest time until the requested form is usable, certainty, reversibility and explicit pricing/execution labels. Quotes alone do not authorize, reserve or execute a payment.
+Use a future deadline when running this example. Amounts and `max_fee` are decimal strings with at most two places; supported destination currencies are USD, MXN and EUR. `max_fee` and policy budgets are **USD**. Delivery can be `any`, `internal`, `bank` or `wallet`; reversibility can be `none`, `preferred` or `required`. The payer must match the authenticated agent. No rail field is accepted.
 
-- **ledger:** instant/free between internal test accounts in the supported currency.
-- **ach-mock:** explicitly simulated US/USD banking. 16:00 New York cutoff, US banking holidays, weekends and 1–2 banking-day settlement. It cannot directly pay MXN to Mexico.
-- **usdc-base-sepolia:** testnet transfer leg with modeled onramp, gas, FX and offramp pricing. Bank-form availability includes payout waiting time; no live onramp/offramp or real bank payout is claimed.
-- **wise-quote:** labelled mock by default. Optional `WISE_SANDBOX_TOKEN` and `WISE_SANDBOX_PROFILE_ID` enable the documented [2026Q4 sandbox quote API](https://docs.wise.com/api-reference/quote/quotecreate) at `api.wise-sandbox.com`. Its inclusive source amount and `price.total.value.amount` drive the normalized total; separately undisclosed FX spread is not invented. A configured sandbox error is reported as unavailable, never silently relabelled a mock. This adapter creates quotes only, never Wise transfers.
+Identical normalized requests reuse their original ID/result. A changed payload with the same payer/key returns **409**, including changing a deadline or metadata. A returned/rejected/failed key remains consumed. To retry an uncertain network response, send the original intent and key; never create a replacement payment.
 
-Model rates are explicitly fixed test assumptions (17 MXN/USD and 0.92 EUR/USD), not market rates. All new adapters share `quote`, `execute`, `status`, `reverse` signatures; multi-rail execution methods remain blocked until the lifecycle milestone wires them safely. The existing USD-only payment API retains its persisted idempotency keys and real test USDC execution path.
+Legacy USD wallet requests with an inline `{id,name,address,category}` recipient are supported through the same gates, with the address required to match the owner catalog. Historical M1 fingerprints/IDs/hashes remain valid. Full intents are preferred for new integrations. Quote and plan requests alone never reserve funds or execute a payment.
 
-## Deterministic route planning
+## Rails, quotes and routing
 
-`plan_payment` / `POST /api/routes` accept the same full intent as quoting. They run owner identity/category/expiry and simulated KYB gates before contacting providers. Every returned quote then passes recipient/corridor, amount, liquidity, availability/deadline, fee, FX, health, reversibility and all-in USD spending gates **before scoring**. A sandbox quote-only provider is not an executable route. `GET /api/routes/:id` retrieves only the authenticated payer's stored plan.
+| Rail | Execution | Pricing / availability |
+| --- | --- | --- |
+| `ledger` | Atomic internal **test** accounts | Instant, free; both parties need internal accounts |
+| `ach-mock` | **Simulated** US/USD bank transfers and returns | 16:00 New York cutoff; US banking holidays/weekends; 1–2 business days |
+| `usdc-base-sepolia` | Real test USDC on chain **84532** | Modeled onramp, gas, FX and offramp fees; bank-form payout is simulated |
+| `wise-quote` without credentials | **Mock** Wise-style bank execution/returns | Explicitly modeled FX, fees and bank timing |
+| `wise-quote` with sandbox credentials | Verified sandbox **quotes only** | No transfer creation/funding; ineligible for execution |
 
-Plans contain the selected quote, a human-readable explanation, all alternatives and rejection reasons, a policy fingerprint and any human-approval requirement. They are saved with an append-only audit event and create no payment or reservation. Planning liquidity, bank service windows, certainty and FX remain explicit test models; KYB flags are fictional test data, not a real compliance service.
+Optional `WISE_SANDBOX_TOKEN` + `WISE_SANDBOX_PROFILE_ID` use the documented [2026Q4 sandbox quote API](https://docs.wise.com/api-reference/quote/quotecreate) on `api.wise-sandbox.com`. Inclusive `sourceAmount` and `price.total.value.amount` normalize total cost without double-counting fees. Undisclosed FX spread is not invented. A configured provider error is unavailable, never silently replaced with mock pricing. Live sandbox calls remain unverified without credentials.
 
-An optional owner `routing` block configures `strategy` (`lowest_cost`, `fastest`, `refund_certainty`), `allowed_rails`, `blocked_countries` and `min_certainty`. KYB verification remains required. Hard policy denials cannot be overridden by a score or human approval. Setting explicit routing constraints disables **new legacy USD-only requests** that cannot carry full counterparty context; existing idempotency keys still return their original records. The common lifecycle milestone will unify execution.
+Quotes reconcile principal, all-in USD cost, fee/step totals, expected/latest usable-funds time, certainty, reversibility and pricing/execution labels. Fixed test FX assumptions are **17 MXN/USD** and **0.92 EUR/USD**, not market rates. Ledger and mock bank sources each seed $100 fictional money once per configured source/database; restarting preserves balances. The test FX treasury supplies only modeled payouts. USDC liquidity uses the real testnet wallet balance. Modeled USD fees are policy/accounting allowances, not actual fiat charges.
 
-Run `pnpm demo:routing`: it evaluates the **identical hypothetical** 250,000 MXN bank-form intent on Monday after cutoff and Tuesday morning. Monday selects modeled USDC because the simulated bank rail is outside its operating window; Tuesday selects the cheaper mock Wise-style bank quote. Both quote the complete MXN bank payout, not just a chain confirmation. [policies/corporate.example.yaml](policies/corporate.example.yaml) supplies a clearly labelled fictional high-value USD budget for this demonstration; the server's $100 policy is not changed. Neither hypothetical plan executes a payment, and an already-paid idempotency key can never pay again through a different route.
+Identity, category, owner expiry and simulated KYB pass **before providers are called**. Every quote then passes recipient/corridor, policy budgets, amount/liquidity, deadline, max fee, FX, health, operating window and reversibility gates **before scoring**. Owner `routing` settings choose `lowest_cost`, `fastest` or `refund_certainty`, allowed rails, blocked countries and minimum certainty. Plans store alternatives, rejection reasons and a policy hash. [policies/corporate.example.yaml](policies/corporate.example.yaml) supplies a separate fictional high-value budget for the 250,000 MXN demo; it never replaces the server's $100 limits.
 
-## Policy format and semantics
+## Lifecycle, fallback and returns
 
-See [policies/example.yaml](policies/example.yaml). The agreed demo policy has a hard `$100` per-payment ceiling, `$100` daily ceiling and approval **strictly above `$20`**. Approval cannot override either hard ceiling. The new-merchant ceiling is `$5` so the first `$5` demonstration establishes real successful history; lower it to `$2` if that is your preference.
+```text
+created → recipient_resolved → route_selected → funds_reserved
+                                              ↓ approval if required
+          in_transit → settled → completed
+               ↘ failed          ↘ returned (only after confirmed source credit)
+```
 
-- `max_per_payment`, `max_per_day`: inclusive hard ceilings, enforced in integer cents.
-- `require_approval_above`: inclusive automatic-payment limit; greater amounts require approval.
-- `new_merchant_max`: inclusive hard ceiling for an allowed merchant **and destination address** with no successful payment history. Reusing a merchant ID with a new wallet does not inherit trust.
-- `allowed_merchants`: owner allowlist of IDs, optional `categories`, optional pinned `address`. Add a pinned address if the agent must never choose another wallet for that merchant. An absent category fails a category-constrained rule. Unknown merchants are denied.
-- `expires_at`: UTC ISO timestamp; payments are denied at or after that instant.
+The API exposes common logical status, approval/denial outcomes and a safe summary, without raw signed transactions or provider states. Instant ledger stages may occur within one worker tick; the audit retains each transition. `settled` is distinct from `completed`: a confirmed chain transaction delivering a modeled bank payout remains `settled` until the requested bank funds are usable. Bank holidays/cutoffs still apply.
 
-Policies reload on each evaluation, so owner edits take effect without giving agents an editing API. Invalid policy files fail closed. The daily period is **00:00–24:00 UTC**, across the owner's database. Pending approvals, queued transfers, submissions and uncertain outcomes reserve budget. Expired/rejected/denied requests release it. Completed payments retain it for their execution day. Historical success is required before a merchant gains the higher allowance.
+Source holds and daily reservations are atomic. Approval rechecks policy, beneficiary and deadline before execution. Quotes expire after five minutes in the model; a pending approval lasts 15 minutes. Expired quotes are refreshed within the approved source-cost cap; a more expensive replacement fails clearly. A changed recipient profile requires a new reviewed intent. UTC rollover rechecks the execution day's budget.
 
-The policy is checked at request time, after human approval, before preparation, and again before persisting a signed transaction (including after a date rollover). A transaction already persisted for submission is an existing authorized payment: restarts reconcile its original hash rather than issuing another payment.
+Automatic fallback requires proof that no funds may have left, no irreversible transfer, no FX exposure and no charged fees. A replacement must preserve amount/currency/form, pass fresh gates and fit any human-approved cap. Unknown results retain the original operation and accounting. Signed USDC bytes/hash are durable before broadcast; timeouts and restarts replay those bytes only. Interrupted signing is quarantined and blocks further signing until the owner investigates.
 
-## Approval and execution security
+A rejected simulated bank destination returns principal to the original payer and retains quoted fees. Only confirmed source credit produces `returned`. The owner can request a return with `POST /owner/payments/:id/return`, owner authentication and an empty JSON object. The dashboard remains read-only. USDC generally needs recipient cooperation: an optional matching `DEMO_RECIPIENT_PRIVATE_KEY` enables the dedicated test recipient to sign a return, and that recipient also needs test ETH for gas. Missing cooperation, insufficient gas, an unknown outcome or a reverted transaction never produces a fabricated refund. A real cooperative return was not exercised in this instance.
 
-- Tokens bind payment, action, random nonce and a 15-minute expiry using HMAC-SHA256 and constant-time comparison. One database decision consumes both buttons. Expiry, forgery and replay fail; GET never changes state. Tokens are excluded from agent responses and audit records.
-- ntfy uses its [documented JSON publishing API](https://docs.ntfy.sh/publish/#using-a-json-array), with explicit POST Approve/Reject actions. The `Notifier` interface isolates the channel. A missed or failed push leaves the authenticated `/approvals` page available.
-- SQLite transactions serialize evaluation and reservations. A payment is claimed once; the signed testnet transaction and its hash are persisted **before** any broadcast. Ambiguous submissions and restarts rebroadcast the identical signed bytes. There is no automatic replacement nonce, rail fallback or second payment.
-- A crash during preparation is quarantined as `uncertain` and blocks further signing until an owner investigates. Do not manually delete/reset state to force a retry. Safe recovery controls and the broader lifecycle belong to a later milestone. On-chain reverts are terminal for that idempotency key.
-- Completion in this milestone means two L2 confirmations of the fixed USDC transfer to the requested wallet. This is **not** finality on Ethereum or a claim that bank/fiat funds arrived. Later milestones will separate settlement from completion across rails.
-- Audit INSERTs record the validated intent, decision/reasons, authenticated requester, owner approval identity (`owner:approval-token`), timestamps and transaction hash. UPDATE and DELETE are blocked by SQLite triggers. An owner with direct filesystem/database control can still alter storage: this is not an externally tamper-proof ledger.
-- The threat boundary is an agent using MCP/HTTP with its restricted credential. An agent with OS access to `.env`, database files or owner policy files has the owner's privileges; isolate those filesystem permissions separately. Untrusted agent strings are escaped in HTML and owner pages disable framing, scripts, caching and referrer leakage.
-- Never commit `.env`, keys, SQLite files, signed transaction bytes or screenshots of secret-bearing URLs. Testnet keys are local and unfunded on mainnets. There is no mainnet execution mode.
+## Owner policy
 
-## Milestones
+[policies/example.yaml](policies/example.yaml) has a hard **$100/payment**, **$100/day**, and approval **strictly above $20**. All-in source cost includes modeled fees. `new_merchant_max: 5.10` permits the first $5 wallet demo plus its modeled $0.03 fee allowance; it is an inclusive hard ceiling, not an approval override.
 
-1. **Implemented and live rejection-path acceptance passed:** deterministic policy, atomic idempotency, ntfy approvals, SQLite audit, MCP, test USDC adapter and read-only dashboard. A real $5 Base Sepolia transfer completed, ntfy accepted the $45 approval notification, the owner rejected it through the public approval page, overspending was denied, and retrying returned the same payment/transaction. See [validation evidence](docs/milestone-1.md). Native ntfy app delivery has not been independently confirmed.
-2. **Implemented:** full quote intent/counterparty model, normalized ledger/ACH/USDC/Wise quotes, HTTP/MCP access, banking-calendar and provider-contract tests. Wise sandbox network calls remain untested without optional credentials; active Wise pricing is explicitly mocked.
-3. **Implemented:** eligibility gates before scoring, configurable deterministic strategies, persisted explanations/alternatives and the identical Monday-night/Tuesday-morning corridor test. Router tests were written first; route planning remains read-only until lifecycle integration.
-4. Then: common lifecycle, safe fallback, funds availability and returns.
-5. Final documentation/demo polish after the earlier milestones pass.
+- `max_per_payment`, `max_per_day`: inclusive USD hard ceilings, integer cents.
+- `require_approval_above`: amounts greater than this require a human.
+- `new_merchant_max`: hard ceiling until this merchant **and owner destination** have successful history. Wallet/bank/internal destinations do not inherit each other's trust.
+- `allowed_merchants`: IDs, optional allowed categories and optional destination address pin. Category information comes from the owner catalog. Unknown merchants fail.
+- `expires_at`: UTC ISO timestamp; denied at/after expiry.
+- Optional `routing`: strategy, `allowed_rails`, `blocked_countries`, `min_certainty`. See the corporate example.
 
-Milestones are tested and committed in order. See the [overspend recording guide](examples/overspend-demo/README.md).
+The owner file reloads on evaluation; invalid rules fail closed. Daily accounting uses **UTC** and the day funds were committed for execution. Reserved/unknown outcomes retain budget; rejection/expiry releases it. Confirmed returns retain nonrefundable fees against the original execution day. Approval never overrides hard policy, compliance or delivery constraints.
+
+## Security and limits
+
+- Approval URLs use HMAC-SHA256, a random single-use nonce and 15-minute expiry. One decision consumes both actions; replay/forgery/expiry fail. **GET never approves**. ntfy uses its [documented JSON publish API](https://docs.ntfy.sh/publish/#using-a-json-array) behind a `Notifier` interface; its POST buttons and owner web page provide the two paths.
+- The fixed token is Circle's [Base Sepolia test USDC](https://developers.circle.com/stablecoins/usdc-contract-addresses). No live bank, Wise transfer, mainnet, live FX or actual fiat on/off-ramp path exists. Fictional KYB flags are not a real compliance service.
+- Audit/journal tables block UPDATE/DELETE with SQLite triggers. This records intent, authenticated actor, decisions, explanation, approval identity, timestamps and hashes. A filesystem/database owner can still alter storage; it is not externally tamper-proof.
+- Isolate `.env`, wallet, policy, catalog and database files from the agent. An agent with owner filesystem access has owner privileges. Owner HTML escapes agent content and disables scripts, framing, caching and referrer leakage.
+- Never publish keys, topics, approval URLs, signed bytes or private database backups. Preserve the database during recovery; do not delete reservations or reuse a signing wallet outside this daemon to force a retry. Two L2 confirmations are not Ethereum finality.
+
+## Milestones and evidence
+
+1. Deterministic policy, ntfy approvals, MCP and test USDC: **implemented**. A real $5 transfer, owner rejection of $45, overspend denials and unchanged retry hash passed. [M1 evidence](docs/milestone-1.md) distinguishes ntfy API acceptance from unconfirmed native-app delivery.
+2. Full intents, profiles and normalized quotes: **implemented**. [M2](docs/milestone-2.md).
+3. Gates before scoring, persisted explanations and Monday/Tuesday routing: **implemented**, with policy/router tests written first. [M3](docs/milestone-3.md).
+4. Common execution, safe fallback, usable-funds completion and returns: **implemented**. [M4](docs/milestone-4.md). Automated native returns use a mock transport; no additional live spend was performed.
+5. Quickstart, architecture, recording guide, read-only dashboard, MIT license and CI: **implemented**. [Record the overspend clip](examples/overspend-demo/README.md).
+
+Milestones were tested and committed in order. Current-instance checks do not establish remote CI execution, cloud publication or restoration in a fresh task.
