@@ -84,12 +84,12 @@ describe('official MCP client → MCP server → real HTTP API → SQLite integr
     const client = new Client({ name: 'stdio-integration-test', version: '1.0.0' });
     cleanups.push(() => client.close());
     await client.connect(transport);
-    expect((await client.listTools()).tools).toHaveLength(5);
+    expect((await client.listTools()).tools).toHaveLength(6);
     const result = await client.callTool({ name: 'request_payment', arguments: intent() });
     expect(result.isError).toBe(false); await complete(f);
     expect(f.store.list()[0]!.status).toBe('completed');
   });
-  it('discovers the four payment tools plus read-only quoting and enforces policy/idempotency end to end', async () => {
+  it('discovers payment tools plus read-only quoting/planning and enforces policy/idempotency end to end', async () => {
     const f = setup();
     const http = serve({ fetch: f.app.fetch, hostname: '127.0.0.1', port: 0 });
     await new Promise<void>((resolve) => http.once('listening', resolve));
@@ -100,7 +100,7 @@ describe('official MCP client → MCP server → real HTTP API → SQLite integr
     const [a, b] = InMemoryTransport.createLinkedPair(); await server.connect(a); await client.connect(b);
     cleanups.push(() => client.close()); cleanups.push(() => server.close());
     const tools = await client.listTools();
-    expect(tools.tools.map((t) => t.name).sort()).toEqual(['get_my_limits','get_payment_status','list_payments','quote_payment','request_payment']);
+    expect(tools.tools.map((t) => t.name).sort()).toEqual(['get_my_limits','get_payment_status','list_payments','plan_payment','quote_payment','request_payment']);
     const result = await client.callTool({ name: 'request_payment', arguments: intent() });
     expect(result.isError).toBe(false);
     const content = result.content as { type: string; text: string }[];
@@ -114,6 +114,8 @@ describe('official MCP client → MCP server → real HTTP API → SQLite integr
     expect(JSON.stringify(await client.callTool({ name: 'list_payments', arguments: { limit: 5 } }))).toContain(p.id);
     const quote = await client.callTool({ name: 'quote_payment', arguments: { idempotency_key: 'quote-only-mcp', payer: agentId, recipient: 'norte', amount: '250000', destination_currency: 'MXN', deadline: '2026-11-06T23:00:00Z', purpose: 'invoice', max_fee: '1000', reversibility_requirement: 'none', recipient_preferences: { delivery: 'bank' } } });
     expect(quote.isError).toBe(false); expect(JSON.stringify(quote)).toContain('Norte Manufacturing');
+    const plan = await client.callTool({ name: 'plan_payment', arguments: { idempotency_key: 'plan-only-mcp', payer: agentId, recipient: 'dataco', amount: '1', destination_currency: 'USD', deadline: '2026-11-06T23:00:00Z', purpose: 'plan', max_fee: '10', reversibility_requirement: 'none', recipient_preferences: {} } });
+    expect(plan.isError).toBe(false); expect(JSON.stringify(plan)).toContain('Route chosen: ledger');
     expect(f.store.list()).toHaveLength(1); expect(f.executor.prepared).toBe(1);
     const bad = await client.callTool({ name: 'request_payment', arguments: { ...intent(), payer: 'impostor' } }); expect(bad.isError).toBe(true);
   });

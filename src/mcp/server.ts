@@ -26,5 +26,6 @@ export function createMcpServer(apiUrl: string, agentToken: string) {
   server.registerTool('list_payments', { description: 'List this agent’s payments', inputSchema: List }, async ({ limit }) => call(`/api/payments?limit=${limit}`));
   server.registerTool('get_my_limits', { description: 'Read owner policy and remaining daily allowance', inputSchema: z.strictObject({}) }, async () => call('/api/limits'));
   server.registerTool('quote_payment', { description: 'Compare test-only payment quotes, fees and recipient availability. This read-only tool does not execute a payment. Specify the recipient catalog ID and destination amount/currency, never a rail.', inputSchema: PaymentIntentV2Schema }, async (input) => call('/api/quotes', PaymentIntentV2Schema.parse(input)));
+  server.registerTool('plan_payment', { description: 'Plan a test-only payment using deterministic owner policy, compliance/eligibility gates and configured scoring. Stores a route explanation and alternatives; does not execute or approve payments.', inputSchema: PaymentIntentV2Schema }, async (input) => call('/api/routes', PaymentIntentV2Schema.parse(input)));
   return server;
 }

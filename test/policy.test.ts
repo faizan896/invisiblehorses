@@ -72,4 +72,9 @@ describe('deterministic policy gates (tests written before implementation)', () 
     }
     expect(() => PaymentIntentSchema.parse({ ...intent(), rail: 'usdc' })).toThrow();
   });
+  it('does not let legacy intents bypass explicit owner routing constraints', () => {
+    const p = PolicySchema.parse({ ...policy(), routing: { allowed_rails: ['ledger'] } });
+    expect(evaluate(intent(), p, history()).decision).toBe('deny');
+    expect(evaluate(intent(), p, history(), { routed: true }).decision).toBe('allow');
+  });
 });

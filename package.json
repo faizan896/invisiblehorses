@@ -21,7 +21,8 @@
     "test:watch": "vitest",
     "demo": "tsx examples/overspend-demo/live.ts",
     "demo:offline": "tsx examples/overspend-demo/offline.ts",
-    "demo:quotes": "tsx examples/quotes-demo.ts"
+    "demo:quotes": "tsx examples/quotes-demo.ts",
+    "demo:routing": "tsx examples/routing-demo.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

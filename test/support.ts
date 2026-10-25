@@ -7,6 +7,7 @@ import { createApp } from '../src/http/app.js';
 import { MockTestnetExecutor, RecordingNotifier } from '../examples/support/mock.js';
 import { QuoteService } from '../src/rails/quotes.js';
 import { Counterparties } from '../src/counterparty/profiles.js';
+import { RoutingService } from '../src/router/service.js';
 
 export const agentId = 'research-agent-07';
 export function intent(amount = '5', key = 'invoice-1') {
@@ -21,9 +22,11 @@ export function fixture(path = ':memory:') {
   const tokens = new ApprovalTokens('test-only-signing-material-not-a-real-secret');
   const service = new PaymentService(store, () => policy, tokens, notifier, executor, 'https://approvals.example.test', () => now);
   const config = { ownerToken: 'test-only-owner-token-not-a-credential', agentToken: 'test-only-agent-token-not-a-credential', agentId };
-  const quotes = new QuoteService(Counterparties.load('examples/counterparties.json'), undefined, () => now);
-  const app = createApp(service, config, quotes);
-  return { store, executor, notifier, service, policy, tokens, app, config, setNow: (value: string) => { now = new Date(value); } };
+  const profiles = Counterparties.load('examples/counterparties.json');
+  const quotes = new QuoteService(profiles, undefined, () => now);
+  const routing = new RoutingService(store, profiles, quotes, () => policy, () => now);
+  const app = createApp(service, config, quotes, routing);
+  return { store, executor, notifier, service, policy, tokens, app, config, profiles, quotes, routing, setNow: (value: string) => { now = new Date(value); } };
 }
 export function approvalToken(url: string) { return new URL(url).searchParams.get('token')!; }
 export async function complete(f: ReturnType<typeof fixture>) { await f.service.tick(); await f.service.tick(); }

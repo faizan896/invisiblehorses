@@ -1,6 +1,6 @@
 # railgate
 
-railgate is an open-source payment layer for AI agents: an agent requests a payment, deterministic owner rules decide whether it is allowed, a human approves when required, and every step is recorded. Inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural), the goal is for agents to say what they want to pay while railgate decides how money moves. **The current version supports policy-controlled test USDC payments and normalized multi-rail quotes. Route selection and the common multi-rail execution lifecycle are subsequent milestones. Test money only.**
+railgate is an open-source payment layer for AI agents: an agent requests a payment, deterministic owner rules decide whether it is allowed, a human approves when required, and every step is recorded. Inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural), the goal is for agents to say what they want to pay while railgate decides how money moves. **The current version supports policy-controlled test USDC payments, normalized multi-rail quotes and deterministic route plans. The common multi-rail execution lifecycle is the next milestone. Test money only.**
 
 ```mermaid
 flowchart LR
@@ -82,7 +82,7 @@ Start the HTTP service first and run `pnpm build`. Add this to Claude Desktop's 
 
 The stdio MCP process deliberately **does not load `.env`**. Give it only the limited agent token and API origin. Keep owner credentials, HMAC material and wallet keys out of the agent's MCP environment. A remote MCP API must use HTTPS; HTTP is permitted only for loopback.
 
-Tools: `request_payment`, `get_payment_status`, `list_payments`, `get_my_limits`, and read-only `quote_payment`. No tool can edit policy, approve a payment, select a rail, or bypass evaluation. A USD-only payment request looks like:
+Tools: `request_payment`, `get_payment_status`, `list_payments`, `get_my_limits`, and read-only `quote_payment` / `plan_payment`. No tool can edit policy, approve a payment, select a rail, or bypass evaluation. A USD-only payment request looks like:
 
 ```json
 {
@@ -135,6 +135,16 @@ Amount is what the recipient should receive in `destination_currency` (currently
 
 Model rates are explicitly fixed test assumptions (17 MXN/USD and 0.92 EUR/USD), not market rates. All new adapters share `quote`, `execute`, `status`, `reverse` signatures; multi-rail execution methods remain blocked until the lifecycle milestone wires them safely. The existing USD-only payment API retains its persisted idempotency keys and real test USDC execution path.
 
+## Deterministic route planning
+
+`plan_payment` / `POST /api/routes` accept the same full intent as quoting. They run owner identity/category/expiry and simulated KYB gates before contacting providers. Every returned quote then passes recipient/corridor, amount, liquidity, availability/deadline, fee, FX, health, reversibility and all-in USD spending gates **before scoring**. A sandbox quote-only provider is not an executable route. `GET /api/routes/:id` retrieves only the authenticated payer's stored plan.
+
+Plans contain the selected quote, a human-readable explanation, all alternatives and rejection reasons, a policy fingerprint and any human-approval requirement. They are saved with an append-only audit event and create no payment or reservation. Planning liquidity, bank service windows, certainty and FX remain explicit test models; KYB flags are fictional test data, not a real compliance service.
+
+An optional owner `routing` block configures `strategy` (`lowest_cost`, `fastest`, `refund_certainty`), `allowed_rails`, `blocked_countries` and `min_certainty`. KYB verification remains required. Hard policy denials cannot be overridden by a score or human approval. Setting explicit routing constraints disables **new legacy USD-only requests** that cannot carry full counterparty context; existing idempotency keys still return their original records. The common lifecycle milestone will unify execution.
+
+Run `pnpm demo:routing`: it evaluates the **identical hypothetical** 250,000 MXN bank-form intent on Monday after cutoff and Tuesday morning. Monday selects modeled USDC because the simulated bank rail is outside its operating window; Tuesday selects the cheaper mock Wise-style bank quote. Both quote the complete MXN bank payout, not just a chain confirmation. [policies/corporate.example.yaml](policies/corporate.example.yaml) supplies a clearly labelled fictional high-value USD budget for this demonstration; the server's $100 policy is not changed. Neither hypothetical plan executes a payment, and an already-paid idempotency key can never pay again through a different route.
+
 ## Policy format and semantics
 
 See [policies/example.yaml](policies/example.yaml). The agreed demo policy has a hard `$100` per-payment ceiling, `$100` daily ceiling and approval **strictly above `$20`**. Approval cannot override either hard ceiling. The new-merchant ceiling is `$5` so the first `$5` demonstration establishes real successful history; lower it to `$2` if that is your preference.
@@ -164,7 +174,7 @@ The policy is checked at request time, after human approval, before preparation,
 
 1. **Implemented and live rejection-path acceptance passed:** deterministic policy, atomic idempotency, ntfy approvals, SQLite audit, MCP, test USDC adapter and read-only dashboard. A real $5 Base Sepolia transfer completed, ntfy accepted the $45 approval notification, the owner rejected it through the public approval page, overspending was denied, and retrying returned the same payment/transaction. See [validation evidence](docs/milestone-1.md). Native ntfy app delivery has not been independently confirmed.
 2. **Implemented:** full quote intent/counterparty model, normalized ledger/ACH/USDC/Wise quotes, HTTP/MCP access, banking-calendar and provider-contract tests. Wise sandbox network calls remain untested without optional credentials; active Wise pricing is explicitly mocked.
-3. Then: eligibility gates, route scoring/explanations and the Monday-night/Tuesday-morning corridor test (router tests first).
+3. **Implemented:** eligibility gates before scoring, configurable deterministic strategies, persisted explanations/alternatives and the identical Monday-night/Tuesday-morning corridor test. Router tests were written first; route planning remains read-only until lifecycle integration.
 4. Then: common lifecycle, safe fallback, funds availability and returns.
 5. Final documentation/demo polish after the earlier milestones pass.
 

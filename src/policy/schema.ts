@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { AddressSchema, IdSchema, MoneySchema, minor } from '../intent/schema.js';
+import { RoutingRulesSchema } from './routing.js';
 
 const Limit = z.union([MoneySchema, z.number().finite().nonnegative().transform(String).pipe(MoneySchema)]);
 export const PolicySchema = z.strictObject({
   max_per_payment: Limit, max_per_day: Limit, new_merchant_max: Limit,
   require_approval_above: Limit,
   expires_at: z.iso.datetime(),
+  routing: RoutingRulesSchema.optional(),
   allowed_merchants: z.array(z.strictObject({
     id: IdSchema, address: AddressSchema.optional(), categories: z.array(z.string().min(1)).optional(),
   })).min(1),

@@ -1,0 +1,18 @@
+# Fictional high-value routing DEMO policy. Never loaded by the server by default.
+# Owner USD budget; 250,000 MXN is converted to all-in USD before evaluation.
+max_per_payment: 20000
+max_per_day: 50000
+new_merchant_max: 15000
+require_approval_above: 100
+expires_at: "2030-01-01T00:00:00Z"
+allowed_merchants:
+  - id: norte
+    categories: [manufacturing]
+  - id: dataco
+    categories: [data, api]
+routing:
+  strategy: lowest_cost
+  allowed_rails: [ledger, ach-mock, usdc-base-sepolia, wise-quote]
+  blocked_countries: []
+  require_kyb: true
+  min_certainty: 0.8

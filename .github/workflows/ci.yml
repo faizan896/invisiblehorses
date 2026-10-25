@@ -22,3 +22,4 @@ jobs:
       - run: pnpm build
       - run: pnpm demo:offline
       - run: pnpm demo:quotes
+      - run: pnpm demo:routing

@@ -5,10 +5,11 @@ export type PolicyHistory = { now: string; spent_today: string; paid_merchants: 
 export type Evaluation = { decision: 'allow' | 'needs_approval' | 'deny'; reasons: string[] };
 
 /** Pure deterministic rules. Money is compared in integer cents; history includes reservations. */
-export function evaluate(intent: PaymentIntent, policy: Policy, history: PolicyHistory): Evaluation {
+export function evaluate(intent: PaymentIntent, policy: Policy, history: PolicyHistory, context?: { routed: true }): Evaluation {
   const reasons: string[] = [];
   const amount = minor(intent.amount);
   const now = Date.parse(history.now);
+  if (policy.routing && !context?.routed) reasons.push('Owner routing rules require a full counterparty intent; the legacy USD-only API cannot bypass them');
   if (!Number.isFinite(now) || now >= Date.parse(policy.expires_at)) reasons.push('Policy has expired or the evaluation clock is invalid');
   if (amount > minor(policy.max_per_payment)) reasons.push(`Hard per-payment limit is $${policy.max_per_payment}`);
   if (amount + minor(history.spent_today) > minor(policy.max_per_day)) reasons.push(`Daily limit is $${policy.max_per_day}; $${history.spent_today} is already spent or reserved today (UTC)`);

@@ -11,6 +11,7 @@ export function defaultAdapters(wiseToken?: string, wiseProfileId?: string): Rai
 }
 export class QuoteService {
   constructor(private readonly profiles: Counterparties, private readonly adapters: RailAdapter[] = defaultAdapters(), private readonly clock: () => Date = () => new Date()) {}
+  railIds() { return this.adapters.map((a) => a.id); }
   async quotes(input: unknown, authenticatedPayer: string) {
     const intent = PaymentIntentV2Schema.parse(input);
     if (intent.payer !== authenticatedPayer) throw new AppError(403, 'Payer does not match the authenticated agent');
