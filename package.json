@@ -20,7 +20,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "demo": "tsx examples/overspend-demo/live.ts",
-    "demo:offline": "tsx examples/overspend-demo/offline.ts"
+    "demo:offline": "tsx examples/overspend-demo/offline.ts",
+    "demo:quotes": "tsx examples/quotes-demo.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

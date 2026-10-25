@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { getAddress, isAddress } from 'viem';
 
-export const MoneySchema = z.string().regex(/^(?:0|[1-9]\d{0,8})(?:\.\d{1,2})?$/, 'Use a decimal USD string with at most two decimal places');
+export const MoneySchema = z.string().regex(/^(?:0|[1-9]\d{0,8})(?:\.\d{1,2})?$/, 'Use a decimal amount string with at most two decimal places');
 export const IdSchema = z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,99}$/);
 export const AddressSchema = z.string().refine((v) => isAddress(v, { strict: true }) && !/^0x0{40}$/i.test(v), 'Expected a nonzero Ethereum address').transform((v) => getAddress(v));
 export const PaymentIntentSchema = z.strictObject({

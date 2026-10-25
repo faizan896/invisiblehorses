@@ -13,6 +13,10 @@ export const ConfigSchema = z.object({
   HOST: z.string().default('127.0.0.1'), PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   DATABASE_PATH: z.string().min(1).default('./data/railgate.sqlite'),
   POLICY_PATH: z.string().min(1).default('./policies/example.yaml'),
+  COUNTERPARTY_PATH: z.string().min(1).default('./examples/counterparties.json'),
+  WISE_SANDBOX_TOKEN: z.string().optional().transform((v) => v || undefined),
+  WISE_SANDBOX_PROFILE_ID: z.preprocess((v) => v === '' ? undefined : v, z.string().regex(/^[1-9]\d{0,18}$/).optional()),
 }).superRefine((v, ctx) => {
   if (new Set([v.APPROVAL_SECRET, v.OWNER_API_TOKEN, v.AGENT_API_TOKEN]).size !== 3) ctx.addIssue({ code: 'custom', message: 'Owner, agent and signing secrets must be different' });
+  if (v.WISE_SANDBOX_TOKEN && !v.WISE_SANDBOX_PROFILE_ID) ctx.addIssue({ code: 'custom', path: ['WISE_SANDBOX_PROFILE_ID'], message: 'Required when a Wise sandbox token is configured' });
 });

@@ -21,3 +21,4 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm demo:offline
+      - run: pnpm demo:quotes

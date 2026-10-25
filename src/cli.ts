@@ -13,6 +13,8 @@ import { createApp } from './http/app.js';
 import { createMcpServer } from './mcp/server.js';
 import type { Hex } from 'viem';
 import { configureProxy } from './network.js';
+import { QuoteService, defaultAdapters } from './rails/quotes.js';
+import { Counterparties } from './counterparty/profiles.js';
 
 async function main() {
   const command = process.argv[2];
@@ -36,7 +38,8 @@ async function main() {
   const store = new Store(cfg.DATABASE_PATH);
   const service = new PaymentService(store, policy, new ApprovalTokens(cfg.APPROVAL_SECRET), new NtfyNotifier(cfg.NTFY_SERVER, cfg.NTFY_TOPIC, cfg.NTFY_TOKEN), executor, cfg.PUBLIC_BASE_URL);
   await service.initialize();
-  const app = createApp(service, { ownerToken: cfg.OWNER_API_TOKEN, agentToken: cfg.AGENT_API_TOKEN, agentId: cfg.AGENT_ID });
+  const quotes = new QuoteService(Counterparties.load(cfg.COUNTERPARTY_PATH), defaultAdapters(cfg.WISE_SANDBOX_TOKEN, cfg.WISE_SANDBOX_PROFILE_ID));
+  const app = createApp(service, { ownerToken: cfg.OWNER_API_TOKEN, agentToken: cfg.AGENT_API_TOKEN, agentId: cfg.AGENT_ID }, quotes);
   const server = serve({ fetch: app.fetch, hostname: cfg.HOST, port: cfg.PORT }, () => console.error(`railgate listening on port ${cfg.PORT}; Base Sepolia TEST MONEY ONLY`));
   server.on('error', () => { console.error('Unable to bind HTTP server'); process.exitCode = 1; clearInterval(timer); store.close(); });
   let running: Promise<void> | undefined;

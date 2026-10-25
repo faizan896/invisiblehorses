@@ -1,6 +1,6 @@
 # railgate
 
-railgate is an open-source payment layer for AI agents: an agent requests a payment, deterministic owner rules decide whether it is allowed, a human approves when required, and every step is recorded. Inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural), the goal is for agents to say what they want to pay while railgate decides how money moves. **Milestone 1 implements policy-controlled test USDC payments on Base Sepolia. Multi-rail quoting and routing come in later milestones. Test money only.**
+railgate is an open-source payment layer for AI agents: an agent requests a payment, deterministic owner rules decide whether it is allowed, a human approves when required, and every step is recorded. Inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural), the goal is for agents to say what they want to pay while railgate decides how money moves. **The current version supports policy-controlled test USDC payments and normalized multi-rail quotes. Route selection and the common multi-rail execution lifecycle are subsequent milestones. Test money only.**
 
 ```mermaid
 flowchart LR
@@ -82,7 +82,7 @@ Start the HTTP service first and run `pnpm build`. Add this to Claude Desktop's 
 
 The stdio MCP process deliberately **does not load `.env`**. Give it only the limited agent token and API origin. Keep owner credentials, HMAC material and wallet keys out of the agent's MCP environment. A remote MCP API must use HTTPS; HTTP is permitted only for loopback.
 
-Tools: `request_payment`, `get_payment_status`, `list_payments`, `get_my_limits`. No tool can edit policy, approve a payment, select a rail, or bypass evaluation. A request looks like:
+Tools: `request_payment`, `get_payment_status`, `list_payments`, `get_my_limits`, and read-only `quote_payment`. No tool can edit policy, approve a payment, select a rail, or bypass evaluation. A USD-only payment request looks like:
 
 ```json
 {
@@ -103,6 +103,37 @@ Tools: `request_payment`, `get_payment_status`, `list_payments`, `get_my_limits`
 Amounts are positive USD decimal **strings**, at most two decimal places. This milestone pays the same nominal amount in test USDC; it makes no live FX or USD redemption claim. The payer must match the authenticated `AGENT_ID`. An identical normalized intent with the same payer/idempotency key returns the existing payment. Reusing a key for a different payload returns HTTP 409.
 
 The authenticated HTTP API mirrors these tools: `POST /api/payments`, `GET /api/payments/:id`, `GET /api/payments?limit=100`, `GET /api/limits`. Use the **agent** bearer token. Agents cannot read other payers' payments, the owner audit endpoint, or pending approval capabilities.
+
+## Multi-rail quote model
+
+Run `pnpm demo:quotes` for a credential-free demonstration of comparable quotes for DataCo and **Norte Manufacturing** (Mexico, MXN bank preference, also accepts a Base Sepolia wallet). The owner catalog is [examples/counterparties.json](examples/counterparties.json); these are explicitly fictional test profiles, test bank references and simulated KYB statuses. Set `COUNTERPARTY_PATH` to another owner-controlled catalog. The API/MCP cannot edit it.
+
+`quote_payment` and `POST /api/quotes` accept the full destination-denominated intent:
+
+```json
+{
+  "idempotency_key": "norte-invoice-001",
+  "payer": "research-agent-07",
+  "recipient": "norte",
+  "amount": "250000",
+  "destination_currency": "MXN",
+  "deadline": "2026-11-06T23:00:00Z",
+  "purpose": "manufacturing invoice",
+  "max_fee": "1000",
+  "reversibility_requirement": "none",
+  "recipient_preferences": { "delivery": "bank", "avoid_stablecoins": false },
+  "metadata": { "invoice_id": "001" }
+}
+```
+
+Amount is what the recipient should receive in `destination_currency` (currently USD, MXN, EUR). `max_fee` is a USD decimal string. The payer funds in USD in this prototype. There is no rail field. Quotes contain all-in USD cost, reconciled fee/step breakdowns, expected/latest time until the requested form is usable, certainty, reversibility and explicit pricing/execution labels. Quotes alone do not authorize, reserve or execute a payment.
+
+- **ledger:** instant/free between internal test accounts in the supported currency.
+- **ach-mock:** explicitly simulated US/USD banking. 16:00 New York cutoff, US banking holidays, weekends and 1–2 banking-day settlement. It cannot directly pay MXN to Mexico.
+- **usdc-base-sepolia:** testnet transfer leg with modeled onramp, gas, FX and offramp pricing. Bank-form availability includes payout waiting time; no live onramp/offramp or real bank payout is claimed.
+- **wise-quote:** labelled mock by default. Optional `WISE_SANDBOX_TOKEN` and `WISE_SANDBOX_PROFILE_ID` enable the documented [2026Q4 sandbox quote API](https://docs.wise.com/api-reference/quote/quotecreate) at `api.wise-sandbox.com`. Its inclusive source amount and `price.total.value.amount` drive the normalized total; separately undisclosed FX spread is not invented. A configured sandbox error is reported as unavailable, never silently relabelled a mock. This adapter creates quotes only, never Wise transfers.
+
+Model rates are explicitly fixed test assumptions (17 MXN/USD and 0.92 EUR/USD), not market rates. All new adapters share `quote`, `execute`, `status`, `reverse` signatures; multi-rail execution methods remain blocked until the lifecycle milestone wires them safely. The existing USD-only payment API retains its persisted idempotency keys and real test USDC execution path.
 
 ## Policy format and semantics
 
@@ -132,7 +163,7 @@ The policy is checked at request time, after human approval, before preparation,
 ## Milestones
 
 1. **Implemented and live rejection-path acceptance passed:** deterministic policy, atomic idempotency, ntfy approvals, SQLite audit, MCP, test USDC adapter and read-only dashboard. A real $5 Base Sepolia transfer completed, ntfy accepted the $45 approval notification, the owner rejected it through the public approval page, overspending was denied, and retrying returned the same payment/transaction. See [validation evidence](docs/milestone-1.md). Native ntfy app delivery has not been independently confirmed.
-2. Next: full payment intent/counterparty model and normalized ledger, ACH simulation, USDC and Wise sandbox/mock quotes.
+2. **Implemented:** full quote intent/counterparty model, normalized ledger/ACH/USDC/Wise quotes, HTTP/MCP access, banking-calendar and provider-contract tests. Wise sandbox network calls remain untested without optional credentials; active Wise pricing is explicitly mocked.
 3. Then: eligibility gates, route scoring/explanations and the Monday-night/Tuesday-morning corridor test (router tests first).
 4. Then: common lifecycle, safe fallback, funds availability and returns.
 5. Final documentation/demo polish after the earlier milestones pass.

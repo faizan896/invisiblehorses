@@ -4,13 +4,14 @@ import { bodyLimit } from 'hono/body-limit';
 import { z, ZodError } from 'zod';
 import type { PaymentService } from '../executor/service.js';
 import { AppError } from '../errors.js';
+import type { QuoteService } from '../rails/quotes.js';
 
 export type HttpConfig = { ownerToken: string; agentToken: string; agentId: string };
 const same = (a: string, b: string) => timingSafeEqual(createHash('sha256').update(a).digest(), createHash('sha256').update(b).digest());
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g, (v) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[v]!);
 const page = (title: string, content: string) => `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escape(title)} · railgate</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#18222c}nav,a{color:#1646a0}article{border:1px solid #cbd5e1;border-radius:8px;padding:20px;margin:20px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}button{padding:10px 20px;margin:8px}form{display:inline}td,th{padding:10px;text-align:left;vertical-align:top}table{width:100%;border-collapse:collapse}tr{border-bottom:1px solid #ddd}</style><body><h1>railgate <small>TEST MONEY ONLY</small></h1><nav><a href="/approvals">Approvals</a> · <a href="/dashboard">Dashboard</a></nav><h2>${escape(title)}</h2>${content}</body></html>`;
 
-export function createApp(service: PaymentService, config: HttpConfig) {
+export function createApp(service: PaymentService, config: HttpConfig, quotes?: QuoteService) {
   const app = new Hono();
   app.use('*', bodyLimit({ maxSize: 16 * 1024, onError: (c) => c.json({ error: 'Request body exceeds 16 KiB' }, 413) }));
   app.use('*', async (c, next) => {
@@ -51,6 +52,12 @@ export function createApp(service: PaymentService, config: HttpConfig) {
   });
   app.get('/api/payments/:id', (c) => c.json(service.get(z.uuid().parse(c.req.param('id')), config.agentId)));
   app.get('/api/limits', (c) => c.json(service.limits()));
+  app.post('/api/quotes', async (c) => {
+    if (!quotes) throw new AppError(503, 'Quote service unavailable');
+    const result = await quotes.quotes(await c.req.json(), config.agentId);
+    service.store.audit(null, 'quotes_requested', config.agentId, { intent: result.intent, quotes: result.quotes.map((q) => ({ id: q.id, rail: q.rail, total_all_in_cost: q.total_all_in_cost, pricing: q.pricing })), unavailable: result.unavailable }, new Date().toISOString());
+    return c.json(result);
+  });
   for (const path of ['/approvals', '/dashboard', '/owner/*']) app.use(path, async (c, next) => {
     if (!owner(c.req.header('Authorization'))) {
       c.header('WWW-Authenticate', 'Basic realm="railgate owner", charset="UTF-8"');

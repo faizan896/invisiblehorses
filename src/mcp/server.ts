@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { PaymentIntentSchema } from '../intent/schema.js';
+import { PaymentIntentV2Schema } from '../intent/routing.js';
 
 const Status = z.strictObject({ payment_id: z.uuid() });
 const List = z.strictObject({ limit: z.number().int().min(1).max(200).default(100) });
@@ -24,5 +25,6 @@ export function createMcpServer(apiUrl: string, agentToken: string) {
   server.registerTool('get_payment_status', { description: 'Read one of this agent’s payments', inputSchema: Status }, async ({ payment_id }) => call(`/api/payments/${payment_id}`));
   server.registerTool('list_payments', { description: 'List this agent’s payments', inputSchema: List }, async ({ limit }) => call(`/api/payments?limit=${limit}`));
   server.registerTool('get_my_limits', { description: 'Read owner policy and remaining daily allowance', inputSchema: z.strictObject({}) }, async () => call('/api/limits'));
+  server.registerTool('quote_payment', { description: 'Compare test-only payment quotes, fees and recipient availability. This read-only tool does not execute a payment. Specify the recipient catalog ID and destination amount/currency, never a rail.', inputSchema: PaymentIntentV2Schema }, async (input) => call('/api/quotes', PaymentIntentV2Schema.parse(input)));
   return server;
 }
