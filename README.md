@@ -190,6 +190,14 @@ Automatic fallback requires proof that no funds may have left, no irreversible t
 
 A rejected simulated bank destination returns principal to the original payer and retains quoted fees. Only confirmed source credit produces `returned`. The owner can request a return with `POST /owner/payments/:id/return`, owner authentication and an empty JSON object. The dashboard remains read-only. USDC generally needs recipient cooperation: an optional matching `DEMO_RECIPIENT_PRIVATE_KEY` enables the dedicated test recipient to sign a return, and that recipient also needs test ETH for gas. Missing cooperation, insufficient gas, an unknown outcome or a reverted transaction never produces a fabricated refund. A real cooperative return was not exercised in this instance.
 
+### Standalone payroute library and playground
+
+The routing engine is also an independent [payroute workspace package](packages/payroute/README.md). It has no railgate server, SQLite or MCP dependency. Railgate imports its core planner, schemas and adapters through compatibility exports, preserving the existing routing tests unchanged.
+
+Try [the routing playground](https://railgate-self.vercel.app/playground/) after deploying this revision, or run `pnpm dev:playground` locally. Enter amount, currencies, deadline, delivery preferences and send time to see normalized quotes, the chosen rail and every rejection reason. Presets cover domestic payments, Monday/Tuesday MXN timing, refunds, weekends and holidays. It runs the actual library entirely in the browser with fictional profiles and modeled/mock pricing; it cannot approve or execute payments.
+
+`pnpm build:playground` builds the static page and stages it under `public/playground/` for the existing Vercel site. The package also includes Vercel/Netlify configs for independent hosting. Its README covers the typed `createRouter({ rails, scoring, context })` API, custom adapters/scoring, standalone installation and test boundaries. `payroute` returned 404 on the public npm registry on 2026-10-26; no package was published.
+
 ### x402 paid HTTP resources
 
 Run `pnpm demo:x402` with no credentials: fetch a $0.01 weather resource, deny a $5 request against a $1 ceiling, then retry the first request with exactly one payment. It uses the official x402 **2.28.0** client, EVM scheme and Hono merchant middleware with real EIP-712 signatures. The default fixture's chain/facilitator is **mocked**, and its hashes are not blockchain receipts. See [fixture setup and optional real testnet mode](examples/x402-server/README.md).

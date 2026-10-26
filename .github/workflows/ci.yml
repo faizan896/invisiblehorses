@@ -20,6 +20,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm build:playground
       - run: pnpm demo:offline
       - run: pnpm demo:quotes
       - run: pnpm demo:routing

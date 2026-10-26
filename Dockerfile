@@ -5,14 +5,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 make g+
 RUN --mount=type=secret,id=railgate_build_ca \
     if [ -f /run/secrets/railgate_build_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/railgate_build_ca; fi; \
     npm install --global pnpm@10.20.0
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/payroute/package.json ./packages/payroute/package.json
 RUN --mount=type=secret,id=railgate_build_ca \
     if [ -f /run/secrets/railgate_build_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/railgate_build_ca; fi; \
     pnpm install --frozen-lockfile
 COPY tsconfig.json tsconfig.build.json ./
 COPY src ./src
+COPY packages/payroute ./packages/payroute
 COPY examples/counterparties.json ./examples/counterparties.json
-RUN pnpm build && pnpm prune --prod
+RUN pnpm build && CI=true pnpm prune --prod
 
 FROM node:24-bookworm-slim
 WORKDIR /app
@@ -20,6 +22,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends gosu ca-certifi
 ENV NODE_ENV=production HOST=0.0.0.0 DATABASE_PATH=/var/data/railgate.sqlite
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/packages/payroute/dist ./packages/payroute/dist
+COPY --from=build --chown=node:node /app/packages/payroute/package.json ./packages/payroute/package.json
 COPY --chown=node:node package.json ./
 COPY --chown=node:node policies ./policies
 COPY --chown=node:node examples/counterparties.json ./examples/counterparties.json

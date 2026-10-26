@@ -1,8 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm build && pnpm build:playground",
   "outputDirectory": "public",
   "functions": { "api/index.ts": { "maxDuration": 30 } },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  "routes": [
+    { "src": "/playground$", "headers": { "Location": "/playground/" }, "status": 308 },
+    { "handle": "filesystem" },
+    { "src": "/playground/", "dest": "/playground/index.html" },
+    { "src": "/(.*)", "dest": "/api/index" }
+  ]
 }

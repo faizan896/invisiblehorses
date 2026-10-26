@@ -25,12 +25,12 @@ Goal: fetch a resource, inspect its HTTP 402 requirements, apply owner rules/app
 
 Goal: extract routing into an independently usable package without dependencies on railgate's server, database or MCP code. The working name is `payroute`; check npm availability before choosing its publish name.
 
-- [ ] Create `packages/payroute` as a pnpm workspace package and switch railgate to it while preserving existing routing behavior/tests.
-- [ ] Export a small typed `createRouter({ rails, scoring })` API with `quote(intent)` and `plan(intent)`.
-- [ ] Publish the quote/execute/status/reverse adapter interface and ledger, ACH mock, Base Sepolia USDC and Wise sandbox/labelled mock adapters.
-- [ ] Support cheapest-by-deadline, fastest, most-certain/refund presets and custom scoring.
-- [ ] Add scenarios for US domestic cutoffs/weekends, Monday-night vs Tuesday-morning USD→MXN, refund preference, stablecoin refusal, fee limits, an unhealthy rail and a holiday.
-- [ ] Build a static routing playground with intent/time/preferences inputs, quote comparison, a selected route and clear rejection explanations. Use a light background, serif headings and readable cards.
-- [ ] Add the package's own README with a short usage example, adapter guide, scenarios and playground link; keep it ready for a later repository split.
+- [x] Create `packages/payroute` as a pnpm workspace package and switch railgate to it while preserving existing routing behavior/tests.
+- [x] Export a small typed `createRouter({ rails, scoring })` API with `quote(intent)` and `plan(intent)`.
+- [x] Publish the quote/execute/status/reverse adapter interface and ledger, ACH mock, Base Sepolia USDC and Wise sandbox/labelled mock adapters.
+- [x] Support cheapest-by-deadline, fastest, most-certain/refund presets and custom scoring.
+- [x] Add scenarios for US domestic cutoffs/weekends, Monday-night vs Tuesday-morning USD→MXN, refund preference, stablecoin refusal, fee limits, an unhealthy rail and a holiday.
+- [x] Build a static routing playground with intent/time/preferences inputs, quote comparison, a selected route and clear rejection explanations. Use a light background, serif headings and readable cards.
+- [x] Add the package's own README with a short usage example, adapter guide, scenarios and playground link; keep it ready for a later repository split.
 
 Every phase finishes with lint, typecheck, tests, build and credential-free demos passing, followed by a focused commit. Mainnet, real banking and production readiness are outside this roadmap.

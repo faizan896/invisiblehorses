@@ -29,6 +29,9 @@ importers:
       hono:
         specifier: 4.13.13
         version: 4.13.13
+      payroute:
+        specifier: workspace:*
+        version: link:packages/payroute
       undici:
         specifier: ^6.29.1
         version: 6.29.1
@@ -72,6 +75,34 @@ importers:
       wrangler:
         specifier: 4.152.0
         version: 4.152.0(@types/node@20.19.43)
+
+  packages/payroute:
+    dependencies:
+      viem:
+        specifier: 2.57.11
+        version: 2.57.11(typescript@5.9.3)(zod@4.6.7)
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: ^20.19.43
+        version: 20.19.43
+      eslint:
+        specifier: ^10.13.0
+        version: 10.13.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.72.0
+        version: 8.72.0(eslint@10.13.0)(typescript@5.9.3)
+      vite:
+        specifier: ^7.3.1
+        version: 7.3.7(@types/node@20.19.43)(tsx@4.23.15)(yaml@2.9.1)
+      vitest:
+        specifier: 4.0.18
+        version: 4.0.18(@types/node@20.19.43)(tsx@4.23.15)(yaml@2.9.1)
 
 packages:
 

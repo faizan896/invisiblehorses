@@ -1,0 +1,34 @@
+[
+  {
+    "id": "research-agent-07", "name": "Research Agent Treasury", "country": "US",
+    "preferred_currency": "USD", "test_profile": true, "internal_account": "test:treasury",
+    "bank_accounts": [{"id":"treasury-us","country":"US","currency":"USD","reference":"TEST-US-TREASURY","status":"open"}],
+    "stablecoin_wallets": [{"chain_id":84532,"address":"0x0000000000000000000000000000000000000010"}],
+    "kyb_status":"verified", "payment_preferences":["internal","bank","wallet"]
+  },
+  {
+    "id": "dataco", "name": "DataCo", "country": "US", "preferred_currency": "USD",
+    "test_profile": true, "internal_account": "test:dataco", "categories": ["data", "api"],
+    "bank_accounts": [{"id":"dataco-us","country":"US","currency":"USD","reference":"TEST-US-DATACO","status":"open"}],
+    "stablecoin_wallets": [{"chain_id":84532,"address":"0x0000000000000000000000000000000000000001"}],
+    "kyb_status":"verified", "payment_preferences":["internal","bank","wallet"]
+  },
+  {
+    "id": "norte", "name": "Norte Manufacturing", "country": "MX", "preferred_currency": "MXN",
+    "test_profile": true, "categories": ["manufacturing"],
+    "bank_accounts": [{"id":"norte-mx","country":"MX","currency":"MXN","reference":"TEST-MX-NORTE","status":"open"}],
+    "stablecoin_wallets": [{"chain_id":84532,"address":"0x0000000000000000000000000000000000000002"}],
+    "kyb_status":"verified", "payment_preferences":["bank","wallet"]
+  },
+  {
+    "id": "euro-data", "name": "Euro Data", "country": "DE", "preferred_currency": "EUR", "test_profile": true,
+    "categories": ["data"], "bank_accounts": [{"id":"euro-data-eu","country":"DE","currency":"EUR","reference":"TEST-DE-EURODATA","status":"open"}],
+    "stablecoin_wallets": [], "kyb_status":"pending", "payment_preferences":["bank"]
+  },
+  {
+    "id": "compute-co", "name": "ComputeCo", "country": "US", "preferred_currency": "USD",
+    "test_profile": true, "internal_account": "test:compute", "categories": ["compute"], "bank_accounts": [],
+    "stablecoin_wallets": [{"chain_id":84532,"address":"0x0000000000000000000000000000000000000003"}],
+    "kyb_status":"verified", "payment_preferences":["internal","wallet"]
+  }
+]

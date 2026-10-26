@@ -1,0 +1,6 @@
+{
+  "max_per_payment": "30000", "max_per_day": "50000", "new_merchant_max": "30000",
+  "require_approval_above": "100", "expires_at": "2030-01-01T00:00:00Z",
+  "allowed_merchants": [{ "id": "dataco" }, { "id": "norte" }, { "id": "euro-data" }],
+  "routing": {}
+}

@@ -13,3 +13,6 @@ coverage
 .cursor
 .wrangler
 worker-dist
+**/node_modules
+**/dist
+public/playground

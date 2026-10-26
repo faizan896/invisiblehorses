@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Compare payment rails by cost, timing and reversibility. An interactive, test-money-only routing playground." />
+  <title>payroute — find the right rail</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23274332'/%3E%3Ctext x='12' y='34' fill='%23f6f3eb' font-size='34' font-family='Georgia'%3Ep%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <div class="shell">
+    <header><a class="wordmark" href="./" aria-label="payroute home"><span class="mark">p<span>→</span></span>payroute<span class="version">0.1</span></a><nav><a href="https://github.com/faizan896/railgate/tree/main/packages/payroute">Source →</a><span class="badge">TEST MONEY ONLY</span></nav></header>
+    <main>
+      <section class="intro"><p class="eyebrow">THE PAYMENT ROUTING PLAYGROUND</p><h1>The right rail.<br>For every payment.</h1><p class="lede">One intent. Every available route.<br>See what wins on cost, timing and certainty—and why.</p></section>
+      <div class="scenario-bar" aria-label="Example scenarios"><span>TRY A SCENARIO</span><button data-scenario="domestic">US invoice</button><button data-scenario="monday">MXN · Monday night</button><button data-scenario="tuesday">MXN · Tuesday morning</button><button data-scenario="refund">Refund</button><button data-scenario="weekend">Weekend</button><button data-scenario="holiday">Bank holiday</button></div>
+      <div class="workspace">
+        <section class="intent-panel panel"><div class="panel-heading"><span class="step">01</span><h2>Your intent</h2></div>
+          <form id="intent-form">
+            <label for="amount">Recipient receives</label><div class="amount-input"><input id="amount" name="amount" type="number" min="0.01" max="999999999.99" step="0.01" value="10.00" required /><select id="currency" aria-label="Recipient currency"><option>USD</option><option>MXN</option><option>EUR</option></select></div><p id="recipient-name" class="hint"></p>
+            <div class="field-row"><div><label for="source">Pay from</label><select id="source"><option>USD</option></select></div><div><label for="delivery">Deliver to</label><select id="delivery"><option value="any">Any form</option><option value="bank">Bank account</option><option value="wallet">USDC wallet</option><option value="internal">Internal account</option></select></div></div>
+            <fieldset><legend>When is it sent? <span>UTC</span></legend><div class="field-row"><input id="day" aria-label="Send date in UTC" type="date" value="2026-10-27" required /><input id="time" aria-label="Send time in UTC" type="time" value="14:00" required /></div><p id="bank-time" class="hint"></p></fieldset>
+            <label for="deadline">Funds needed by <span class="label-note">UTC</span></label><input id="deadline" type="datetime-local" value="2026-11-06T23:00" required />
+            <div class="field-row"><div><label for="max-fee">Max total fee <span class="label-note">USD</span></label><input id="max-fee" type="number" min="0" max="999999" step="0.01" value="100.00" required /></div><div><label for="reversibility">Reversibility</label><select id="reversibility"><option value="none">No requirement</option><option value="preferred">Preferred</option><option value="required">Required</option></select></div></div>
+            <label for="scoring">Optimize for</label><select id="scoring"><option value="cheapest-by-deadline">Lowest cost by deadline</option><option value="fastest">Fastest availability</option><option value="most-certain">Certainty & reversibility</option></select>
+            <label class="check"><input id="avoid-stablecoins" type="checkbox" /><span>Recipient refuses stablecoins</span></label>
+            <button type="submit" class="primary">Find a route <span>→</span></button>
+            <p class="form-note">Planning only. Nothing is signed or sent.</p>
+          </form>
+        </section>
+        <section class="results" aria-label="Routing results" aria-live="polite" aria-busy="false"><div class="panel-heading"><span class="step">02</span><h2>The route</h2><span id="quote-count" class="quiet"></span></div><div id="chosen"></div><div class="comparison-heading"><h3>Every route, explained</h3><span class="quiet">All-in costs in USD</span></div><div id="quotes" class="quote-grid"></div><details class="model-note"><summary>How this model works</summary><p>Fictional counterparty profiles; fixed demonstration FX rates (17 MXN and 0.92 EUR per USD). Fees, bank delivery and liquidity are modeled. ACH uses a 16:00 New York cutoff, weekends and US banking holidays. No real bank, wallet, RPC or Wise API is contacted.</p><p>Demo owner policy: $30,000 per payment, $50,000/day, $100 approval threshold, zero existing spend. Approval requirements remain visible. This page cannot approve or execute payments.</p></details></section>
+      </div>
+    </main>
+    <footer><span>Built for decisions you can explain.</span><span><a href="https://github.com/faizan896/railgate">Part of railgate</a> · MIT licensed · Test money only</span></footer>
+  </div>
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
