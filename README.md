@@ -124,6 +124,7 @@ To configure local clients automatically after building, run `pnpm setup:mcp` fr
 | MCP tool | HTTP equivalent | Effect |
 | --- | --- | --- |
 | `request_payment` | `POST /api/payments` | Create/retry an idempotent payment |
+| `fetch_paid_resource` | `POST /api/paid-resources` | Fetch an owner-allowed x402 resource; same key reuses one authorization |
 | `get_payment_status` | `GET /api/payments/:id` | Read this payer's logical status |
 | `list_payments` | `GET /api/payments?limit=100` | List this payer's payments |
 | `get_my_limits` | `GET /api/limits` | Read owner limits and daily allowance |
@@ -188,6 +189,28 @@ Source holds and daily reservations are atomic. Approval rechecks policy, benefi
 Automatic fallback requires proof that no funds may have left, no irreversible transfer, no FX exposure and no charged fees. A replacement must preserve amount/currency/form, pass fresh gates and fit any human-approved cap. Unknown results retain the original operation and accounting. Signed USDC bytes/hash are durable before broadcast; timeouts and restarts replay those bytes only. Interrupted signing is quarantined and blocks further signing until the owner investigates.
 
 A rejected simulated bank destination returns principal to the original payer and retains quoted fees. Only confirmed source credit produces `returned`. The owner can request a return with `POST /owner/payments/:id/return`, owner authentication and an empty JSON object. The dashboard remains read-only. USDC generally needs recipient cooperation: an optional matching `DEMO_RECIPIENT_PRIVATE_KEY` enables the dedicated test recipient to sign a return, and that recipient also needs test ETH for gas. Missing cooperation, insufficient gas, an unknown outcome or a reverted transaction never produces a fabricated refund. A real cooperative return was not exercised in this instance.
+
+### x402 paid HTTP resources
+
+Run `pnpm demo:x402` with no credentials: fetch a $0.01 weather resource, deny a $5 request against a $1 ceiling, then retry the first request with exactly one payment. It uses the official x402 **2.28.0** client, EVM scheme and Hono merchant middleware with real EIP-712 signatures. The default fixture's chain/facilitator is **mocked**, and its hashes are not blockchain receipts. See [fixture setup and optional real testnet mode](examples/x402-server/README.md).
+
+The MCP tool `fetch_paid_resource(url, max_price, purpose, idempotency_key?)` maps to authenticated `POST /api/paid-resources`; poll `GET /api/paid-resources/:id` after an owner approval. Example body:
+
+```json
+{"url":"https://api.example.com/weather","max_price":"1.00","purpose":"weather lookup","idempotency_key":"weather-2026-10-26"}
+```
+
+`max_price` is a ceiling in USD, not an offered price. The server's `PAYMENT-REQUIRED` header determines the exact atomic USDC amount. Sub-cent prices round **up** for conservative policy accounting; the signed transfer retains the exact server amount. Results contain bounded text/JSON data plus an independently confirmed receipt, never signatures or approval tokens. Free 2xx resources require no payment.
+
+Paid fetching is **disabled until the owner configures `x402`** in the existing owner policy. Merge [the example block](policies/x402.example.yaml), replacing its placeholder hostname with trusted public HTTPS merchants. Configure per-request/daily API caps, exact hostnames and owner-assigned categories (`data`, `inference`, `compute`). API reservations also count against the existing $100/payment, $100/day shared caps and shared USDC wallet holds. The existing approval threshold applies; approval expires after 15 minutes and releases unspent reservations. Agents cannot edit policy or approve themselves.
+
+Only x402 v2 `exact` EIP-3009 on **Base Sepolia (`eip155:84532`)**, fixed Circle test USDC, is enabled. Actual RPC chain/contract checks run before signing and sending. Real receipts require two L2 confirmations, matching token transfer logs and a transaction matching the persisted authorization nonce. This verifier currently accepts direct token `transferWithAuthorization` settlement; batched/smart-wallet settlement, Permit2, `upto`, mainnet and other tokens are unsupported and fail closed.
+
+Requirements and the exact signed authorization are saved before HTTP delivery (SQLite `synchronous=FULL` locally, `storage.sync()` on the durable worker). Completed retries return cached data/receipt; ambiguous delivery replays the **same** EIP-3009 nonce/header only when the original request is retried. It never signs a replacement. A merchant without durable response recovery may fail to deliver content after settlement; the request remains uncertain with funds reserved for owner reconciliation. Keep the same explicit key; omitting it means one logical purchase per agent and URL. Changing a request under an existing key returns 409.
+
+The fetcher accepts GET text/JSON responses up to 256 KiB, refuses redirects, URL credentials and private IP literals, and forwards no cookies or authorization. Explicit trusted-host allowlisting is the network boundary; this is not a general-purpose DNS-pinned web proxy. Resource content is untrusted data. No additional secret is needed for x402 beyond the existing owner-controlled test wallet/RPC. The live deployment has not made an x402 transfer as part of these tests.
+
+Official references verified before implementation: [buyer](https://docs.x402.org/getting-started/quickstart-for-buyers), [seller](https://docs.x402.org/getting-started/quickstart-for-sellers), [exact scheme](https://docs.x402.org/schemes/exact), [canonical SDK source](https://github.com/x402-foundation/x402/tree/main/typescript).
 
 ### Owner policy
 

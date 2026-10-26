@@ -26,6 +26,8 @@
     "demo:record": "vhs examples/overspend-demo/railgate.tape",
     "demo:quotes": "tsx examples/quotes-demo.ts",
     "demo:routing": "tsx examples/routing-demo.ts",
+    "demo:x402": "tsx examples/x402-server/demo.ts",
+    "x402:server": "tsx examples/x402-server/serve.ts",
     "build:worker": "wrangler deploy --dry-run --outdir worker-dist/production",
     "test:worker": "pnpm build && wrangler deploy --config wrangler.test.jsonc --dry-run --outdir worker-dist/test && vitest run --config vitest.cloudflare.config.ts",
     "deploy:worker": "wrangler deploy",
@@ -41,6 +43,8 @@
   "dependencies": {
     "@hono/node-server": "^2.1.5",
     "@modelcontextprotocol/sdk": "1.32.2",
+    "@x402/core": "2.28.0",
+    "@x402/evm": "2.28.0",
     "better-sqlite3": "12.4.1",
     "dotenv": "^18.0.9",
     "hono": "4.13.13",
@@ -52,6 +56,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^20.19.43",
+    "@x402/hono": "2.28.0",
     "eslint": "^10.13.0",
     "miniflare": "4.20260730.0",
     "tsx": "^4.23.15",

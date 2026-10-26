@@ -69,8 +69,8 @@ export class RailgateOwner {
       if (!this.meta('history_hash')) {
         return Response.json({status:'awaiting_history',chain_id:84532,test_money_only:true,read_only:true}, {status:path==='/health'?200:503,headers:{'Cache-Control':'no-store'}});
       }
-      const {service,quotes,routing} = await this.getServices();
-      const app = createApp(service,{ownerToken:this.cfg.OWNER_API_TOKEN,agentToken:this.cfg.AGENT_API_TOKEN,agentId:this.cfg.AGENT_ID,readOnly:!this.active()},quotes,routing);
+      const {service,quotes,routing,resources} = await this.getServices();
+      const app = createApp(service,{ownerToken:this.cfg.OWNER_API_TOKEN,agentToken:this.cfg.AGENT_API_TOKEN,agentId:this.cfg.AGENT_ID,readOnly:!this.active()},quotes,routing,resources);
       const response = await app.fetch(request);
       if (request.method === 'POST') { await this.state.storage.sync(); await this.schedule(); }
       return response;
@@ -79,7 +79,7 @@ export class RailgateOwner {
   async alarm() {
     await this.ready;
     if (!this.meta('history_hash') || !this.active()) return;
-    try { const {service} = await this.getServices(); await service.tick(); await this.state.storage.sync(); await this.schedule(); }
+    try { const {service,resources} = await this.getServices(); await service.tick(); await resources.tick(); await this.state.storage.sync(); await this.schedule(); }
     catch { await this.state.storage.setAlarm(Date.now()+30000); }
   }
   /** Sleep between necessary steps. There is no always-running interval or free-tier keepalive. */

@@ -264,7 +264,7 @@ describe('fallback authorization and API boundaries', () => {
     const addr=http.address(); if(!addr || typeof addr==='string') throw new Error('No test port');
     const server=createMcpServer(`http://127.0.0.1:${addr.port}`,f.config.agentToken), client=new Client({name:'lifecycle-test',version:'1'});
     const [a,b]=InMemoryTransport.createLinkedPair(); await server.connect(a);await client.connect(b); close.push(()=>server.close());close.push(()=>client.close());
-    const tools=await client.listTools(); expect(tools.tools).toHaveLength(6);
+    const tools=await client.listTools(); expect(tools.tools).toHaveLength(7);
     expect(JSON.stringify(tools.tools.find((t)=>t.name==='request_payment')!.inputSchema)).toContain('destination_currency');
     const result=await client.callTool({name:'request_payment',arguments:intent()}); expect(result.isError).toBe(false);
     const p=JSON.parse((result.content as {text:string}[])[0]!.text) as {id:string}; await ticks(f,6);

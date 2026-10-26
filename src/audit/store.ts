@@ -10,5 +10,6 @@ export class Store extends StoreCore {
   constructor(path: string) {
     if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     super(new Database(path));
+    this.db.pragma('synchronous = FULL');
   }
 }

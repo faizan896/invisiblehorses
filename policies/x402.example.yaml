@@ -1,0 +1,9 @@
+# Merge this optional block into the owner policy; placeholder hostname stays disabled
+# until you replace it with a merchant you trust. Agents cannot edit this configuration.
+x402:
+  max_per_request: "1.00"
+  max_per_day: "10.00"
+  allowed_hosts:
+    - host: api.example.com
+      category: data
+  categories: [data, inference, compute]

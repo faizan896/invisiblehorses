@@ -7,13 +7,14 @@ import type { PaymentService } from '../executor/service.js';
 import { AppError } from '../errors.js';
 import type { QuoteService } from '../rails/quotes.js';
 import type { RoutingService } from '../router/service.js';
+import type { X402Service } from '../x402/service.js';
 
 export type HttpConfig = { ownerToken: string; agentToken: string; agentId: string; readOnly?: boolean };
 const same = (a: string, b: string) => timingSafeEqual(createHash('sha256').update(a).digest(), createHash('sha256').update(b).digest());
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g, (v) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[v]!);
 const page = (title: string, content: string) => `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escape(title)} · railgate</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#18222c}nav,a{color:#1646a0}article{border:1px solid #cbd5e1;border-radius:8px;padding:20px;margin:20px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}button{padding:10px 20px;margin:8px}form{display:inline}td,th{padding:10px;text-align:left;vertical-align:top}table{width:100%;border-collapse:collapse}tr{border-bottom:1px solid #ddd}</style><body><h1>railgate <small>TEST MONEY ONLY</small></h1><nav><a href="/approvals">Approvals</a> · <a href="/dashboard">Dashboard</a></nav><h2>${escape(title)}</h2>${content}</body></html>`;
 
-export function createApp(service: PaymentService | UnifiedPaymentService, config: HttpConfig, quotes?: QuoteService, routing?: RoutingService) {
+export function createApp(service: PaymentService | UnifiedPaymentService, config: HttpConfig, quotes?: QuoteService, routing?: RoutingService, resources?: X402Service) {
   const app = new Hono();
   app.use('*', bodyLimit({ maxSize: 16 * 1024, onError: (c) => c.json({ error: 'Request body exceeds 16 KiB' }, 413) }));
   app.use('*', async (c, next) => {
@@ -55,6 +56,15 @@ export function createApp(service: PaymentService | UnifiedPaymentService, confi
   });
   app.get('/api/payments/:id', (c) => c.json(service.get(z.uuid().parse(c.req.param('id')), config.agentId)));
   app.get('/api/limits', (c) => c.json(service.limits()));
+  app.post('/api/paid-resources', async c => {
+    if (config.readOnly) throw new AppError(503, 'Payment writes are disabled during hosting verification');
+    if (!resources) throw new AppError(503, 'Paid resource service unavailable');
+    return c.json(await resources.request(await c.req.json(), config.agentId), 202);
+  });
+  app.get('/api/paid-resources/:id', async c => {
+    if (!resources) throw new AppError(503, 'Paid resource service unavailable');
+    return c.json(await resources.get(z.uuid().parse(c.req.param('id')), config.agentId));
+  });
   app.post('/api/quotes', async (c) => {
     if (!quotes) throw new AppError(503, 'Quote service unavailable');
     const result = await quotes.quotes(await c.req.json(), config.agentId);
@@ -83,7 +93,7 @@ export function createApp(service: PaymentService | UnifiedPaymentService, confi
   app.post('/approval-actions', (c) => {
     if (config.readOnly) throw new AppError(503, 'Approval actions are disabled during hosting verification');
     const query = z.strictObject({ token: z.string().min(1).max(1500) }).parse(c.req.query());
-    const result = service.decide(query.token);
+    const result = resources?.decideIfOwned(query.token) ?? service.decide(query.token);
     return c.html(page('Approval recorded', `<p>Payment ${escape(result.id)}: ${escape(result.status)}</p><p>${escape(result.evaluation.reasons.join('; '))}</p>`));
   });
   // GET never changes state: link scanners cannot approve/reject a payment.

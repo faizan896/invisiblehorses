@@ -84,7 +84,7 @@ describe('official MCP client → MCP server → real HTTP API → SQLite integr
     const client = new Client({ name: 'stdio-integration-test', version: '1.0.0' });
     cleanups.push(() => client.close());
     await client.connect(transport);
-    expect((await client.listTools()).tools).toHaveLength(6);
+    expect((await client.listTools()).tools).toHaveLength(7);
     const result = await client.callTool({ name: 'request_payment', arguments: intent() });
     expect(result.isError).toBe(false); await complete(f);
     expect(f.store.list()[0]!.status).toBe('completed');
@@ -100,7 +100,7 @@ describe('official MCP client → MCP server → real HTTP API → SQLite integr
     const [a, b] = InMemoryTransport.createLinkedPair(); await server.connect(a); await client.connect(b);
     cleanups.push(() => client.close()); cleanups.push(() => server.close());
     const tools = await client.listTools();
-    expect(tools.tools.map((t) => t.name).sort()).toEqual(['get_my_limits','get_payment_status','list_payments','plan_payment','quote_payment','request_payment']);
+    expect(tools.tools.map((t) => t.name).sort()).toEqual(['fetch_paid_resource','get_my_limits','get_payment_status','list_payments','plan_payment','quote_payment','request_payment']);
     const result = await client.callTool({ name: 'request_payment', arguments: intent() });
     expect(result.isError).toBe(false);
     const content = result.content as { type: string; text: string }[];

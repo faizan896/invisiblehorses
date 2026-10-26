@@ -23,6 +23,7 @@ jobs:
       - run: pnpm demo:offline
       - run: pnpm demo:quotes
       - run: pnpm demo:routing
+      - run: pnpm demo:x402
   container:
     runs-on: ubuntu-latest
     steps:

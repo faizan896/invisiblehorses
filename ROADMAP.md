@@ -13,13 +13,13 @@ railgate stays test-money-only: fixed Base Sepolia USDC (chain 84532), internal 
 
 Goal: fetch a resource, inspect its HTTP 402 requirements, apply owner rules/approval, pay using the verified official x402 `exact` scheme on Base Sepolia, and return the resource plus receipt.
 
-- [ ] Verify official x402 documentation/packages before implementing the protocol; report unsupported or unverifiable parts.
-- [ ] Add `fetch_paid_resource(url, max_price, purpose)` through MCP and a matching authenticated HTTP route, with an explicit idempotency key for payment retries.
-- [ ] Use server-provided prices, resource-host identity, owner host/category allowlists, per-request caps and daily API spending limits.
-- [ ] Persist requirements, authorization/payment state, receipt and resource result; never create another payment after an ambiguous response or restart.
-- [ ] Add a local protected weather/dataset fixture and `pnpm demo:x402`: a $0.01 fetch, an over-limit $5 denial and a retry with no second payment.
-- [ ] Write protocol/policy tests first, including 402 parsing, official-package headers, idempotency, approvals and denials. Mock external chain calls in tests and label the demo's execution mode.
-- [ ] Document setup, credentials needed for optional real testnet use, and all limitations.
+- [x] Verify official x402 documentation/packages before implementing the protocol; report unsupported or unverifiable parts.
+- [x] Add `fetch_paid_resource(url, max_price, purpose)` through MCP and a matching authenticated HTTP route, with an explicit idempotency key for payment retries.
+- [x] Use server-provided prices, resource-host identity, owner host/category allowlists, per-request caps and daily API spending limits.
+- [x] Persist requirements, authorization/payment state, receipt and resource result; never create another payment after an ambiguous response or restart.
+- [x] Add a local protected weather/dataset fixture and `pnpm demo:x402`: a $0.01 fetch, an over-limit $5 denial and a retry with no second payment.
+- [x] Write protocol/policy tests first, including 402 parsing, official-package headers, idempotency, approvals and denials. Mock external chain calls in tests and label the demo's execution mode.
+- [x] Document setup, credentials needed for optional real testnet use, and all limitations.
 
 ## Phase 3: standalone payroute package and playground
 

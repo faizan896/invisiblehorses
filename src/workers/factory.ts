@@ -14,6 +14,9 @@ import { RailRuntime } from '../executor/rail-runtime.js';
 import { QuoteService, defaultAdapters } from '../rails/quotes.js';
 import { RoutingService } from '../router/service.js';
 import type { DurableStorage } from './sqlite.js';
+import { X402Service } from '../x402/service.js';
+import { realX402Protocol } from '../x402/real.js';
+import type { ExactProtocol } from '../x402/protocol.js';
 
 export type Native = { executor: TestnetExecutor; address: Hex; balanceMinor: () => Promise<number>; returnExecutor?: TestnetExecutor; returnAddress?: Hex };
 export function durableExecutor(executor: TestnetExecutor, storage: DurableStorage): TestnetExecutor {
@@ -29,7 +32,7 @@ export async function realNative(cfg: ReturnType<typeof ConfigSchema.parse>): Pr
   if (returning) { await returning.assertTestnet(); await returning.verifyToken(); }
   return { executor, address: executor.walletAddress, balanceMinor: () => executor.balanceMinor(), returnExecutor: returning, returnAddress: returning?.walletAddress };
 }
-export async function createDurableService(store: StoreCore, storage: DurableStorage, cfg: ReturnType<typeof ConfigSchema.parse>, catalog: unknown, policyYaml: string, native: Native, notifier?: Notifier, clock = () => new Date()) {
+export async function createDurableService(store: StoreCore, storage: DurableStorage, cfg: ReturnType<typeof ConfigSchema.parse>, catalog: unknown, policyYaml: string, native: Native, notifier?: Notifier, clock = () => new Date(), resourceProtocol?: ExactProtocol) {
   const policyValue = PolicySchema.parse(parse(policyYaml)); const policy = () => policyValue;
   const profiles = new Counterparties(catalog).withWallets({ [cfg.AGENT_ID]: native.address, ...(cfg.DEMO_RECIPIENT_ADDRESS ? { dataco: cfg.DEMO_RECIPIENT_ADDRESS } : {}) });
   const tokens = new ApprovalTokens(cfg.APPROVAL_SECRET), channel = notifier ?? new NtfyNotifier(cfg.NTFY_SERVER, cfg.NTFY_TOPIC, cfg.NTFY_TOKEN);
@@ -40,5 +43,8 @@ export async function createDurableService(store: StoreCore, storage: DurableSto
   const routing = new RoutingService(store, profiles, quotes, policy, clock);
   const service = new UnifiedPaymentService(store, legacy, profiles, routing, runtime, policy, tokens, channel, cfg.PUBLIC_BASE_URL, clock);
   await service.initialize();
-  return { service, quotes, routing };
+  const resources = new X402Service({ store, policy, tokens, notifier: channel, protocol: resourceProtocol ?? realX402Protocol(cfg.BASE_SEPOLIA_RPC_URL, cfg.RAILGATE_PRIVATE_KEY as Hex), balanceMinor: native.balanceMinor, publicBaseUrl: cfg.PUBLIC_BASE_URL, clock, beforeSend: () => storage.sync() });
+  // Unconfigured x402 remains disabled; no extra RPC is needed on a legacy-only actor.
+  if (policyValue.x402) await resources.initialize();
+  return { service, quotes, routing, resources };
 }

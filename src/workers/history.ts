@@ -3,7 +3,7 @@ import { fingerprint } from '../intent/fingerprint.js';
 import { AddressSchema, IdSchema } from '../intent/schema.js';
 import type { SqlDatabase } from '../audit/store-core.js';
 
-export const historyTables = ['payments','approvals','audit','route_plans','payment_contexts','test_rail_accounts','test_rail_holds','rail_operations','test_rail_journal'] as const;
+export const historyTables = ['payments','approvals','audit','route_plans','payment_contexts','test_rail_accounts','test_rail_holds','rail_operations','test_rail_journal','resource_requests'] as const;
 const Scalar = z.union([z.string(), z.number().finite(), z.null()]);
 const Table = z.strictObject({ name: z.enum(historyTables), columns: z.array(z.string().regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/)).min(1), rows: z.array(z.array(Scalar)) });
 export const HistorySchema = z.strictObject({
