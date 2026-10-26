@@ -1,8 +1,45 @@
 # railgate
 
-railgate is an open-source payment layer for AI agents, inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural). An agent describes a payment; deterministic owner rules and human approvals control spending, a router chooses how to deliver the requested funds, and an append-only log records the result. It supports a common lifecycle across an internal test ledger, simulated banking and real **Base Sepolia test USDC**. **Test money only.**
+Spending limits, human approvals and smart rail routing for AI agent payments. Open source, test money only.
 
-![Offline railgate demo: a small payment completes, a larger payment needs simulated owner approval, the daily cap blocks overspending, and a retry creates no second debit](docs/media/railgate-offline.gif)
+![Offline demo: $5 completes, $45 needs simulated owner approval, a $150 cumulative attempt is denied, and a retry creates no second debit](docs/demo.gif)
+
+The GIF uses an in-memory test ledger and simulated approval/notifications. It makes no external calls. [MP4](docs/media/railgate-offline.mp4) · [Reproduce the recording](examples/overspend-demo/README.md#record-the-terminal-demo)
+
+```mermaid
+flowchart LR
+  Agent --> Gate[railgate policy gate]
+  Gate -->|approval needed| Phone[Approval via phone]
+  Gate -->|allowed| Router
+  Phone --> Router
+  Router --> Rail[Ledger / simulated bank / test USDC]
+  Rail --> Audit[Audit log]
+```
+
+## What it does
+
+- Enforces owner spending limits and recipient rules before funds move; larger payments need human approval.
+- Compares eligible rails, fees and delivery times, then explains the selected route and rejected alternatives.
+- Persists payment state, reservations and signed testnet transactions so retries reuse the original payment.
+- Offers MCP tools and an HTTP API, with an append-only audit log and explicit test/simulation labels.
+
+## Quickstart
+
+Use Node **20.19+, 22.13+ or 24** and **pnpm 10.20.0**. No wallet, faucet or provider credentials are needed for this offline demo.
+
+```sh
+pnpm install
+pnpm test
+pnpm demo:offline
+```
+
+[Full documentation](#full-documentation) · [Contributing](CONTRIBUTING.md) · [Roadmap](ROADMAP.md)
+
+## Full documentation
+
+### Architecture
+
+railgate is an open-source payment layer for AI agents, inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural). An agent describes a payment; deterministic owner rules and human approvals control spending, a router chooses how to deliver the requested funds, and an append-only log records the result. It supports a common lifecycle across an internal test ledger, simulated banking and real **Base Sepolia test USDC**. **Test money only.**
 
 This recording runs the actual policy/router/lifecycle against an in-memory test ledger. Owner approval and notifications are simulated; it makes no external calls or chain transfers. [MP4 video](docs/media/railgate-offline.mp4) · [Recording instructions and VHS tape](examples/overspend-demo/README.md#record-the-terminal-demo)
 
@@ -28,7 +65,7 @@ flowchart LR
   Router --> DB
 ```
 
-## Five-minute local quickstart
+### Five-minute local quickstart
 
 Use **Node 20.19+, 22.13+ or 24** and **pnpm 10.20.0**. Install that pnpm version with Corepack or `npm install --global pnpm@10.20.0`. From the checkout:
 
@@ -47,7 +84,7 @@ The offline overspend demo exercises the actual lifecycle with an in-memory test
 
 Tests use real SQLite, Hono, official MCP clients (including stdio) and local HTTP/RPC fixtures. External chains, notifications and Wise responses are mocked. CI runs lint, typecheck, tests, build and all offline demos on Node 20, 22 and 24.
 
-## Run the testnet service
+### Run the testnet service
 
 1. Run `pnpm init:local`. It preserves an existing `.env`; otherwise it generates dedicated test-only payer/merchant wallets, independent owner/agent/HMAC credentials and a random ntfy topic in a git-ignored **mode 0600** file. It prints only the payer's public address. `.env.example` contains placeholders.
 2. Fund the payer with **at least 55 test USDC** for the $5 + $45 approve path, and **Base Sepolia ETH** for gas. Use [Circle's faucet](https://faucet.circle.com/) with **Base Sepolia** selected and the [Base faucet directory](https://docs.base.org/base-chain/tools/network-faucets). Faucet quotas can take longer than five minutes. A full routing quote reserves its all-in modeled USD cost; exactly 50 test USDC may be insufficient for both payments plus fee allowances.
@@ -61,7 +98,7 @@ The CLI binds the configured payer's catalog wallet to the signing wallet and Da
 
 Owner pages `/approvals` and `/dashboard` require Basic username **`owner`**, password **`OWNER_API_TOKEN`**. `/approvals` provides Approve/Reject when a push is missed. The dashboard is read-only and shows decisions, reasons, hashes and audit events. `/owner/audit` accepts owner authentication; `/health` is public. Serve these routes over HTTPS. Run one payment daemon per database/signing wallet; do not run another process using that wallet's nonce or mutate payment state manually.
 
-## Connect Claude Desktop, Cursor or Codex
+### Connect Claude Desktop, Cursor or Codex
 
 Start the HTTP daemon and run `pnpm build`. Add this server to Claude Desktop's MCP configuration, Cursor's `.cursor/mcp.json`, or the equivalent Codex MCP configuration:
 
@@ -119,7 +156,7 @@ Identical normalized requests reuse their original ID/result. A changed payload 
 
 Legacy USD wallet requests with an inline `{id,name,address,category}` recipient are supported through the same gates, with the address required to match the owner catalog. Historical M1 fingerprints/IDs/hashes remain valid. Full intents are preferred for new integrations. Quote and plan requests alone never reserve funds or execute a payment.
 
-## Rails, quotes and routing
+### Rails, quotes and routing
 
 | Rail | Execution | Pricing / availability |
 | --- | --- | --- |
@@ -135,7 +172,7 @@ Quotes reconcile principal, all-in USD cost, fee/step totals, expected/latest us
 
 Identity, category, owner expiry and simulated KYB pass **before providers are called**. Every quote then passes recipient/corridor, policy budgets, amount/liquidity, deadline, max fee, FX, health, operating window and reversibility gates **before scoring**. Owner `routing` settings choose `lowest_cost`, `fastest` or `refund_certainty`, allowed rails, blocked countries and minimum certainty. Plans store alternatives, rejection reasons and a policy hash. [policies/corporate.example.yaml](policies/corporate.example.yaml) supplies a separate fictional high-value budget for the 250,000 MXN demo; it never replaces the server's $100 limits.
 
-## Lifecycle, fallback and returns
+### Lifecycle, fallback and returns
 
 ```text
 created → recipient_resolved → route_selected → funds_reserved
@@ -152,7 +189,7 @@ Automatic fallback requires proof that no funds may have left, no irreversible t
 
 A rejected simulated bank destination returns principal to the original payer and retains quoted fees. Only confirmed source credit produces `returned`. The owner can request a return with `POST /owner/payments/:id/return`, owner authentication and an empty JSON object. The dashboard remains read-only. USDC generally needs recipient cooperation: an optional matching `DEMO_RECIPIENT_PRIVATE_KEY` enables the dedicated test recipient to sign a return, and that recipient also needs test ETH for gas. Missing cooperation, insufficient gas, an unknown outcome or a reverted transaction never produces a fabricated refund. A real cooperative return was not exercised in this instance.
 
-## Owner policy
+### Owner policy
 
 [policies/example.yaml](policies/example.yaml) has a hard **$100/payment**, **$100/day**, and approval **strictly above $20**. All-in source cost includes modeled fees. `new_merchant_max: 5.10` permits the first $5 wallet demo plus its modeled $0.03 fee allowance; it is an inclusive hard ceiling, not an approval override.
 
@@ -165,7 +202,7 @@ A rejected simulated bank destination returns principal to the original payer an
 
 The owner file reloads on evaluation; invalid rules fail closed. Daily accounting uses **UTC** and the day funds were committed for execution. Reserved/unknown outcomes retain budget; rejection/expiry releases it. Confirmed returns retain nonrefundable fees against the original execution day. Approval never overrides hard policy, compliance or delivery constraints.
 
-## Security and limits
+### Security and limits
 
 - Approval URLs use HMAC-SHA256, a random single-use nonce and 15-minute expiry. One decision consumes both actions; replay/forgery/expiry fail. **GET never approves**. ntfy uses its [documented JSON publish API](https://docs.ntfy.sh/publish/#using-a-json-array) behind a `Notifier` interface; its POST buttons and owner web page provide the two paths.
 - The fixed token is Circle's [Base Sepolia test USDC](https://developers.circle.com/stablecoins/usdc-contract-addresses). No live bank, Wise transfer, mainnet, live FX or actual fiat on/off-ramp path exists. Fictional KYB flags are not a real compliance service.
@@ -173,7 +210,7 @@ The owner file reloads on evaluation; invalid rules fail closed. Daily accountin
 - Isolate `.env`, wallet, policy, catalog and database files from the agent. An agent with owner filesystem access has owner privileges. Owner HTML escapes agent content and disables scripts, framing, caching and referrer leakage.
 - Never publish keys, topics, approval URLs, signed bytes or private database backups. Preserve the database during recovery; do not delete reservations or reuse a signing wallet outside this daemon to force a retry. Two L2 confirmations are not Ethereum finality.
 
-## Milestones and evidence
+### Milestones and evidence
 
 1. Deterministic policy, ntfy approvals, MCP and test USDC: **implemented**. A real $5 transfer, owner rejection of $45, overspend denials and unchanged retry hash passed. [M1 evidence](docs/milestone-1.md) distinguishes ntfy API acceptance from unconfirmed native-app delivery.
 2. Full intents, profiles and normalized quotes: **implemented**. [M2](docs/milestone-2.md).
@@ -183,7 +220,7 @@ The owner file reloads on evaluation; invalid rules fail closed. Daily accountin
 
 Milestones were tested and committed in order. Current-instance checks do not establish remote CI execution, cloud publication or restoration in a fresh task.
 
-## Free Vercel + persistent Cloudflare hosting
+### Free Vercel + persistent Cloudflare hosting
 
 The free hosting path uses the existing Vercel gateway plus a **Cloudflare Workers Free** backend: one SQLite-backed Durable Object stores payment history and native alarms resume execution without an always-running server. See [the free deployment guide](docs/deployment-free.md). The Vercel project receives only `RAILGATE_BACKEND_ORIGIN`; wallet/owner/ntfy secrets stay on the backend. Cloudflare's free quotas are finite: exceeding them produces errors and requires waiting for reset or reducing usage. This setup never enables a paid plan automatically.
 
