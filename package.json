@@ -23,6 +23,7 @@
     "test:watch": "vitest",
     "demo": "tsx examples/overspend-demo/live.ts",
     "demo:offline": "tsx examples/overspend-demo/offline.ts",
+    "demo:record": "vhs examples/overspend-demo/railgate.tape",
     "demo:quotes": "tsx examples/quotes-demo.ts",
     "demo:routing": "tsx examples/routing-demo.ts",
     "build:worker": "wrangler deploy --dry-run --outdir worker-dist/production",

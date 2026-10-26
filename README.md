@@ -2,6 +2,10 @@
 
 railgate is an open-source payment layer for AI agents, inspired by [Stablecoins at Natural](https://faizan.sh/stablecoins-at-natural). An agent describes a payment; deterministic owner rules and human approvals control spending, a router chooses how to deliver the requested funds, and an append-only log records the result. It supports a common lifecycle across an internal test ledger, simulated banking and real **Base Sepolia test USDC**. **Test money only.**
 
+![Offline railgate demo: a small payment completes, a larger payment needs simulated owner approval, the daily cap blocks overspending, and a retry creates no second debit](docs/media/railgate-offline.gif)
+
+This recording runs the actual policy/router/lifecycle against an in-memory test ledger. Owner approval and notifications are simulated; it makes no external calls or chain transfers. [MP4 video](docs/media/railgate-offline.mp4) · [Recording instructions and VHS tape](examples/overspend-demo/README.md#record-the-terminal-demo)
+
 ```mermaid
 flowchart LR
   Agent[Claude / Cursor / Codex] --> MCP[MCP: limited agent credential]
