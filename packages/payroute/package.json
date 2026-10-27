@@ -1,20 +1,25 @@
 {
   "name": "payroute",
   "version": "0.1.0",
-  "private": true,
   "description": "Deterministic payment rail routing with costs, deadlines and explanations. Test money only.",
+  "keywords": ["payments", "routing", "stablecoins", "usdc", "agents", "mcp", "x402"],
   "type": "module",
   "license": "MIT",
-  "engines": { "node": ">=20.19.0" },
-  "files": ["dist", "README.md", "LICENSE", "examples"],
+  "repository": { "type": "git", "url": "git+https://github.com/faizan896/railgate.git", "directory": "packages/payroute" },
+  "homepage": "https://github.com/faizan896/railgate/tree/main/packages/payroute#readme",
+  "bugs": { "url": "https://github.com/faizan896/railgate/issues" },
+  "engines": { "node": ">=20" },
+  "files": ["dist", "README.md", "LICENSE"],
+  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-    "./*": { "types": "./dist/*.d.ts", "default": "./dist/*.js" }
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./*": { "types": "./dist/*.d.ts", "import": "./dist/*.js" }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build && npm test",
     "typecheck": "tsc -p tsconfig.test.json --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "lint": "eslint src test playground/main.ts",

@@ -1,0 +1,77 @@
+Command: npm pack --dry-run
+Directory: packages/payroute
+
+npm notice
+npm notice 📦  payroute@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 10.1kB README.md
+npm notice 2.3kB dist/counterparty/profiles.d.ts
+npm notice 2.1kB dist/counterparty/profiles.js
+npm notice 2.9kB dist/counterparty/profiles.js.map
+npm notice 205B dist/errors.d.ts
+npm notice 181B dist/errors.js
+npm notice 240B dist/errors.js.map
+npm notice 614B dist/index.d.ts
+npm notice 647B dist/index.js
+npm notice 487B dist/index.js.map
+npm notice 1.3kB dist/intent/routing.d.ts
+npm notice 1.1kB dist/intent/routing.js
+npm notice 1.4kB dist/intent/routing.js.map
+npm notice 874B dist/intent/schema.d.ts
+npm notice 1.5kB dist/intent/schema.js
+npm notice 2.1kB dist/intent/schema.js.map
+npm notice 552B dist/policy/engine.d.ts
+npm notice 2.2kB dist/policy/engine.js
+npm notice 2.0kB dist/policy/engine.js.map
+npm notice 538B dist/policy/routing.d.ts
+npm notice 549B dist/policy/routing.js
+npm notice 778B dist/policy/routing.js.map
+npm notice 1.5kB dist/policy/schema.d.ts
+npm notice 1.1kB dist/policy/schema.js
+npm notice 1.4kB dist/policy/schema.js.map
+npm notice 1.6kB dist/rails/ach-mock.d.ts
+npm notice 1.5kB dist/rails/ach-mock.js
+npm notice 1.6kB dist/rails/ach-mock.js.map
+npm notice 6.0kB dist/rails/adapter.d.ts
+npm notice 3.6kB dist/rails/adapter.js
+npm notice 4.2kB dist/rails/adapter.js.map
+npm notice 288B dist/rails/calendar.d.ts
+npm notice 3.3kB dist/rails/calendar.js
+npm notice 5.0kB dist/rails/calendar.js.map
+npm notice 1.6kB dist/rails/ledger.d.ts
+npm notice 874B dist/rails/ledger.js
+npm notice 858B dist/rails/ledger.js.map
+npm notice 931B dist/rails/pricing.d.ts
+npm notice 2.0kB dist/rails/pricing.js
+npm notice 2.2kB dist/rails/pricing.js.map
+npm notice 3.7kB dist/rails/quotes.d.ts
+npm notice 2.5kB dist/rails/quotes.js
+npm notice 2.6kB dist/rails/quotes.js.map
+npm notice 1.6kB dist/rails/usdc-quote.d.ts
+npm notice 3.1kB dist/rails/usdc-quote.js
+npm notice 2.9kB dist/rails/usdc-quote.js.map
+npm notice 3.8kB dist/rails/wise-quote.d.ts
+npm notice 6.3kB dist/rails/wise-quote.js
+npm notice 6.1kB dist/rails/wise-quote.js.map
+npm notice 831B dist/router.d.ts
+npm notice 1.6kB dist/router.js
+npm notice 1.8kB dist/router.js.map
+npm notice 1.7kB dist/router/engine.d.ts
+npm notice 9.7kB dist/router/engine.js
+npm notice 10.6kB dist/router/engine.js.map
+npm notice 1.6kB package.json
+npm notice Tarball Details
+npm notice name: payroute
+npm notice version: 0.1.0
+npm notice filename: payroute-0.1.0.tgz
+npm notice package size: 31.6 kB
+npm notice unpacked size: 135.8 kB
+npm notice shasum: 1f20d1c31e5a322761bdfc33fa07fc5e28d2471f
+npm notice integrity: sha512-f+Q2ZCLnYgJLI[...]gj7ZjdYSX/2sg==
+npm notice total files: 57
+npm notice
+payroute-0.1.0.tgz
+
+Exact sizes: 31576 bytes packed; 135834 bytes unpacked; 57 files.
+Archive checks: whitelist only; no secrets, environment files, tests or fixture files.
