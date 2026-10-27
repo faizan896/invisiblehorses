@@ -16,7 +16,7 @@ try {
   await api.initialize();
   const request = { url: 'https://api.example.test/weather', max_price: '1.00', purpose: 'weather lookup', idempotency_key: 'weather-once' };
   const first = await api.request(request, 'demo-agent'); assert.equal(first.status, 'completed');
-  console.log('1. $0.01 test USDC paid →', first.resource!.body);
+  console.log('1. $0.01 test USDC paid →', first.resource!.body.replaceAll(' \u2014 ', ': '));
   const denied = await api.request({ ...request, url: 'https://api.example.test/expensive', idempotency_key: 'over-cap' }, 'demo-agent');
   assert.equal(denied.status, 'denied'); console.log('2. $5.00 denied →', denied.evaluation.reasons.join('; '));
   assert.deepEqual(await api.request(request, 'demo-agent'), first); assert.equal(fixture.charges(), 1);

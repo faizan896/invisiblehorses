@@ -18,7 +18,7 @@ The committed [tape](railgate.tape) uses VHS 0.12.1, ttyd 1.7.7, FFmpeg, Chromiu
 
 For the social video, use a 35–45 second recording of an MCP-connected Claude/Cursor/Codex client plus a separate camera shot or screen recording of the owner's phone:
 
-1. Show “Base Sepolia — test money only” and the actual configured limits. Keep keys and private subscription topics out of the frame.
+1. Show “Base Sepolia: test money only” and the actual configured limits. Keep keys and private subscription topics out of the frame.
 2. Ask the agent for a small test-USDC payment and show its real completed result/hash.
 3. Request an amount above the approval threshold only after funding and recipient checks pass. Show the actual phone alert, the human's approval, and the resulting payment status. Verify device subscription/delivery before recording; server publication alone is not proof that the phone received it. Direct notification action support depends on platform; use the owner approval page as needed.
 4. Ask for $150 and show the actual policy denial. No dashboard shot is required.
