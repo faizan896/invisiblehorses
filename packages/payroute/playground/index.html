@@ -1,37 +1,260 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Compare payment rails by cost, timing and reversibility. An interactive, test-money-only routing playground." />
-  <title>payroute: find the right rail</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23274332'/%3E%3Ctext x='12' y='34' fill='%23f6f3eb' font-size='34' font-family='Georgia'%3Ep%3C/text%3E%3C/svg%3E" />
-</head>
-<body>
-  <div class="shell">
-    <header><a class="wordmark" href="./" aria-label="payroute home"><span class="mark">p<span>→</span></span>payroute<span class="version">0.1</span></a><nav><a href="https://github.com/faizan896/railgate/tree/main/packages/payroute">Source →</a><span class="badge">TEST MONEY ONLY</span></nav></header>
-    <main>
-      <section class="intro"><p class="eyebrow">THE PAYMENT ROUTING PLAYGROUND</p><h1>The right rail.<br>For every payment.</h1><p class="lede">One intent. Every available route.<br>See what wins on cost, timing and certainty, and why.</p></section>
-      <div class="scenario-bar" aria-label="Example scenarios"><span>TRY A SCENARIO</span><button data-scenario="domestic">US invoice</button><button data-scenario="monday">MXN · Monday night</button><button data-scenario="tuesday">MXN · Tuesday morning</button><button data-scenario="refund">Refund</button><button data-scenario="weekend">Weekend</button><button data-scenario="holiday">Bank holiday</button></div>
-      <div class="workspace">
-        <section class="intent-panel panel"><div class="panel-heading"><span class="step">01</span><h2>Your intent</h2></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Compare test payment routes, see their sources and explore editable assumptions."
+    />
+    <title>payroute playground</title>
+    <script>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("payroute-theme") || "";
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a href="https://faizan.sh">Faizan</a>
+        <nav>
+          <a
+            href="https://github.com/faizan896/railgate/tree/main/packages/payroute"
+            >Source ↗</a
+          ><button id="theme" type="button" aria-label="Switch color theme">
+            Dark mode
+          </button>
+        </nav>
+      </header>
+      <main>
+        <section class="intro">
+          <p class="small">railgate / playground</p>
+          <h1>payroute</h1>
+          <p>
+            Compare ways to send money by cost, arrival time and your deadline.
+          </p>
+          <p class="small">Planning tool with test data. Not a quote.</p>
+        </section>
+        <div class="scenarios" role="group" aria-label="Example scenarios">
+          <button data-scenario="domestic" aria-pressed="true">
+            US invoice</button
+          ><button data-scenario="monday" aria-pressed="false">
+            MXN Monday night</button
+          ><button data-scenario="tuesday" aria-pressed="false">
+            MXN Tuesday morning</button
+          ><button data-scenario="refund" aria-pressed="false">Refund</button
+          ><button data-scenario="weekend" aria-pressed="false">Weekend</button
+          ><button data-scenario="holiday" aria-pressed="false">
+            Bank holiday
+          </button>
+        </div>
+        <section class="inputs" aria-labelledby="input-title">
+          <h2 id="input-title">Your payment</h2>
           <form id="intent-form">
-            <label for="amount">Recipient receives</label><div class="amount-input"><input id="amount" name="amount" type="number" min="0.01" max="999999999.99" step="0.01" value="10.00" required /><select id="currency" aria-label="Recipient currency"><option>USD</option><option>MXN</option><option>EUR</option></select></div><p id="recipient-name" class="hint"></p>
-            <div class="field-row"><div><label for="source">Pay from</label><select id="source"><option>USD</option></select></div><div><label for="delivery">Deliver to</label><select id="delivery"><option value="any">Any form</option><option value="bank">Bank account</option><option value="wallet">USDC wallet</option><option value="internal">Internal account</option></select></div></div>
-            <fieldset><legend>When is it sent? <span>UTC</span></legend><div class="field-row"><input id="day" aria-label="Send date in UTC" type="date" value="2026-10-27" required /><input id="time" aria-label="Send time in UTC" type="time" value="14:00" required /></div><p id="bank-time" class="hint"></p></fieldset>
-            <label for="deadline">Funds needed by <span class="label-note">UTC</span></label><input id="deadline" type="datetime-local" value="2026-11-06T23:00" required />
-            <div class="field-row"><div><label for="max-fee">Max total fee <span class="label-note">USD</span></label><input id="max-fee" type="number" min="0" max="999999" step="0.01" value="100.00" required /></div><div><label for="reversibility">Reversibility</label><select id="reversibility"><option value="none">No requirement</option><option value="preferred">Preferred</option><option value="required">Required</option></select></div></div>
-            <label for="scoring">Optimize for</label><select id="scoring"><option value="cheapest-by-deadline">Lowest cost by deadline</option><option value="fastest">Fastest availability</option><option value="most-certain">Certainty & reversibility</option></select>
-            <label class="check"><input id="avoid-stablecoins" type="checkbox" /><span>Recipient refuses stablecoins</span></label>
-            <button type="submit" class="primary">Find a route <span>→</span></button>
-            <p class="form-note">Planning only. Nothing is signed or sent.</p>
+            <div class="form-grid">
+              <div>
+                <label for="amount">Recipient receives</label>
+                <div class="amount">
+                  <input
+                    id="amount"
+                    type="number"
+                    min="0.01"
+                    max="999999999.99"
+                    step="0.01"
+                    value="10.00"
+                    required
+                  /><select id="currency" aria-label="Recipient currency">
+                    <option>USD</option>
+                    <option>MXN</option>
+                    <option>EUR</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label for="send"
+                  >Send time <span class="small">UTC</span></label
+                ><input
+                  id="send"
+                  type="datetime-local"
+                  value="2026-10-27T14:00"
+                  required
+                />
+              </div>
+              <div>
+                <label for="deadline"
+                  >Deadline <span class="small">UTC</span></label
+                ><input
+                  id="deadline"
+                  type="datetime-local"
+                  value="2026-11-06T23:00"
+                  required
+                />
+              </div>
+              <div>
+                <label for="delivery">Deliver to</label
+                ><select id="delivery">
+                  <option value="any">Any account</option>
+                  <option value="bank">Bank account</option>
+                  <option value="wallet">USDC wallet</option>
+                  <option value="internal">Internal account</option>
+                </select>
+              </div>
+              <div>
+                <label for="scoring">Optimise for</label
+                ><select id="scoring">
+                  <option value="cheapest-by-deadline">
+                    Lowest cost by deadline
+                  </option>
+                  <option value="fastest">Earliest arrival</option>
+                  <option value="most-certain">Refunds and certainty</option>
+                </select>
+              </div>
+            </div>
+            <p id="bank-time" class="small"></p>
+            <p class="small">
+              Amounts, dates and preferences are test inputs you choose.
+            </p>
+            <details>
+              <summary>Advanced options</summary>
+              <div class="advanced">
+                <div>
+                  <label for="max-fee">Maximum fees in USD</label
+                  ><input
+                    id="max-fee"
+                    type="number"
+                    min="0"
+                    max="999999"
+                    step="0.01"
+                    value="100.00"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="reversibility">Can the payment be undone?</label
+                  ><select id="reversibility">
+                    <option value="none">No requirement</option>
+                    <option value="preferred">Prefer a refund option</option>
+                    <option value="required">Must be fully reversible</option>
+                  </select>
+                </div>
+                <label class="check"
+                  ><input id="avoid-stablecoins" type="checkbox" />Avoid
+                  stablecoins</label
+                >
+              </div>
+            </details>
+            <button class="primary" type="submit">Compare routes →</button>
           </form>
         </section>
-        <section class="results" aria-label="Routing results" aria-live="polite" aria-busy="false"><div class="panel-heading"><span class="step">02</span><h2>The route</h2><span id="quote-count" class="quiet"></span></div><div id="chosen"></div><div class="comparison-heading"><h3>Every route, explained</h3><span class="quiet">All-in costs in USD</span></div><div id="quotes" class="quote-grid"></div><details class="model-note"><summary>How this model works</summary><p>Fictional counterparty profiles; fixed demonstration FX rates (17 MXN and 0.92 EUR per USD). Fees, bank delivery and liquidity are modeled. ACH uses a 16:00 New York cutoff, weekends and US banking holidays. No real bank, wallet, RPC or Wise API is contacted.</p><p>Demo owner policy: $30,000 per payment, $50,000/day, $100 approval threshold, zero existing spend. Approval requirements remain visible. This page cannot approve or execute payments.</p></details></section>
-      </div>
-    </main>
-    <footer><span>Built for decisions you can explain.</span><span><a href="https://github.com/faizan896/railgate">Part of railgate</a> · MIT licensed · Test money only</span></footer>
-  </div>
-  <script type="module" src="./main.ts"></script>
-</body>
+        <section
+          class="results"
+          aria-label="Routing results"
+          aria-live="polite"
+          aria-busy="false"
+        >
+          <div id="chosen"></div>
+          <div class="section-heading">
+            <h2>Every route</h2>
+            <span class="small">All-in = USD principal + fees</span>
+          </div>
+          <p class="small">
+            Ranges vary external fees around the central estimate. Rankings and
+            limits use the central estimate. Arrival windows are planning
+            bounds.
+          </p>
+          <div
+            class="table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="Payment route comparison"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Route</th>
+                  <th scope="col">All-in cost</th>
+                  <th scope="col">Money arrives</th>
+                  <th scope="col">Certainty</th>
+                  <th scope="col">Decision</th>
+                </tr>
+              </thead>
+              <tbody id="quotes"></tbody>
+            </table>
+          </div>
+          <section class="timeline-section">
+            <h2>When the money arrives</h2>
+            <p class="small">
+              Now means your chosen send time. Shading shows the assumed bank
+              window and US banking closures, not chain downtime or Mexican
+              holidays.
+            </p>
+            <div id="timeline"></div>
+          </section>
+        </section>
+        <section class="assumptions">
+          <div class="section-heading">
+            <h2>Assumptions</h2>
+            <button id="reset" type="button">Reset values</button>
+          </div>
+          <p>Change any value to see the routes recalculate.</p>
+          <p class="small">
+            No provider is selected for bank fees, funding or payouts. Published
+            wholesale fees cannot stand in for a customer quote.
+          </p>
+          <p id="assumption-error" role="alert"></p>
+          <details>
+            <summary>
+              Pricing and timing inputs <span id="assumption-count"></span>
+            </summary>
+            <div id="assumption-fields"></div>
+          </details>
+        </section>
+        <section class="sources">
+          <h2>Numbers and sources</h2>
+          <p id="checked" class="small"></p>
+          <p class="small">
+            Published rules provide context. A route whose fees or delivery time
+            depend on an assumption stays labelled assumption.
+          </p>
+          <div id="live-data" class="small" aria-live="polite"></div>
+          <details>
+            <summary>Public rules and price references</summary>
+            <div id="public-sources"></div>
+          </details>
+          <details>
+            <summary>Full numbers audit</summary>
+            <div
+              class="table-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="Numbers audit"
+            >
+              <table>
+                <thead>
+                  <tr>
+                    <th>Number</th>
+                    <th>Value</th>
+                    <th>Origin and classification</th>
+                  </tr>
+                </thead>
+                <tbody id="audit"></tbody>
+              </table>
+            </div>
+          </details>
+          <p class="small">
+            Fictional recipients. EUR recipient verification is pending, so
+            routes are blocked by policy. FedNow and RTP are reference rules
+            only, not available routes. No payment is signed or sent.
+          </p>
+        </section>
+      </main>
+      <footer>
+        <span>Planning tool with test data. Not a quote.</span
+        ><a href="https://github.com/faizan896/railgate">railgate ↗</a>
+      </footer>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
 </html>
