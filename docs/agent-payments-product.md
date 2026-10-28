@@ -2,6 +2,8 @@
 
 [Open the working product](https://railgate-self.vercel.app/app/) · [Routing playground](https://railgate-self.vercel.app/playground/)
 
+[Watch the 51-second product walkthrough](https://railgate-self.vercel.app/railgate-walkthrough.mp4). Captured from the deployed app, with readable captions and the private API key hidden. Shows workspace creation, scoped access, spending rules, a $75 approval, background settlement and the audit record. Internal test credits only.
+
 Railgate turns an agent's payment request into an owner-controlled workflow: authenticate a scoped key, check company and agent budgets, reserve spending capacity, collect approval when necessary, settle accepted work in a durable internal ledger, and keep an append-only record.
 
 The public release is a working demo with internal USD test credits. It does not connect to customers' bank accounts, move production crypto, or claim to be a licensed payment processor. The infrastructure and controls execute on the server; dashboard records are not hardcoded examples.
