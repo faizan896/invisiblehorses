@@ -17,7 +17,8 @@ import { PaymentService } from './service.js';
 import { RailRuntime } from './rail-runtime.js';
 import { assertTransition, RouteFailure, safeFallback, WalletBusy } from './state.js';
 
-export const RequestSchema = z.union([PaymentIntentV2Schema, PaymentIntentSchema]);
+import { RequestSchema } from '../intent/request.js';
+export { RequestSchema } from '../intent/request.js';
 const Context = z.object({
   original: RequestSchema, intent: PaymentIntentV2Schema, recipient: CounterpartySchema.nullable(),
   quote: RouteQuoteSchema.nullable(), operation: z.string().nullable(), attempt: z.number().int(),

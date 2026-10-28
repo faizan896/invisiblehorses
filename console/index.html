@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Give agents a budget and keep control of every payment. Try a private railgate demo workspace."
+    />
+    <title>Workspace · railgate</title>
+    <script>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("payroute-theme") || "";
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"><p class="loading">Opening your workspace…</p></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

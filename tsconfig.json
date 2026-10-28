@@ -1,9 +1,28 @@
 {
   "compilerOptions": {
-    "target": "ES2022", "module": "NodeNext", "moduleResolution": "NodeNext",
-    "strict": true, "noUncheckedIndexedAccess": true, "esModuleInterop": true,
-    "skipLibCheck": true, "resolveJsonModule": true, "outDir": "dist",
-    "types": ["node"], "forceConsistentCasingInFileNames": true
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "api/**/*.ts", "test/**/*.ts", "cloudflare-test/**/*.ts", "examples/**/*.ts", "scripts/**/*.ts", "vitest.config.ts", "vitest.cloudflare.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "api/**/*.ts",
+    "test/**/*.ts",
+    "cloudflare-test/**/*.ts",
+    "examples/**/*.ts",
+    "scripts/**/*.ts",
+    "vitest.config.ts",
+    "vitest.cloudflare.config.ts",
+    "console/**/*.ts",
+    "console-test/**/*.ts",
+    "vitest.console.config.ts"
+  ]
 }

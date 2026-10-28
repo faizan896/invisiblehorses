@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Railgate gives software agents scoped payment access, spending rules, owner approvals and durable background processing. Try the working demo."
+    />
+    <title>railgate · Payments agents can use. Controls you can trust.</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #faf8f5;
+        --text: #1a1a1a;
+        --muted: #666;
+        --line: #e8e0d5;
+        --accent: #295f7c;
+        --wash: #ede8e1;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --bg: #212226;
+          --text: #e2e4e9;
+          --muted: #b8bcc8;
+          --line: #3c3e47;
+          --accent: #a0b4cc;
+          --wash: #2e3038;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          15px/1.7 "Helvetica Neue",
+          Arial,
+          sans-serif;
+      }
+      .shell {
+        max-width: 1060px;
+        margin: auto;
+        padding: 0 28px;
+      }
+      header,
+      nav,
+      footer,
+      .actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      header {
+        padding: 26px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      a {
+        color: var(--accent);
+        text-underline-offset: 4px;
+      }
+      .brand {
+        font:
+          30px "Times New Roman",
+          Times,
+          serif;
+        color: var(--text);
+        text-decoration: none;
+      }
+      nav,
+      small,
+      .small,
+      .eyebrow,
+      footer,
+      code {
+        font-size: 13px;
+      }
+      .small,
+      small,
+      .eyebrow,
+      footer {
+        color: var(--muted);
+      }
+      h1,
+      h2,
+      h3 {
+        font:
+          normal 30px/1.25 "Times New Roman",
+          Times,
+          serif;
+        margin: 0 0 20px;
+      }
+      p {
+        margin: 0 0 18px;
+      }
+      .hero {
+        padding: 90px 0 70px;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 65px;
+      }
+      .hero > div:first-child {
+        max-width: 520px;
+      }
+      .eyebrow {
+        margin-bottom: 20px;
+      }
+      .actions {
+        justify-content: flex-start;
+        gap: 10px;
+        margin: 26px 0;
+      }
+      .button {
+        padding: 10px 16px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .primary {
+        background: var(--accent);
+        color: var(--bg);
+        border-color: var(--accent);
+      }
+      .example {
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        padding: 24px;
+        align-self: start;
+      }
+      .example p {
+        margin: 8px 0;
+      }
+      .example ol {
+        list-style: none;
+        padding: 0;
+      }
+      .example li {
+        border-left: 1px solid var(--line);
+        padding: 0 0 20px 20px;
+        position: relative;
+      }
+      .example li:before {
+        content: "";
+        position: absolute;
+        left: -4px;
+        top: 9px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .example code {
+        display: block;
+        color: var(--muted);
+      }
+      section {
+        padding: 40px 0;
+        border-top: 1px solid var(--line);
+      }
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+      }
+      .features h3 {
+        margin-bottom: 12px;
+      }
+      .truth {
+        background: var(--wash);
+        padding: 24px;
+        margin-top: 26px;
+      }
+      .flow {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+      }
+      .flow pre {
+        font-size: 13px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        padding: 24px;
+        background: var(--wash);
+        border-radius: 3px;
+        margin: 0;
+      }
+      .flow ol {
+        padding-left: 22px;
+      }
+      .flow li {
+        margin-bottom: 14px;
+      }
+      footer {
+        padding: 28px 0 40px;
+        border-top: 1px solid var(--line);
+        margin-top: 30px;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+      }
+      @media (max-width: 700px) {
+        .shell {
+          padding: 0 20px;
+        }
+        .hero {
+          padding: 50px 0 40px;
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+        .features,
+        .flow {
+          grid-template-columns: 1fr;
+        }
+        .features {
+          gap: 20px;
+        }
+        nav {
+          gap: 14px;
+        }
+        .example {
+          padding: 20px;
+        }
+        section {
+          padding: 30px 0;
+        }
+        footer {
+          gap: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a class="brand" href="/">railgate</a>
+        <nav aria-label="Main">
+          <a href="/playground/">Routing playground</a
+          ><a href="https://github.com/faizan896/railgate">GitHub ↗</a
+          ><a class="button" href="/app/">Open workspace →</a>
+        </nav>
+      </header>
+      <main>
+        <div class="hero">
+          <div>
+            <p class="eyebrow">Payment controls for software agents</p>
+            <h1>Give agents a budget.<br />Keep control of every payment.</h1>
+            <p>
+              Your agent requests a payment. Railgate checks its permissions,
+              reserves the budget, asks for your approval when needed, and
+              finishes accepted work in the background.
+            </p>
+            <div class="actions">
+              <a class="button primary" href="/app/">Try the working demo →</a
+              ><a
+                class="button"
+                href="https://github.com/faizan896/railgate/blob/main/docs/agent-payments-product.md"
+                >Read the architecture</a
+              >
+            </div>
+            <p class="small">
+              Private demo workspace. Real API and background processing.<br />Internal
+              test credits. No bank connection required.
+            </p>
+          </div>
+          <div class="example">
+            <p class="small">Example flow, not live transaction data</p>
+            <h2>One request. Every decision recorded.</h2>
+            <ol>
+              <li>
+                Agent requests a vendor payment<code
+                  >POST /console-api/v1/payments</code
+                >
+              </li>
+              <li>
+                Permissions and budget checked<code
+                  >Scoped key · company + agent limits</code
+                >
+              </li>
+              <li>
+                Owner approves when required<code
+                  >Agent keys cannot approve themselves</code
+                >
+              </li>
+              <li>
+                Background worker settles the ledger<code
+                  >Durable record · duplicate-safe request</code
+                >
+              </li>
+            </ol>
+            <p class="small">Close the tab. The server keeps working.</p>
+          </div>
+        </div>
+        <section>
+          <p class="eyebrow">Built around the boundaries that matter</p>
+          <div class="features">
+            <article>
+              <h3>Access with a scope.</h3>
+              <p>
+                Give each agent its own API key. Choose read or payment
+                permissions, see when the key was used, and revoke it
+                immediately.
+              </p>
+            </article>
+            <article>
+              <h3>A budget before a balance.</h3>
+              <p>
+                Company limits, agent limits and vendor allowlists are checked
+                server-side. Pending work reserves budget so simultaneous
+                requests cannot spend it twice.
+              </p>
+            </article>
+            <article>
+              <h3>Work that outlives a tab.</h3>
+              <p>
+                Durable jobs handle queued requests. The worker rechecks the
+                current rules and records settlement with balanced ledger
+                entries.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section class="flow">
+          <div>
+            <h2>An API your agent can use today.</h2>
+            <ol>
+              <li>Create a private demo workspace.</li>
+              <li>Issue a scoped test key to an agent.</li>
+              <li>Send a payment request with an idempotency key.</li>
+              <li>Inspect approvals, payment status and the audit trail.</li>
+            </ol>
+            <a class="button primary" href="/app/">Create your workspace →</a>
+          </div>
+          <pre><code>POST /console-api/v1/payments
+Authorization: Bearer YOUR_TEST_KEY
+Content-Type: application/json
+
+{
+  "idempotency_key": "invoice_001",
+  "recipient": "dataco",
+  "amount": "12.50",
+  "purpose": "Research data invoice"
+}
+
+// Read the persisted payment status.
+// Retry the same request without paying twice.</code></pre>
+        </section>
+        <section>
+          <h2>Clear about what ships.</h2>
+          <p>
+            This release is a working agent payments control plane with isolated
+            demo workspaces, hashed keys, deterministic policies, owner
+            approvals, durable processing and an append-only audit log.
+          </p>
+          <div class="truth">
+            <p>
+              Payments settle in the internal demo ledger. External bank payouts
+              and crypto transfers are not connected in the public workspace.
+              This is not a licensed payment processor or a production custody
+              service.
+            </p>
+            <p class="small">
+              The separate routing playground compares modeled alternatives and
+              shows where every number comes from.
+              <a href="/playground/">Explore the routing model →</a>
+            </p>
+          </div>
+        </section>
+      </main>
+      <footer>
+        <span>railgate · Built by <a href="https://faizan.sh">Faizan</a></span
+        ><span
+          ><a href="https://github.com/faizan896/railgate">Source</a> ·
+          <a href="/app/">Working demo</a> ·
+          <a href="/playground/">Playground</a></span
+        >
+      </footer>
+    </div>
+  </body>
+</html>

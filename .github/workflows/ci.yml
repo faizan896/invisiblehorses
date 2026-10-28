@@ -21,6 +21,7 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm build:playground
+      - run: pnpm build:console
       - run: pnpm demo:offline
       - run: pnpm demo:quotes
       - run: pnpm demo:routing
@@ -46,3 +47,4 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:worker
       - run: pnpm test:worker
+      - run: pnpm test:console-worker

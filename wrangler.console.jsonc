@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "railgate-console",
+  "main": "src/console/worker.ts",
+  "compatibility_date": "2026-07-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "vars": {
+    "PUBLIC_ORIGIN": "https://railgate-self.vercel.app",
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "WORKSPACES",
+        "class_name": "ConsoleWorkspace",
+      },
+      {
+        "name": "GATE",
+        "class_name": "ConsoleGate",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "console-v1",
+      "new_sqlite_classes": ["ConsoleWorkspace", "ConsoleGate"],
+    },
+  ],
+  "observability": {
+    "enabled": false,
+  },
+  "account_id": "a5379c8a58012fa6f1e3fb3c0957eb3c",
+}

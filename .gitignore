@@ -16,3 +16,7 @@ data/
 worker-dist/
 public/playground/
 .dev.vars*
+
+console/dist/
+public/app/
+public/index.html

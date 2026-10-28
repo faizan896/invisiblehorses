@@ -1,25 +1,8 @@
-import { serve } from '@hono/node-server';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { config as dotenv } from 'dotenv';
 import { z } from 'zod';
-import { ConfigSchema } from './config.js';
-import { Store } from './audit/store.js';
-import { ApprovalTokens } from './approval/tokens.js';
-import { NtfyNotifier } from './approval/notifier.js';
-import { BaseSepoliaExecutor } from './rails/usdc-base-sepolia.js';
-import { loadPolicy } from './policy/loader.js';
-import { RailRuntime } from './executor/rail-runtime.js';
-import { UnifiedPaymentService } from './executor/unified.js';
-import { PaymentService } from './executor/service.js';
-import { createApp } from './http/app.js';
 import { createMcpServer } from './mcp/server.js';
 import type { Hex } from 'viem';
 import { configureProxy } from './network.js';
-import { QuoteService, defaultAdapters } from './rails/quotes.js';
-import { Counterparties } from './counterparty/profiles.js';
-import { RoutingService } from './router/service.js';
-import { X402Service } from './x402/service.js';
-import { realX402Protocol } from './x402/real.js';
 
 async function main() {
   const command = process.argv[2];
@@ -33,6 +16,45 @@ async function main() {
     return;
   }
   if (command !== 'serve') throw new Error('Usage: railgate serve | mcp');
+  // Wallet, SQLite, HTTP and provider code belongs only to the server command.
+  const [
+    { serve },
+    { config: dotenv },
+    { ConfigSchema },
+    { Store },
+    { ApprovalTokens },
+    { NtfyNotifier },
+    { BaseSepoliaExecutor },
+    { loadPolicy },
+    { RailRuntime },
+    { UnifiedPaymentService },
+    { PaymentService },
+    { createApp },
+    { QuoteService, defaultAdapters },
+    { Counterparties },
+    { RoutingService },
+    { X402Service },
+    { realX402Protocol }
+  ] = await Promise.all([
+    import('@hono/node-server'),
+    import('dotenv'),
+    import('./config.js'),
+    import('./audit/store.js'),
+    import('./approval/tokens.js'),
+    import('./approval/notifier.js'),
+    import('./rails/usdc-base-sepolia.js'),
+    import('./policy/loader.js'),
+    import('./executor/rail-runtime.js'),
+    import('./executor/unified.js'),
+    import('./executor/service.js'),
+    import('./http/app.js'),
+    import('./rails/quotes.js'),
+    import('./counterparty/profiles.js'),
+    import('./router/service.js'),
+    import('./x402/service.js'),
+    import('./x402/real.js')
+  ]);
+
   dotenv({ quiet: true });
   configureProxy();
   const cfg = ConfigSchema.parse(process.env);

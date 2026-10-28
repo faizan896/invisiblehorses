@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { RequestSchema } from '../executor/unified.js';
+import { RequestSchema } from '../intent/request.js';
 import { PaymentIntentSchema } from '../intent/schema.js';
 import { PaymentIntentV2Schema } from '../intent/routing.js';
 import { PaidResourceRequestSchema } from '../x402/schema.js';

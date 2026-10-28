@@ -2,6 +2,14 @@
 
 Spending limits, human approvals and smart rail routing for AI agent payments. Open source, test money only.
 
+## Working product
+
+[Open the private demo workspace](https://railgate-self.vercel.app/app/) · [Product page](https://railgate-self.vercel.app/) · [Architecture and portfolio case study](docs/agent-payments-product.md)
+
+Create scoped agent keys, set company and agent budgets, approve requests, and watch durable background jobs settle an internal test ledger. Every visitor gets an isolated workspace; all dashboard metrics come from persisted records. External bank and USDC payouts are explicitly not connected in this public demo.
+
+The existing routing playground and testnet runtime are preserved. [Explore the playground](https://railgate-self.vercel.app/playground/) · [Numbers audit](docs/payroute-numbers-audit.md)
+
 ![Offline demo: $5 completes, $45 needs simulated owner approval, a $150 cumulative attempt is denied, and a retry creates no second debit](docs/demo.gif)
 
 The GIF uses an in-memory test ledger and simulated approval/notifications. It makes no external calls. [MP4](docs/media/railgate-offline.mp4) · [Reproduce the recording](examples/overspend-demo/README.md#record-the-terminal-demo)
