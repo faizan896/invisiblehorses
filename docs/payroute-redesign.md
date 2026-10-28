@@ -22,7 +22,7 @@
 
 ## Screenshots
 
-Captured in Chromium at desktop 1440px and mobile 390px, using the Monday-night scenario, with all four combinations of size and theme:
+Captured from the production URL in Chromium at desktop 1440px and mobile 390px on 2026-10-28, using the Monday-night scenario, with all four combinations of size and theme:
 
 | | Light | Dark |
 | --- | --- | --- |
@@ -37,6 +37,8 @@ Captured in Chromium at desktop 1440px and mobile 390px, using the Monday-night 
 - Browser: all six scenarios, no eligible route / invalid input handling, assumption edits changing the winner, reset restoring the plan, source tag click / Escape, both themes and mobile layout verified. No page errors or page-level horizontal overflow.
 - Monday night chooses USDC; Tuesday morning chooses Bank transfer. With the ECB reference defaults, the central all-in costs are $13,450.58 and $13,432.61 respectively for a 250,000 MXN recipient amount.
 - Production JS is about 49 KB gzipped, with system fonts and no image or font downloads for the playground.
+
+Production verification: Vercel reported deployment success for application commit `c287458`. The live page served the locally verified assets `index-qX3NZMlm.js` and `index-CM_HVCkJ.css`. The complete six-scenario browser flow, assumption overrides, reset, mobile sizing and light / dark screenshots were verified at https://railgate-self.vercel.app/playground/ with no console errors. Deployment used the existing Git integration; no additional Vercel authorization was needed.
 
 ## Boundaries and limitations
 
