@@ -140,6 +140,21 @@ The browser walkthrough creates a workspace and key, submits an actual API reque
 
 Release verification: 205 automated tests passed: 180 root tests, 12 payroute tests, 11 existing worker-runtime tests, and 2 new console-runtime tests. Typecheck, lint, application build and both static frontend builds passed. The original five-second MCP startup test passes after removing server-only imports from connector startup.
 
+## Production walkthrough and screenshots
+
+The deployed product was verified end to end at https://railgate-self.vercel.app/. The browser created a private workspace and scoped key, submitted a payment through the actual dashboard form, closed the only tab, and verified that the durable worker completed it without polling. The walkthrough also verified owner approval, a blocked payment, idempotent replay, an audit export without the raw API key, all seven app views, a separate browser's isolated onboarding, and the preserved routing playground. No uncaught JavaScript errors or page-level horizontal overflow were observed.
+
+The dedicated production backend also passed an independent API check for background settlement, replay safety and immediate key revocation. Its worker version at release was `31ff6649-5d84-444c-a072-464f37890c2d`; the frontend application commit was `eae18ae`.
+
+All screenshots below were captured from production with real records created by the verification walkthrough. API keys and session cookies are not shown.
+
+| Screen | Light | Dark |
+| --- | --- | --- |
+| Desktop workspace | [View](agent-payments-screenshots/desktop-light.png) | [View](agent-payments-screenshots/desktop-dark.png) |
+| Mobile workspace | [View](agent-payments-screenshots/mobile-light.png) | [View](agent-payments-screenshots/mobile-dark.png) |
+
+[Product page, desktop](agent-payments-screenshots/product-desktop.png) · [Product page, mobile](agent-payments-screenshots/product-mobile.png) · [Actual approval queue](agent-payments-screenshots/approval-queue.png)
+
 ## Portfolio description you can use
 
 > Built Railgate, an agent payments control plane with scoped API keys, deterministic spending policies, owner approvals, atomic budget reservations and durable background processing. Implemented isolated SQLite workspaces on Cloudflare Durable Objects, a responsive Vercel-hosted dashboard, and idempotent internal ledger settlement with an append-only audit trail. Shipped a working public test-credit demo and an independently sourced routing playground.
