@@ -1,34 +1,34 @@
 :root {
   color-scheme: light;
-  --bg: #ffffff;
-  --paper: #ffffff;
-  --text: #191919;
-  --muted: #66645f;
-  --line: #deddd8;
-  --accent: #202020;
-  --wash: #f5f5f5;
+  --bg: var(--ih-bg);
+  --paper: var(--ih-paper);
+  --text: var(--ih-ink);
+  --muted: var(--ih-muted);
+  --line: var(--ih-border);
+  --accent: var(--ih-link);
+  --wash: var(--ih-wash);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #151515;
-    --paper: #1b1b1b;
-    --text: #f4f3ef;
-    --muted: #b5b3ac;
-    --line: #383837;
-    --accent: #eeede8;
-    --wash: #262625;
+    --bg: var(--ih-bg);
+    --paper: var(--ih-paper);
+    --text: var(--ih-ink);
+    --muted: var(--ih-muted);
+    --line: var(--ih-border);
+    --accent: var(--ih-link);
+    --wash: var(--ih-wash);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #151515;
-  --paper: #1b1b1b;
-  --text: #f4f3ef;
-  --muted: #b5b3ac;
-  --line: #383837;
-  --accent: #eeede8;
-  --wash: #262625;
+  --bg: var(--ih-bg);
+  --paper: var(--ih-paper);
+  --text: var(--ih-ink);
+  --muted: var(--ih-muted);
+  --line: var(--ih-border);
+  --accent: var(--ih-link);
+  --wash: var(--ih-wash);
 }
 * {
   box-sizing: border-box;
@@ -789,4 +789,10 @@ button.primary:hover,
   .sidebar .brand {
     max-width: none;
   }
+}
+
+input,
+select,
+textarea {
+  border-color: var(--ih-control-border);
 }

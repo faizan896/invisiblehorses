@@ -1,0 +1,54 @@
+/* Shared colors for the product site, workspace and route planner. */
+:root {
+  --ih-bg: #ffffff;
+  --ih-paper: #ffffff;
+  --ih-ink: #171c2b;
+  --ih-muted: #5e6678;
+  --ih-border: #dce1eb;
+  --ih-wash: #f5f7fb;
+  --ih-cobalt: #3155db;
+  --ih-link: #274bc4;
+  --ih-soft: #edf1ff;
+  --ih-soft-border: #d3dcfa;
+  --ih-soft-ink: #171c2b;
+  --ih-highlight: #dbe3ff;
+  --ih-night: #171c2b;
+  --ih-night-muted: #bac4da;
+  --ih-night-border: #3e4960;
+  --ih-code: #101521;
+  --ih-control-border: #8491a8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ih-bg: #151515;
+    --ih-paper: #1b202b;
+    --ih-ink: #edf1fa;
+    --ih-muted: #b1baca;
+    --ih-border: #343b49;
+    --ih-wash: #1e2430;
+    --ih-link: #b5c5ff;
+    --ih-soft: #202b49;
+    --ih-soft-border: #425788;
+    --ih-soft-ink: #edf1fa;
+    --ih-highlight: #3d4c75;
+    --ih-control-border: #71809c;
+  }
+}
+:root[data-theme="dark"] {
+  --ih-bg: #151515;
+  --ih-paper: #1b202b;
+  --ih-ink: #edf1fa;
+  --ih-muted: #b1baca;
+  --ih-border: #343b49;
+  --ih-wash: #1e2430;
+  --ih-link: #b5c5ff;
+  --ih-soft: #202b49;
+  --ih-soft-border: #425788;
+  --ih-soft-ink: #edf1fa;
+  --ih-highlight: #3d4c75;
+  --ih-control-border: #71809c;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--ih-cobalt);
+}

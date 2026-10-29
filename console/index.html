@@ -15,10 +15,22 @@
           localStorage.getItem("payroute-theme") || "";
       } catch {}
     </script>
-      <link rel="stylesheet" href="/brand/motion.css" />
+    <link rel="stylesheet" href="/brand/motion.css" />
+    <link rel="stylesheet" href="/brand/palette.css" />
   </head>
   <body>
-    <div id="root"><div class="loading" role="status"><img class="loading-horse" src="/brand/running-horse.svg" width="80" height="56" alt="" /><p>Opening your workspace…</p></div></div>
+    <div id="root">
+      <div class="loading" role="status">
+        <img
+          class="loading-horse"
+          src="/brand/running-horse.svg"
+          width="80"
+          height="56"
+          alt=""
+        />
+        <p>Opening your workspace…</p>
+      </div>
+    </div>
     <div id="toast" role="status" aria-live="polite"></div>
     <script type="module" src="./main.ts"></script>
   </body>
