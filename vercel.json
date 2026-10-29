@@ -23,6 +23,13 @@
       "status": 308
     },
     {
+      "src": "/railgate-walkthrough.mp4",
+      "headers": {
+        "Location": "/invisible-horses-demo.mp4"
+      },
+      "status": 308
+    },
+    {
       "src": "/playground$",
       "headers": {
         "Location": "/playground/"
