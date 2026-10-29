@@ -10,14 +10,14 @@
     <meta name="theme-color" content="#faf9f6" />
     <meta
       property="og:title"
-      content="Invisible Horses · Let them run. Keep the reins."
+      content="Invisible Horses · Payment controls for software agents."
     />
     <meta
       property="og:description"
       content="Payment controls for software agents. Set budgets, approve exceptions and follow every request."
     />
     <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />
-    <title>Invisible Horses · Let them run. Keep the reins.</title>
+    <title>Invisible Horses · Payment controls for software agents.</title>
     <script>
       try {
         document.documentElement.dataset.theme =
@@ -33,9 +33,9 @@
           ><span>Invisible Horses</span></a
         >
         <nav aria-label="Main">
-          <a class="nav-secondary" href="#workspace-preview">The workspace</a>
+          <a class="nav-secondary" href="#workspace-preview">Product</a>
           <a href="/playground/">Route planner</a>
-          <a class="nav-secondary" href="#developers">Developers</a>
+          <a class="nav-secondary" href="#developers">API</a>
           <button
             id="theme"
             class="theme-button"
@@ -50,65 +50,40 @@
         </nav>
       </header>
       <main>
-        <section class="hero" aria-labelledby="hero-title">
+        <section class="hero factual-hero" aria-labelledby="hero-title">
           <div class="hero-copy">
-            <p class="eyebrow">Payment controls for software agents</p>
-            <h1 id="hero-title">Let them run.<br />Keep the reins.</h1>
+            <p class="eyebrow">Invisible Horses / Test-credit release</p>
+            <h1 id="hero-title">Payment controls<br />for software agents.</h1>
             <p>
-              Give your agents a budget. Set the rules, approve the exceptions,
-              and know where every payment stands.
+              Issue an API key to an agent, set its spending limits and review
+              requests that need approval. Accepted requests run on a background
+              worker and are recorded in a ledger.
             </p>
             <div class="actions">
               <a class="button primary" href="/app/"
-                >Try the working demo <span aria-hidden="true">→</span></a
-              ><a class="text-link small" href="/railgate-walkthrough.mp4"
-                >Watch the demo <span aria-hidden="true">→</span></a
+                >Create a test workspace <span aria-hidden="true">→</span></a
+              ><a class="text-link small" href="#capabilities"
+                >See available features <span aria-hidden="true">→</span></a
               >
             </div>
             <p class="small">
-              A private workspace with test credits.<br />No bank connection
-              needed.
+              The current release uses internal test credits. It does not move
+              bank funds, charge cards or send cryptocurrency.
             </p>
           </div>
           <div class="horse-stage">
-            <span class="field-note" aria-hidden="true"
-              >A little room to run.</span
-            >
-            <svg
-              class="hoof-trail"
-              aria-hidden="true"
-              viewBox="0 0 560 120"
-              fill="none"
-            >
-              <path
-                d="M18 94C110 102 152 38 259 70s155 38 274-43"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-dasharray="3 8"
-              />
-              <path
-                d="m393 51 6 7m-1-15 6 7m50-20 6 7m-1-15 6 7"
-                stroke="currentColor"
-                stroke-width="3"
-                stroke-linecap="round"
-              />
-            </svg>
             <img
               class="hero-horse"
               src="/brand/invisible-horse.webp"
               width="1536"
               height="1024"
-              alt="A galloping horse, visible only through a hand-drawn dashed outline."
+              alt="A dashed outline of a running horse, the Invisible Horses illustration."
               fetchpriority="high"
-            />
-            <span class="art-caption">Quietly doing the legwork.</span>
+            /><span class="art-caption"
+              >Internal test credits / No external payments</span
+            >
           </div>
         </section>
-        <div class="under-hero">
-          <span>A separate key for each agent</span
-          ><span>Your rules, checked on every request</span
-          ><span>A record of every decision</span>
-        </div>
         <section
           class="product-showcase"
           id="workspace-preview"
@@ -117,7 +92,7 @@
           <div class="preview-heading">
             <div>
               <p class="eyebrow">Inside the working app</p>
-              <h2 id="preview-title">See what's running.</h2>
+              <h2 id="preview-title">Workspace screens.</h2>
             </div>
             <p class="preview-intro">
               The budget, the requests, the decisions.<br />Actual screens from
@@ -160,9 +135,7 @@
                   Activity
                 </button>
               </div>
-              <span class="capture-label"
-                >Production capture / Test credits</span
-              >
+              <span class="capture-label">App screenshot / Test credits</span>
             </div>
             <figure class="app-capture">
               <div
@@ -203,13 +176,101 @@
           </p>
         </section>
         <section
+          class="section"
+          id="capabilities"
+          aria-labelledby="capabilities-title"
+        >
+          <div class="section-heading">
+            <p class="eyebrow">Available in this release</p>
+            <h2 id="capabilities-title">What the app does.</h2>
+            <p>
+              These features run against saved workspace data. Payment
+              settlement is limited to the internal test ledger.
+            </p>
+          </div>
+          <div
+            class="capability-table"
+            tabindex="0"
+            role="region"
+            aria-label="Available features"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Feature</th>
+                  <th scope="col">Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Agent access</td>
+                  <td>
+                    Issue scoped keys, edit agent limits, pause an agent and
+                    revoke keys.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Spending rules</td>
+                  <td>
+                    Apply per-payment and daily limits, vendor restrictions and
+                    an approval threshold.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Owner approval</td>
+                  <td>
+                    Review requests above the threshold. Agent keys cannot
+                    approve payments.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Request cancellation</td>
+                  <td>
+                    Cancel a queued or pending request before settlement and
+                    release its reserved budget.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Background processing</td>
+                  <td>
+                    Accepted requests continue after the browser tab is closed.
+                    Current rules are checked again before settlement.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Payment records</td>
+                  <td>
+                    View request history, export audit records and download
+                    balanced internal ledger receipts.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Workspace access</td>
+                  <td>
+                    Restore saved history with a private recovery key, including
+                    after the browser session expires.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Route planning</td>
+                  <td>
+                    Compare modeled costs and arrival times using labelled
+                    sources and editable assumptions. The planner does not
+                    execute payments.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section
           class="section split"
           id="how-it-works"
           aria-labelledby="how-title"
         >
           <div class="section-copy">
-            <p class="eyebrow">01 / A request, with boundaries</p>
-            <h2 id="how-title">They ask.<br />Your rules decide.</h2>
+            <p class="eyebrow">How a request is processed</p>
+            <h2 id="how-title">Policy checks and owner approval.</h2>
             <p>
               Your agent requests a payment. Invisible Horses checks who is
               asking, what they can spend and whether you need to approve it.
@@ -220,7 +281,8 @@
               work continues in the background, even after you close the tab.
             </p>
             <a class="text-link" href="/app/"
-              >Follow a real demo request <span aria-hidden="true">→</span></a
+              >Try a request in your workspace
+              <span aria-hidden="true">→</span></a
             >
           </div>
           <div>
@@ -279,96 +341,39 @@
             </p>
           </div>
         </section>
-        <section class="section split" aria-labelledby="controls-title">
-          <div class="section-copy">
-            <p class="eyebrow">02 / Room to work</p>
-            <h2 id="controls-title">A little freedom.<br />Clear limits.</h2>
-            <p>
-              Set the boundaries before you hand over a task. Keep them in one
-              place as your agents get to work.
-            </p>
-            <a class="text-link" href="/app/#rules"
-              >Explore spending rules <span aria-hidden="true">→</span></a
-            >
-          </div>
-          <div class="capabilities">
-            <div class="capability">
-              <span class="step-number">01</span>
-              <div>
-                <p>A key for each agent.</p>
-                <p class="small">
-                  Choose read or payment access. Revoke a key when the work is
-                  done. Agent keys cannot approve their own requests.
-                </p>
-              </div>
-            </div>
-            <div class="capability">
-              <span class="step-number">02</span>
-              <div>
-                <p>A budget before a payment.</p>
-                <p class="small">
-                  Set company and agent limits, daily budgets and allowed
-                  vendors. Pending requests reserve their share of the budget.
-                </p>
-              </div>
-            </div>
-            <div class="capability">
-              <span class="step-number">03</span>
-              <div>
-                <p>A trail you can follow.</p>
-                <p class="small">
-                  See requests, decisions and ledger entries. Retrying the same
-                  request does not create another payment.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section
-          class="section"
-          id="who-its-for"
-          aria-labelledby="people-title"
-        >
+        <section class="section" aria-labelledby="audience-title">
           <div class="section-heading">
-            <p class="eyebrow">03 / For the people behind the agents</p>
-            <h2 id="people-title">
-              Built for teams.<br />Used by their agents.
-            </h2>
+            <p class="eyebrow">Intended users</p>
+            <h2 id="audience-title">For teams testing agent spending.</h2>
             <p>
-              Developers connect the workflow. The people responsible for
-              spending keep the final say.
+              Developers connect the API. The person responsible for the budget
+              sets limits and reviews exceptions.
             </p>
           </div>
           <div class="people">
             <article class="person">
-              <p class="person-title">AI product teams</p>
+              <p class="person-title">Product engineering teams</p>
               <p>
-                Test how a research or coding agent could request paid data and
-                compute within your budget.
+                Test an agent that requests data or compute purchases. Verify
+                its limits and approval behavior before connecting a payment
+                provider.
               </p>
-              <small>Start with one agent and one task.</small>
             </article>
             <article class="person">
-              <p class="person-title">Automation agencies</p>
+              <p class="person-title">Automation developers</p>
               <p>
-                Prototype a spending workflow for client agents, with separate
-                keys, limits and approval steps.
+                Add a request and approval step to an existing automation, using
+                a separate key for each agent.
               </p>
-              <small>Build the controls into your workflow.</small>
             </article>
             <article class="person">
               <p class="person-title">Finance and operations</p>
               <p>
-                Review requests, approve exceptions and export a history of what
-                happened.
+                Review test requests and inspect the resulting records. No
+                existing bank or accounting system is connected.
               </p>
-              <small>Keep a clear view of agent spending.</small>
             </article>
           </div>
-          <p class="small" style="margin: 30px 0 0">
-            These are intended workflows. The public demo uses internal test
-            credits; it does not buy vendor services or send external payments.
-          </p>
         </section>
         <section
           class="section split"
@@ -376,11 +381,11 @@
           aria-labelledby="api-title"
         >
           <div class="section-copy">
-            <p class="eyebrow">04 / Fits into your workflow</p>
-            <h2 id="api-title">One request.<br />The checks come with it.</h2>
+            <p class="eyebrow">API access</p>
+            <h2 id="api-title">Request a payment from your agent.</h2>
             <p>
-              Call the API from your agent, script or backend. Use the tools and
-              model you already work with.
+              Call the HTTP API from an agent, script or backend. The API key
+              determines which agent is making the request.
             </p>
             <ol class="integration-steps">
               <li>Create a demo workspace.</li>
@@ -415,97 +420,126 @@ Content-Type: application/json
             <span id="copy-status" class="sr-only" role="status"></span>
           </div>
         </section>
-        <section class="section split" aria-labelledby="planner-title">
-          <div class="planner-example">
-            <p class="small">Route planner / Illustrative timeline</p>
-            <div class="rail-line">
-              <span>Bank transfer</span>
-              <div class="track" style="--arrival: 80%"></div>
-            </div>
-            <div class="rail-line">
-              <span>USDC route</span>
-              <div class="track" style="--arrival: 32%"></div>
-            </div>
-            <div class="track-labels">
-              <span>Send</span><span>Deadline</span>
-            </div>
-            <p class="small">
-              Compare actual modeled times in the planner.<br />Planning tool
-              with test data. Not a quote.
-            </p>
-          </div>
-          <div class="section-copy">
-            <p class="eyebrow">05 / Before you choose a route</p>
-            <h2 id="planner-title">Timing changes<br />the picture.</h2>
+        <section
+          class="section"
+          id="real-payments"
+          aria-labelledby="real-title"
+        >
+          <div class="section-heading">
+            <p class="eyebrow">External payments</p>
+            <h2 id="real-title">What real-money use still requires.</h2>
             <p>
-              Compare modeled costs and arrival times. See how bank hours affect
-              the options, check the sources and change the assumptions.
+              The public app cannot accept deposits or execute real payments.
+              Connecting a company requires more than changing an API key.
             </p>
-            <p class="small">
-              The planner is a preview. Choosing a route here does not send a
-              payment or change the demo worker.
-            </p>
-            <a class="text-link" href="/playground/"
-              >Explore the route planner <span aria-hidden="true">→</span></a
-            >
           </div>
+          <ol class="requirements-list">
+            <li>
+              <strong>A supported payment provider.</strong>
+              <p>
+                A company needs its own approved provider account, verification
+                and an eligible bank, card or wallet connection.
+              </p>
+            </li>
+            <li>
+              <strong>An execution integration.</strong>
+              <p>
+                The backend must submit the intended payment type, verify
+                provider callbacks and handle retries without creating duplicate
+                transfers.
+              </p>
+            </li>
+            <li>
+              <strong>Reconciliation and reversals.</strong>
+              <p>
+                Payment states must match provider records, including pending,
+                failed, settled and reversed outcomes. Internal ledger
+                completion is not proof of an external transfer.
+              </p>
+            </li>
+            <li>
+              <strong>Company access and operations.</strong>
+              <p>
+                Team identity, account recovery, access reviews, monitoring and
+                a tested recovery process are needed for a company deployment.
+                The current recovery key does not verify a company or replace
+                team login.
+              </p>
+            </li>
+          </ol>
+          <p class="small">
+            Buying API credits through a checkout and sending a bank payout are
+            different integrations. The appropriate provider depends on the
+            payment type and the company's country.
+          </p>
         </section>
-        <section class="section availability" aria-labelledby="available-title">
-          <div class="section-copy">
-            <p class="eyebrow">A clear starting point</p>
-            <h2 id="available-title">Working software.<br />Test money.</h2>
+        <section
+          class="section questions"
+          id="questions"
+          aria-labelledby="questions-title"
+        >
+          <h2 id="questions-title">Questions.</h2>
+          <details>
+            <summary>Can I use real cash today?</summary>
             <p>
-              Requests, rules, approvals and background jobs work. Payments
-              settle in an internal demo ledger.
+              No. Balances and payments in the public workspace are internal
+              test credits. Bank payouts, card charges and cryptocurrency
+              transfers are not connected.
             </p>
-            <a
-              class="text-link"
-              href="https://github.com/faizan896/railgate/blob/main/docs/architecture.md"
-              >Read the architecture <span aria-hidden="true">→</span></a
-            >
-          </div>
-          <div>
-            <ul>
-              <li>Scoped agent keys <span>Available</span></li>
-              <li>Budgets and owner approvals <span>Available</span></li>
-              <li>Background processing and history <span>Available</span></li>
-              <li>Bank and USDC payouts <span>Not connected</span></li>
-              <li>Real vendor purchases <span>Not connected</span></li>
-            </ul>
-            <p class="small" style="margin: 20px 0 0">
-              A test-credit MVP. Invisible Horses is not a bank or a live
-              payment processing service.
+          </details>
+          <details>
+            <summary>Does my agent need my bank credentials?</summary>
+            <p>
+              No. The agent receives an Invisible Horses API key scoped to its
+              own requests. There is no place to connect production bank
+              credentials in this release.
             </p>
-          </div>
+          </details>
+          <details>
+            <summary>What happens when I retry a payment request?</summary>
+            <p>
+              The same agent, idempotency key and payload return the original
+              record. A changed payload with that key is rejected. New invoices
+              need new keys.
+            </p>
+          </details>
+          <details>
+            <summary>How do I return to a workspace?</summary>
+            <p>
+              Save its private recovery key in a password manager. Use Restore
+              workspace on the start page if you change browser or your
+              seven-day access expires. Restoring invalidates previous owner
+              sessions, revokes agent keys and cancels unsettled requests. Saved
+              history remains. Losing both access and the key means there is no
+              email recovery option.
+            </p>
+          </details>
+          <details>
+            <summary>Can I cancel or refund a payment?</summary>
+            <p>
+              You can cancel a queued or pending request before it settles.
+              Completed internal ledger payments cannot be cancelled. External
+              refunds and disputes are not implemented.
+            </p>
+          </details>
+          <details>
+            <summary>Does choosing a route in the planner send money?</summary>
+            <p>
+              No. The route planner is a separate planning preview within this
+              product. It compares estimates; it does not send a payment or
+              configure the workspace worker.
+            </p>
+          </details>
         </section>
         <section class="closing">
-          <svg
-            class="closing-track"
-            aria-hidden="true"
-            viewBox="0 0 450 120"
-            fill="none"
-          >
-            <path
-              d="M5 104c74 0 88-84 155-84s74 84 144 84S357 24 440 24"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-dasharray="4 9"
-            />
-            <path
-              d="m419 17 12 7-12 7"
-              stroke="currentColor"
-              stroke-width="1.5"
-            />
-          </svg>
           <div>
-            <p class="eyebrow">Start small. See the whole thing.</p>
-            <h2>One agent.<br />A little room to run.</h2>
+            <p class="eyebrow">Try the current release</p>
+            <h2>Create a test workspace.</h2>
+            <p class="muted">No payment-provider credentials required.</p>
           </div>
-          <div class="actions">
-            <a class="button primary" href="/app/"
-              >Create a demo workspace <span aria-hidden="true">→</span></a
-            >
-          </div>
+          <a class="button primary" href="/app/"
+            >Open workspace <span aria-hidden="true">→</span></a
+          >
         </section>
       </main>
       <div class="footer-brand" aria-hidden="true">Invisible Horses.</div>

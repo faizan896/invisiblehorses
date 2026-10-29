@@ -6,6 +6,8 @@ Payment controls for software agents. Give each agent a scoped key, set spending
 
 The public app uses internal test credits. External bank and crypto payments are not connected.
 
+Owners can edit or pause agents, cancel unsettled requests, download ledger receipts and export complete audit history. A private recovery key restores workspace access after changing browser or session expiry.
+
 ## Run locally
 
 Use Node.js 24 and pnpm 10.20.0.

@@ -365,3 +365,208 @@ describe("HTTP boundaries", () => {
     ).toBe(404);
   });
 });
+
+describe("workspace operations", () => {
+  it("pauses credentials and rechecks queued work after agent limit changes", async () => {
+    const f = fixture();
+    const p = await f.service.request(input(), f.a.id);
+    f.service.updateAgent(f.a.id, {
+      name: "Paused agent",
+      per_payment: "100.00",
+      daily: "500.00",
+      active: false,
+    });
+    expect(() => f.service.authenticate(f.key.key, "payments:read")).toThrow(
+      /Invalid/,
+    );
+    f.advance(6000);
+    f.service.tick();
+    expect(f.service.payment(p.id).status).toBe("denied");
+    expect(f.service.snapshot().balance.total).toBe("10000.00");
+    f.service.updateAgent(f.a.id, {
+      name: "Active agent",
+      per_payment: "10.00",
+      daily: "500.00",
+      active: true,
+    });
+    expect(f.service.authenticate(f.key.key, "payments:read").agent_id).toBe(
+      f.a.id,
+    );
+    expect(
+      (await f.service.request(input("12.50", "limited"), f.a.id)).status,
+    ).toBe("denied");
+  });
+  it("cancels queued and pending requests without a debit, with idempotent cancellation", async () => {
+    const f = fixture();
+    for (const [amount, idem] of [
+      ["12.50", "queued"],
+      ["75.00", "approval"],
+    ]) {
+      const p = await f.service.request(input(amount, idem), f.a.id);
+      expect(f.service.cancel(p.id, f.a.id).status).toBe("cancelled");
+      expect(f.service.cancel(p.id, f.a.id).updated_at).toBe(
+        f.service.payment(p.id).updated_at,
+      );
+      expect((await f.service.request(input(amount, idem), f.a.id)).id).toBe(
+        p.id,
+      );
+      expect(() => f.service.decide(p.id, "approve")).toThrow(/no longer/);
+    }
+    f.advance(6000);
+    f.service.tick();
+    expect(f.service.snapshot().balance.total).toBe("10000.00");
+    expect(f.service.snapshot().balance.reserved).toBe("0.00");
+    expect(f.service.nextAlarm()).toBeNull();
+  });
+  it("restricts cancellation and receipts to the owning agent and a completed ledger", async () => {
+    const f = fixture(),
+      other = f.service.createAgent({
+        name: "Other agent",
+        per_payment: "100.00",
+        daily: "500.00",
+      });
+    const p = await f.service.request(input(), f.a.id);
+    expect(() => f.service.cancel(p.id, other.id)).toThrow(/not found/);
+    expect(() => f.service.receipt(p.id, f.a.id)).toThrow(
+      /after internal settlement/,
+    );
+    f.advance(6000);
+    f.service.tick();
+    expect(() => f.service.cancel(p.id, f.a.id)).toThrow(/Only queued/);
+    expect(() => f.service.receipt(p.id, other.id)).toThrow(/not found/);
+    const receipt = f.service.receipt(p.id, f.a.id);
+    expect(receipt.balanced).toBe(true);
+    expect(receipt.entries).toHaveLength(2);
+    expect(receipt.external_payment).toBe(false);
+    f.db
+      .prepare("UPDATE console_journal SET amount_minor=0 WHERE payment_id=?")
+      .run(p.id);
+    expect(() => f.service.receipt(p.id, f.a.id)).toThrow(/reconciled/);
+  });
+  it("restores expired access with a hashed recovery key and invalidates old credentials", async () => {
+    const f = fixture();
+    const completed = await f.service.request(input(), f.a.id);
+    f.advance(6000);
+    f.service.tick();
+    const pending = await f.service.request(input("75.00", "pending"), f.a.id);
+    f.advance(8 * 86400000);
+    expect(() => f.service.checkOwner(f.session.secret)).toThrow(/expired/);
+    expect(JSON.stringify(f.service.snapshot())).not.toContain(
+      f.session.recovery_code,
+    );
+    expect(
+      JSON.stringify(f.db.prepare("SELECT * FROM console_meta").all()),
+    ).not.toContain(f.session.recovery_code);
+    expect(() => f.service.recover("invalid")).toThrow(/Invalid recovery/);
+    const restored = f.service.recover(f.session.recovery_code);
+    expect(() => f.service.checkOwner(f.session.secret)).toThrow(
+      /session required/,
+    );
+    expect(() => f.service.checkOwner(restored.secret)).not.toThrow();
+    expect(() => f.service.authenticate(f.key.key, "payments:read")).toThrow(
+      /revoked/,
+    );
+    expect(f.service.payment(pending.id).status).toBe("cancelled");
+    expect(f.service.receipt(completed.id).balanced).toBe(true);
+    expect(f.service.snapshot().balance.total).toBe("9987.50");
+    const newCode = f.service.createRecoveryCode();
+    expect(() => f.service.recover(f.session.recovery_code)).toThrow(
+      /Invalid recovery/,
+    );
+    expect(() => f.service.recover(newCode)).not.toThrow();
+  });
+  it("invalidates owner sessions on signout and permits recovery after a lost response", () => {
+    const f = fixture();
+    f.service.signOut();
+    expect(() => f.service.checkOwner(f.session.secret)).toThrow(
+      /session required/,
+    );
+    const first = f.service.recover(f.session.recovery_code);
+    const second = f.service.recover(f.session.recovery_code);
+    expect(() => f.service.checkOwner(first.secret)).toThrow();
+    expect(() => f.service.checkOwner(second.secret)).not.toThrow();
+  });
+  it("keeps new owner routes behind origin checks and agent routes behind scopes", async () => {
+    const f = fixture(),
+      app = consoleApp(f.service, "https://site.example"),
+      p = await f.service.request(input(), f.a.id);
+    const cookie = `rg_console=${f.service.workspaceId}.${f.session.secret}`;
+    expect(
+      (
+        await app.request(`/console-api/agents/${f.a.id}`, {
+          method: "POST",
+          headers: {
+            Cookie: cookie,
+            Origin: "https://evil.example",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: "No",
+            active: false,
+            per_payment: "1.00",
+            daily: "1.00",
+          }),
+        })
+      ).status,
+    ).toBe(403);
+    const read = f.service.createKey({
+      agent_id: f.a.id,
+      name: "Reader",
+      scopes: ["payments:read"],
+    });
+    expect(
+      (
+        await app.request(`/console-api/v1/payments/${p.id}/cancel`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${read.key}`,
+            "Content-Type": "application/json",
+          },
+          body: "{}",
+        })
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await app.request(`/console-api/v1/payments/${p.id}/cancel`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${f.key.key}`,
+            "Content-Type": "application/json",
+          },
+          body: "{}",
+        })
+      ).status,
+    ).toBe(200);
+    const done = await f.service.request(input("12.50", "receipt"), f.a.id);
+    f.advance(6000);
+    f.service.tick();
+    expect(
+      (
+        await app.request(`/console-api/v1/payments/${done.id}/receipt`, {
+          headers: { Authorization: `Bearer ${read.key}` },
+        })
+      ).status,
+    ).toBe(200);
+  });
+});
+
+it("exports complete audit history and journal without credentials", async () => {
+  const f = fixture(),
+    p = await f.service.request(input(), f.a.id);
+  f.advance(6000);
+  f.service.tick();
+  for (let index = 0; index < 105; index++)
+    f.service.audit("policy.checked", "owner", null, { index });
+  expect(f.service.snapshot().audit).toHaveLength(100);
+  const result = f.service.exportRecords();
+  expect(result.audit.length).toBeGreaterThan(105);
+  expect(result.journal).toHaveLength(2);
+  expect(result.payments[0]!.id).toBe(p.id);
+  expect(result.test_money_only).toBe(true);
+  const json = JSON.stringify(result);
+  expect(json).not.toContain(f.key.key);
+  expect(json).not.toContain(f.session.secret);
+  expect(json).not.toContain(f.session.recovery_code);
+  expect(json).not.toContain("secret_hash");
+});

@@ -88,7 +88,8 @@ export type ConsolePayment = {
     | "completed"
     | "denied"
     | "rejected"
-    | "expired";
+    | "expired"
+    | "cancelled";
   reasons: string;
   quote: string | null;
   created_at: string;
@@ -201,6 +202,7 @@ export class ConsoleService {
       id: this.workspaceId,
       secret,
       expires_at: this.meta("expires_at")!,
+      recovery_code: this.createRecoveryCode(),
     };
   }
   checkOwner(secret: string) {
@@ -219,8 +221,57 @@ export class ConsoleService {
     )
       throw new AppError(
         401,
-        "This demo workspace has expired. Create a new workspace.",
+        "Workspace access expired. Use your recovery key to restore access.",
       );
+  }
+  createRecoveryCode() {
+    const token = `ih_recovery.${this.workspaceId}.${randomBytes(32).toString("base64url")}`;
+    this.transaction(() => {
+      this.set("recovery_hash", hash(token));
+      this.audit("workspace.recovery_created", "owner", null, {});
+    });
+    return token;
+  }
+  recover(token: string) {
+    const expected = this.meta("recovery_hash");
+    if (!expected || !equal(hash(token), expected))
+      throw new AppError(401, "Invalid recovery key");
+    return this.transaction(() => {
+      const secret = randomBytes(32).toString("base64url");
+      this.set("owner_hash", hash(secret));
+      this.set(
+        "expires_at",
+        new Date(this.clock().getTime() + week).toISOString(),
+      );
+      this.db
+        .prepare(
+          "UPDATE console_keys SET revoked_at=? WHERE revoked_at IS NULL",
+        )
+        .run(this.now());
+      for (const payment of this.payments()) {
+        if (["queued", "pending_approval"].includes(payment.status))
+          this.status(
+            payment.id,
+            "cancelled",
+            ["Cancelled during workspace recovery"],
+            "owner",
+          );
+      }
+      const recovery_code = token;
+      this.audit("workspace.recovered", "owner", null, {
+        keys_revoked: true,
+        pending_requests_cancelled: true,
+      });
+      return { secret, recovery_code, expires_at: this.meta("expires_at")! };
+    });
+  }
+  signOut() {
+    if (!this.meta("recovery_hash"))
+      throw new AppError(409, "Save a recovery key before signing out");
+    this.transaction(() => {
+      this.set("owner_hash", hash(randomBytes(32).toString("base64url")));
+      this.audit("workspace.signed_out", "owner", null, {});
+    });
   }
   rules(): Rules {
     return RulesSchema.parse(JSON.parse(this.meta("rules")!));
@@ -255,6 +306,21 @@ export class ConsoleService {
       daily: a.daily,
     });
     return a;
+  }
+  updateAgent(id: string, input: unknown) {
+    z.uuid().parse(id);
+    const next = AgentSchema.extend({ active: z.boolean() }).parse(input);
+    return this.transaction(() => {
+      if (!this.agents().some((agent) => agent.id === id))
+        throw new AppError(404, "Agent not found");
+      this.db
+        .prepare(
+          "UPDATE console_agents SET name=?,per_payment=?,daily=?,active=? WHERE id=?",
+        )
+        .run(next.name, next.per_payment, next.daily, Number(next.active), id);
+      this.audit("agent.updated", "owner", null, { id, ...next });
+      return this.agents().find((agent) => agent.id === id)!;
+    });
   }
   keys() {
     return this.db
@@ -413,6 +479,12 @@ export class ConsoleService {
   ) {
     const agent = this.agents().find((a) => a.id === p.agent_id);
     if (!agent) throw new AppError(404, "Agent not found");
+    if (!agent.active)
+      return {
+        decision: "deny" as const,
+        reasons: ["Agent is paused"],
+        quote: null,
+      };
     const intent = this.routedIntent(p),
       recipient = profiles.get(p.recipient);
     const plan = planRoutes(
@@ -566,6 +638,64 @@ export class ConsoleService {
       throw new AppError(404, "Payment not found");
     return publicPayment(p);
   }
+  cancel(id: string, agentId?: string) {
+    z.uuid().parse(id);
+    return this.transaction(() => {
+      const payment = this.get(id);
+      if (!payment || (agentId && payment.agent_id !== agentId))
+        throw new AppError(404, "Payment not found");
+      if (payment.status === "cancelled") return publicPayment(payment);
+      if (!["queued", "pending_approval"].includes(payment.status))
+        throw new AppError(
+          409,
+          "Only queued or pending requests can be cancelled",
+        );
+      this.status(
+        id,
+        "cancelled",
+        ["Cancelled before settlement"],
+        agentId ?? "owner",
+      );
+      return publicPayment(this.get(id)!);
+    });
+  }
+  receipt(id: string, agentId?: string) {
+    const payment = this.payment(id, agentId);
+    if (payment.status !== "completed")
+      throw new AppError(409, "Receipt is available after internal settlement");
+    const entries = this.db
+      .prepare(
+        "SELECT account,amount_minor,created_at FROM console_journal WHERE payment_id=? ORDER BY account",
+      )
+      .all(id) as {
+      account: string;
+      amount_minor: number;
+      created_at: string;
+    }[];
+    const balanced =
+      entries.length === 2 &&
+      entries.reduce((total, row) => total + row.amount_minor, 0) === 0 &&
+      entries.some(
+        (row) =>
+          row.account === "treasury" &&
+          row.amount_minor === -minor(payment.amount),
+      ) &&
+      entries.some(
+        (row) =>
+          row.account === `merchant:${payment.recipient}` &&
+          row.amount_minor === minor(payment.amount),
+      );
+    if (!balanced)
+      throw new AppError(503, "Ledger entries could not be reconciled");
+    return {
+      payment,
+      entries,
+      balanced,
+      settlement: "internal_test_ledger",
+      external_payment: false,
+      test_money_only: true,
+    };
+  }
   private status(
     id: string,
     status: ConsolePayment["status"],
@@ -698,6 +828,39 @@ export class ConsoleService {
       ? Math.max(this.clock().getTime() + 500, Math.min(...times))
       : null;
   }
+  exportRecords() {
+    const { workspace, rules, agents, payments, balance } = this.snapshot();
+    const audit = this.db
+      .prepare("SELECT * FROM console_audit ORDER BY id")
+      .all()
+      .map((value) => {
+        const row = value as {
+          id: number;
+          event: string;
+          actor: string;
+          payment_id: string | null;
+          details: string;
+          created_at: string;
+        };
+        return { ...row, details: JSON.parse(row.details) as unknown };
+      });
+    const journal = this.db
+      .prepare(
+        "SELECT payment_id,account,amount_minor,created_at FROM console_journal ORDER BY created_at,payment_id,account",
+      )
+      .all();
+    return {
+      exported_at: this.now(),
+      workspace,
+      rules,
+      agents,
+      payments,
+      balance,
+      audit,
+      journal,
+      test_money_only: true,
+    };
+  }
   snapshot() {
     const payments = this.payments().map(publicPayment),
       agents = this.agents();
@@ -708,6 +871,7 @@ export class ConsoleService {
         mode: "demo",
         created_at: this.meta("created_at"),
         expires_at: this.meta("expires_at"),
+        recovery_enabled: Boolean(this.meta("recovery_hash")),
       },
       rules: this.rules(),
       agents,

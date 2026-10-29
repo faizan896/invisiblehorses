@@ -85,6 +85,33 @@ export function consoleApp(service: ConsoleService, publicOrigin: string) {
     await next();
   });
   app.get("/console-api/session", (c) => c.json(service.snapshot()));
+  app.post("/console-api/recovery-code", async (c) => {
+    z.strictObject({}).parse(await c.req.json());
+    return c.json({ recovery_code: service.createRecoveryCode() });
+  });
+  app.post("/console-api/logout", async (c) => {
+    z.strictObject({}).parse(await c.req.json());
+    service.signOut();
+    c.header(
+      "Set-Cookie",
+      `${cookieName}=; Path=/console-api; HttpOnly; Secure; SameSite=Strict; Max-Age=0`,
+    );
+    return c.json({ signed_out: true });
+  });
+  app.post("/console-api/agents/:id", async (c) =>
+    c.json(service.updateAgent(c.req.param("id"), await c.req.json())),
+  );
+  app.post("/console-api/payments/:id/cancel", async (c) => {
+    z.strictObject({}).parse(await c.req.json());
+    return c.json(service.cancel(c.req.param("id")));
+  });
+  app.get("/console-api/payments/:id/receipt", (c) => {
+    c.header(
+      "Content-Disposition",
+      'attachment; filename="internal-ledger-receipt.json"',
+    );
+    return c.json(service.receipt(c.req.param("id")));
+  });
   app.post("/console-api/agents", async (c) =>
     c.json(service.createAgent(await c.req.json()), 201),
   );
@@ -106,13 +133,26 @@ export function consoleApp(service: ConsoleService, publicOrigin: string) {
     return c.json(service.decide(z.uuid().parse(c.req.param("id")), i.action));
   });
   app.get("/console-api/export", (c) => {
-    const { workspace, rules, agents, payments, audit, balance } =
-      service.snapshot();
     c.header(
       "Content-Disposition",
-      'attachment; filename="railgate-demo-audit.json"',
+      'attachment; filename="invisible-horses-audit.json"',
     );
-    return c.json({ workspace, rules, agents, payments, audit, balance });
+    return c.json(service.exportRecords());
+  });
+  app.post("/console-api/v1/payments/:id/cancel", async (c) => {
+    const key = service.authenticate(
+      c.req.header("Authorization")?.slice(7) ?? "",
+      "payments:write",
+    );
+    z.strictObject({}).parse(await c.req.json());
+    return c.json(service.cancel(c.req.param("id"), key.agent_id));
+  });
+  app.get("/console-api/v1/payments/:id/receipt", (c) => {
+    const key = service.authenticate(
+      c.req.header("Authorization")?.slice(7) ?? "",
+      "payments:read",
+    );
+    return c.json(service.receipt(c.req.param("id"), key.agent_id));
   });
   app.get("/console-api/v1/payments", (c) => {
     const key = service.authenticate(

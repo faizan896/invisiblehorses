@@ -6,6 +6,7 @@ const root = document.querySelector<HTMLDivElement>("#root")!;
 let data: Snapshot | null = null,
   issuedKey: string | null = null,
   issuedKeyId: string | null = null,
+  issuedRecovery: string | null = null,
   loading = false,
   lastRefresh = 0;
 const view = () => location.hash.slice(1) || "overview";
@@ -79,6 +80,7 @@ const nav = [
   ["rules", "Spending rules"],
   ["developers", "Developers"],
   ["activity", "Activity"],
+  ["security", "Workspace access"],
 ];
 function themeButton() {
   const dark =
@@ -88,8 +90,24 @@ function themeButton() {
   return `<button data-action="theme" type="button">${dark ? "Light" : "Dark"} mode</button>`;
 }
 function onboarding(message = "") {
-  root.innerHTML = `<main class="onboarding"><header><a class="brand" href="/">Invisible Horses</a>${themeButton()}</header><p class="kicker">Spending controls for AI agents</p><h1>A budget for your agents.<br>A say in every payment.</h1><p>Create a private demo workspace and try the complete payment flow, from an agent request to a settled internal ledger entry.</p><ul><li>Issue a scoped agent API key.</li><li>Set budgets and require your approval above a limit.</li><li>Let a server-side worker finish accepted payments.</li></ul><div class="panel"><h2>Open your workspace</h2><p class="small">Free public demo. No account or bank connection required.</p><form id="onboard"><label for="workspace-name">Workspace name</label><input id="workspace-name" name="name" placeholder="Acme Studio" minlength="2" maxlength="60" required autocomplete="organization"/><p class="form-error" role="alert">${esc(message)}</p><div class="form-actions"><button class="primary" type="submit">Create demo workspace →</button></div></form></div><p class="small">Your workspace starts with $10,000 in internal demo credits. It is isolated from other visitors. Your access expires after seven days. Access stays in this browser through a secure session cookie.</p><footer>Working software with test credits. External bank and crypto payments are not connected. <a href="/playground/">Explore the route planner ↗</a></footer></main>`;
+  root.innerHTML = `<main class="onboarding"><header><a class="brand" href="/">Invisible Horses</a>${themeButton()}</header><p class="kicker">Payment controls for software agents</p><h1>Create a test-credit workspace</h1><p>Create a private demo workspace and try the complete payment flow, from an agent request to a settled internal ledger entry.</p><ul><li>Issue a scoped agent API key.</li><li>Set budgets and require your approval above a limit.</li><li>Let a server-side worker finish accepted payments.</li></ul><div class="panel"><h2>Open your workspace</h2><p class="small">Free public demo. No account or bank connection required.</p><form id="onboard"><label for="workspace-name">Workspace name</label><input id="workspace-name" name="name" placeholder="Acme Studio" minlength="2" maxlength="60" required autocomplete="organization"/><p class="form-error" role="alert">${esc(message)}</p><div class="form-actions"><button class="primary" type="submit">Create demo workspace →</button></div></form></div><p class="small">Your workspace starts with $10,000 in internal demo credits. It is isolated from other visitors. Your access expires after seven days. Access stays in this browser through a secure session cookie.</p><details class="panel"><summary>Restore an existing workspace</summary><form id="recover-form"><label for="recover-key">Recovery key</label><input id="recover-key" type="password" name="code" autocomplete="off" required placeholder="ih_recovery.…"/><p class="small">Restoring access signs out previous owner sessions, revokes agent keys and cancels unsettled requests. Saved history is retained.</p><label class="check"><input type="checkbox" required/>I understand that I will need to issue new agent keys.</label><p class="form-error" role="alert"></p><button type="submit">Restore workspace</button></form></details><footer>Payments use internal test credits. External bank and crypto payments are not connected. <a href="/playground/">Explore the route planner →</a></footer></main>`;
   bindCommon();
+  formTask(
+    document.querySelector<HTMLFormElement>("#recover-form")!,
+    async (f) => {
+      const restored = await api<{ recovery_code: string }>("/recover", {
+        code: String(f.get("code")).trim(),
+      });
+      issuedRecovery = restored.recovery_code;
+      issuedKey = null;
+      issuedKeyId = null;
+      await refresh();
+      render();
+      toast(
+        "Workspace restored. Issue new agent keys before sending requests.",
+      );
+    },
+  );
   document.querySelector("#onboard")!.addEventListener("submit", async (e) => {
     e.preventDefault();
     const button = (e.currentTarget as HTMLFormElement).querySelector(
@@ -97,10 +115,11 @@ function onboarding(message = "") {
     )!;
     button.disabled = true;
     try {
-      await api("/workspaces", {
+      const created = await api<{ recovery_code: string }>("/workspaces", {
         name: (document.querySelector("#workspace-name") as HTMLInputElement)
           .value,
       });
+      issuedRecovery = created.recovery_code;
       await refresh();
       render();
     } catch (error) {
@@ -115,7 +134,7 @@ function render() {
   if (!data) return;
   const d = data,
     pending = d.payments.filter((p) => p.status === "pending_approval").length;
-  root.innerHTML = `<div class="layout"><aside class="sidebar"><div><a class="brand" href="/">Invisible Horses</a><span class="badge">Private demo</span></div><div class="workspace-name small">${esc(d.workspace.name)}</div><nav aria-label="Workspace">${nav.map(([id, label]) => `<a href="#${id}" ${view() === id ? 'aria-current="page"' : ""}>${label}${id === "approvals" && pending ? ` (${pending})` : ""}</a>`).join("")}</nav><div class="sidebar-bottom"><a href="/playground/">Route planner <span class="small">Preview ↗</span></a><a href="https://github.com/faizan896/railgate">Source & architecture ↗</a><span class="small">Internal demo credits.<br>No external money movement.</span></div></aside><main class="content"><div class="topbar"><p class="small">${esc(d.workspace.name)} / ${esc(nav.find((n) => n[0] === view())?.[1] ?? "Overview")}</p><div class="actions">${themeButton()}<a class="button mobile-nav" href="/playground/">Route planner</a><button data-action="refresh" type="button" aria-label="Refresh workspace">Refresh</button></div></div><div class="notice">Demo mode. Keys, spending rules, approvals and background processing work. Payments settle in an internal test ledger. Bank and USDC payouts are not connected.</div><div id="view"></div><footer class="page-footer">Workspace access expires ${time(d.workspace.expires_at)}. Daily budgets reset at 00:00 UTC. <a href="/console-api/export">Export your audit record</a>.</footer></main></div>`;
+  root.innerHTML = `<div class="layout"><aside class="sidebar"><div><a class="brand" href="/">Invisible Horses</a><span class="badge">Private demo</span></div><div class="workspace-name small">${esc(d.workspace.name)}</div><nav aria-label="Workspace">${nav.map(([id, label]) => `<a href="#${id}" ${view() === id ? 'aria-current="page"' : ""}>${label}${id === "approvals" && pending ? ` (${pending})` : ""}</a>`).join("")}</nav><div class="sidebar-bottom"><a href="/playground/">Route planner <span class="small">Preview →</span></a><a href="https://github.com/faizan896/railgate">Source & architecture →</a><span class="small">Internal demo credits.<br>No external money movement.</span></div></aside><main class="content"><div class="topbar"><p class="small">${esc(d.workspace.name)} / ${esc(nav.find((n) => n[0] === view())?.[1] ?? "Overview")}</p><div class="actions">${themeButton()}<a class="button mobile-nav" href="/playground/">Route planner</a><button data-action="refresh" type="button" aria-label="Refresh workspace">Refresh</button></div></div>${issuedRecovery ? `<div class="notice">Save your recovery key to restore this workspace from another browser. <a href="#security">Open workspace access →</a></div>` : ""}<div class="notice">Internal test credits only. Bank and USDC payouts are not connected.</div><div id="view"></div><footer class="page-footer">Workspace access expires ${time(d.workspace.expires_at)}. Daily budgets reset at 00:00 UTC. <a href="/console-api/export">Export your audit record</a>.</footer></main></div>`;
   const target = document.querySelector("#view")!;
   const v = view();
   target.innerHTML =
@@ -131,7 +150,9 @@ function render() {
               ? developersView()
               : v === "activity"
                 ? activityView()
-                : overviewView();
+                : v === "security"
+                  ? securityView()
+                  : overviewView();
   bindCommon();
   bindView();
 }
@@ -141,7 +162,7 @@ function heading(title: string, description: string, actions = "") {
 function metrics() {
   const d = data!,
     completed = d.payments.filter((p) => p.status === "completed").length;
-  return `<div class="metrics"><div class="metric"><p>Available demo credits</p><strong>${dollars(d.balance.available)}</strong><div class="small">${dollars(d.balance.reserved)} reserved</div></div><div class="metric"><p>Used or reserved today</p><strong>${dollars(d.balance.spent_today)}</strong><div class="small">of ${dollars(d.rules.daily)} daily budget</div></div><div class="metric"><p>Completed payments</p><strong>${completed}</strong><div class="small">Actual internal ledger entries</div></div><div class="metric"><p>Waiting for approval</p><strong>${d.payments.filter((p) => p.status === "pending_approval").length}</strong><div class="small">Your agents cannot approve these</div></div></div>`;
+  return `<div class="metrics"><div class="metric"><p>Available demo credits</p><strong>${dollars(d.balance.available)}</strong><div class="small">${dollars(d.balance.reserved)} reserved</div></div><div class="metric"><p>Used or reserved today</p><strong>${dollars(d.balance.spent_today)}</strong><div class="small">of ${dollars(d.rules.daily)} daily budget</div></div><div class="metric"><p>Completed payments</p><strong>${completed}</strong><div class="small">Internal test-ledger payments</div></div><div class="metric"><p>Waiting for approval</p><strong>${d.payments.filter((p) => p.status === "pending_approval").length}</strong><div class="small">Your agents cannot approve these</div></div></div>`;
 }
 function paymentTable(payments: Payment[]) {
   if (!payments.length)
@@ -153,7 +174,7 @@ function overviewView() {
     active = d.keys.filter((k) => !k.revoked_at);
   return (
     heading(
-      "Your agents can spend. You stay in control.",
+      "Workspace overview",
       "Manage agent budgets, review requests and follow every payment.",
       `<button class="primary" data-action="payment">Try a payment</button>`,
     ) +
@@ -168,14 +189,14 @@ function paymentsView() {
       "Trace every request from policy check to final ledger entry.",
       `<button class="primary" data-action="payment">New demo payment</button>`,
     ) +
-    `<label for="payment-filter" class="small">Show status</label><select id="payment-filter" style="max-width:260px"><option value="all">All payments</option>${["queued", "pending_approval", "completed", "denied", "rejected", "expired"].map((x) => `<option value="${x}">${human(x)}</option>`).join("")}</select><div id="payment-list">${paymentTable(data!.payments)}</div>`
+    `<label for="payment-filter" class="small">Show status</label><select id="payment-filter" style="max-width:260px"><option value="all">All payments</option>${["queued", "pending_approval", "completed", "denied", "rejected", "expired", "cancelled"].map((x) => `<option value="${x}">${human(x)}</option>`).join("")}</select><div id="payment-list">${paymentTable(data!.payments)}</div>`
   );
 }
 function approvalsView() {
   const pending = data!.payments.filter((p) => p.status === "pending_approval");
   return (
     heading(
-      "Your approval comes first.",
+      "Approvals",
       `Payments above ${dollars(data!.rules.approval_above)} need your decision. Approval expires after 15 minutes.`,
     ) +
     (pending.length
@@ -197,19 +218,57 @@ function agentsView() {
   const d = data!;
   return (
     heading(
-      "Agents with clear boundaries.",
+      "Agents and keys",
       "Each key belongs to one agent. Agent keys cannot change rules or approve payments.",
       `<button data-action="agent">Add agent</button><button class="primary" data-action="key">Create API key</button>`,
     ) +
     issuedKeyView() +
-    `<section class="section"><h2>Agents</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Agents"><table><thead><tr><th>Name</th><th>Per payment</th><th>Per day</th><th>Status</th></tr></thead><tbody>${d.agents.map((a) => `<tr><td>${esc(a.name)}<span class="small">${esc(a.id)}</span></td><td>${dollars(a.per_payment)}</td><td>${dollars(a.daily)}</td><td>${badge("active")}</td></tr>`).join("")}</tbody></table></div></section><section class="section"><h2>API keys</h2>${d.keys.length ? `<div class="table-wrap" tabindex="0" role="region" aria-label="API keys"><table><thead><tr><th>Name</th><th>Agent / permissions</th><th>Last used</th><th>Status</th><th>Action</th></tr></thead><tbody>${d.keys.map((k) => `<tr><td>${esc(k.name)}<span class="small">${esc(k.prefix)}</span></td><td>${esc(agent(k.agent_id))}<span class="small">${k.scopes.map(esc).join(", ")}</span></td><td class="small">${time(k.last_used_at)}</td><td>${badge(k.revoked_at ? "revoked" : "active")}</td><td>${k.revoked_at ? "" : `<button data-revoke="${k.id}">Revoke key</button>`}</td></tr>`).join("")}</tbody></table></div>` : '<div class="empty">No API keys yet. Create one to give an agent access.</div>'}</section>`
+    `<section class="section"><h2>Agents</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Agents"><table><thead><tr><th>Name</th><th>Per payment</th><th>Per day</th><th>Status</th></tr></thead><tbody>${d.agents.map((a) => `<tr><td>${esc(a.name)}<span class="small">${esc(a.id)}</span></td><td>${dollars(a.per_payment)}</td><td>${dollars(a.daily)}</td><td>${badge(a.active ? "active" : "paused")} <button data-edit-agent="${a.id}" type="button">Edit</button></td></tr>`).join("")}</tbody></table></div></section><section class="section"><h2>API keys</h2>${d.keys.length ? `<div class="table-wrap" tabindex="0" role="region" aria-label="API keys"><table><thead><tr><th>Name</th><th>Agent / permissions</th><th>Last used</th><th>Status</th><th>Action</th></tr></thead><tbody>${d.keys.map((k) => `<tr><td>${esc(k.name)}<span class="small">${esc(k.prefix)}</span></td><td>${esc(agent(k.agent_id))}<span class="small">${k.scopes.map(esc).join(", ")}</span></td><td class="small">${time(k.last_used_at)}</td><td>${badge(k.revoked_at ? "revoked" : "active")}</td><td>${k.revoked_at ? "" : `<button data-revoke="${k.id}">Revoke key</button>`}</td></tr>`).join("")}</tbody></table></div>` : '<div class="empty">No API keys yet. Create one to give an agent access.</div>'}</section>`
   );
+}
+function download(filename: string, content: string) {
+  const url = URL.createObjectURL(
+    new Blob([content], { type: "text/plain;charset=utf-8" }),
+  );
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function securityView() {
+  return (
+    heading(
+      "Workspace access",
+      "Save a recovery key before leaving this browser. There is no email login or account recovery service.",
+    ) +
+    `<section class="panel"><h2>Recovery key</h2><p>A recovery key restores this workspace, including its history and rules. Keep it in a password manager. Anyone with the key can take control of the workspace.</p><p class="small">Restoring access signs out previous owner sessions, revokes agent keys and cancels unsettled requests. It renews access for seven days. A key can be reused until you replace it.</p>${issuedRecovery ? `<label for="recovery-key">Your private recovery key</label><textarea id="recovery-key" readonly rows="3" spellcheck="false">${esc(issuedRecovery)}</textarea><div class="actions"><button data-action="copy-recovery">Copy key</button><button data-action="download-recovery">Download key</button><button data-action="hide-recovery">Hide key</button></div>` : `<p class="small">${data!.workspace.recovery_enabled ? "A recovery key exists. Its plaintext cannot be retrieved. Replacing it invalidates the old key." : "No recovery key has been issued for this workspace."}</p>`}<div class="form-actions"><button data-action="replace-recovery">${data!.workspace.recovery_enabled ? "Replace recovery key" : "Create recovery key"}</button></div></section><section class="section"><h2>Session</h2><p>Owner access expires ${time(data!.workspace.expires_at)}. Signing out invalidates owner sessions. Agent requests already accepted can continue under the current rules.</p><button data-action="signout">Sign out</button></section>`
+  );
+}
+function editAgentModal(id: string) {
+  const agent = data!.agents.find((a) => a.id === id);
+  if (!agent) return;
+  const dialog = modal(
+    "Edit agent",
+    `<form><label for="edit-agent-name">Name</label><input id="edit-agent-name" name="name" value="${esc(agent.name)}" minlength="2" maxlength="60" required/><div class="form-grid"><div><label for="edit-agent-per">Per payment · USD</label><input id="edit-agent-per" name="per_payment" type="number" min="0.01" max="1000000" step="0.01" value="${esc(agent.per_payment)}" required/></div><div><label for="edit-agent-daily">Daily budget · USD</label><input id="edit-agent-daily" name="daily" type="number" min="0.01" max="1000000" step="0.01" value="${esc(agent.daily)}" required/></div></div><label class="check"><input name="active" type="checkbox" ${agent.active ? "checked" : ""}/>Agent is active</label><p class="small">A paused agent cannot use its keys. Queued requests are checked again before settlement and are denied if the agent remains paused.</p><p class="form-error" role="alert"></p><button class="primary" type="submit">Save agent</button></form>`,
+  );
+  formTask(dialog.querySelector("form")!, async (f) => {
+    await api(`/agents/${id}`, {
+      name: f.get("name"),
+      per_payment: Number(f.get("per_payment")).toFixed(2),
+      daily: Number(f.get("daily")).toFixed(2),
+      active: f.get("active") === "on",
+    });
+    dialog.close();
+    await refresh();
+    toast("Agent updated.");
+  });
 }
 function rulesView() {
   const r = data!.rules;
   return (
     heading(
-      "Set the boundaries once.",
+      "Spending rules",
       "Rules are checked on every request and again before the background worker settles it.",
     ) +
     `<form id="rules-form" class="panel"><div class="form-grid"><div><label for="per-payment">Company limit per payment · USD</label><input id="per-payment" name="per_payment" type="number" min="0.01" max="1000000" step="0.01" value="${esc(r.per_payment)}" required/></div><div><label for="daily">Company daily budget · USD</label><input id="daily" name="daily" type="number" min="0.01" max="1000000" step="0.01" value="${esc(r.daily)}" required/></div><div class="full"><label for="approval-above">Require your approval above · USD</label><input id="approval-above" name="approval_above" type="number" min="0" max="1000000" step="0.01" value="${esc(r.approval_above)}" required/></div><fieldset class="full"><legend>Allowed demo vendors</legend><label class="check"><input name="merchants" type="checkbox" value="dataco" ${r.merchants.includes("dataco") ? "checked" : ""}/>DataCo · data and research</label><label class="check"><input name="merchants" type="checkbox" value="compute-co" ${r.merchants.includes("compute-co") ? "checked" : ""}/>ComputeCo · compute credits</label></fieldset></div><p class="small">The stricter of company and agent limits applies. Pending approvals and queued payments reserve budget. Denied, rejected and expired payments release it. Daily budgets use UTC; outstanding reservations continue to count across midnight.</p><p class="form-error" role="alert"></p><button class="primary" type="submit">Save spending rules</button></form>`
@@ -222,17 +281,17 @@ const jsExample = () =>
 function developersView() {
   return (
     heading(
-      "One API call. The controls stay with you.",
+      "API integration",
       "Use a scoped test key from your agent, script or backend. No model provider is required.",
     ) +
     issuedKeyView() +
-    `<div class="actions"><button class="primary" data-action="key">Create a test API key</button><button data-action="copy-curl">Copy cURL</button></div><section class="section"><h2>Request a payment</h2><pre><code>${esc(curlExample())}</code></pre><details><summary>JavaScript example</summary><pre><code>${esc(jsExample())}</code></pre></details><p class="small">Amounts are decimal strings in USD. The response is HTTP 202 with a persisted payment record. Read its status to distinguish queued, pending approval, completed or denied. A completed payment means internal demo ledger settlement.</p></section><section class="section"><h2>Try the complete flow</h2><p>These buttons make real requests with your test key and current rules.</p><div class="actions"><button data-example="12.50">Try $12.50 payment</button><button data-example="75.00">Try $75 approval</button><button data-example="150.00">Try $150 limit check</button></div><p class="small">Default agent limit: $100 per payment, $500 per day. Default owner approval threshold: $50. Changed rules can produce different outcomes.</p></section><section class="section"><h2>API reference</h2><div class="table-wrap" tabindex="0"><table><thead><tr><th>Method / path</th><th>Permission</th><th>What it does</th></tr></thead><tbody><tr><td><code>POST /console-api/v1/payments</code></td><td>payments:write</td><td>Apply policy and persist an idempotent payment request.</td></tr><tr><td><code>GET /console-api/v1/payments</code></td><td>payments:read</td><td>List only this agent's payments.</td></tr><tr><td><code>GET /console-api/v1/payments/:id</code></td><td>payments:read</td><td>Read a payment and its current state.</td></tr></tbody></table></div><p class="small">401: invalid, expired or revoked key. 403: missing permission. 409: idempotency conflict or demo capacity reached. 400: invalid request. Policy denials are recorded payment outcomes, not transport errors.</p></section><section class="section"><h2>Idempotency is part of the contract.</h2><p>The same agent, idempotency key and payload return the original payment. A different payload with that key returns 409. New logical invoices need new keys.</p><p class="small">Keys expire with this seven-day workspace. Only hashes are stored. Keep keys in server-side environment variables and revoke unused ones.</p></section>`
+    `<div class="actions"><button class="primary" data-action="key">Create a test API key</button><button data-action="copy-curl">Copy cURL</button></div><section class="section"><h2>Request a payment</h2><pre><code>${esc(curlExample())}</code></pre><details><summary>JavaScript example</summary><pre><code>${esc(jsExample())}</code></pre></details><p class="small">Amounts are decimal strings in USD. The response is HTTP 202 with a persisted payment record. Read its status to distinguish queued, pending approval, completed or denied. A completed payment means internal demo ledger settlement.</p></section><section class="section"><h2>Try the complete flow</h2><p>These buttons make real requests with your test key and current rules.</p><div class="actions"><button data-example="12.50">Try $12.50 payment</button><button data-example="75.00">Try $75 approval</button><button data-example="150.00">Try $150 limit check</button></div><p class="small">Default agent limit: $100 per payment, $500 per day. Default owner approval threshold: $50. Changed rules can produce different outcomes.</p></section><section class="section"><h2>API reference</h2><div class="table-wrap" tabindex="0"><table><thead><tr><th>Method / path</th><th>Permission</th><th>What it does</th></tr></thead><tbody><tr><td><code>POST /console-api/v1/payments</code></td><td>payments:write</td><td>Apply policy and persist an idempotent payment request.</td></tr><tr><td><code>GET /console-api/v1/payments</code></td><td>payments:read</td><td>List only this agent's payments.</td></tr><tr><td><code>GET /console-api/v1/payments/:id</code></td><td>payments:read</td><td>Read a payment and its current state.</td></tr><tr><td><code>POST /console-api/v1/payments/:id/cancel</code></td><td>payments:write</td><td>Cancel this agent’s queued or pending request. Send an empty JSON object.</td></tr><tr><td><code>GET /console-api/v1/payments/:id/receipt</code></td><td>payments:read</td><td>Read the balanced internal ledger receipt after completion.</td></tr></tbody></table></div><p class="small">401: invalid, expired or revoked key. 403: missing permission. 409: idempotency conflict or demo capacity reached. 400: invalid request. Policy denials are recorded payment outcomes, not transport errors.</p></section><section class="section"><h2>Idempotency is part of the contract.</h2><p>The same agent, idempotency key and payload return the original payment. A different payload with that key returns 409. New logical invoices need new keys.</p><p class="small">Keys expire with workspace access and are revoked when access is restored. Only hashes are stored. Keep keys in server-side environment variables and revoke unused ones.</p></section>`
   );
 }
 function activityView() {
   return (
     heading(
-      "Every decision leaves a record.",
+      "Activity",
       "Actual append-only events from this workspace.",
       `<a class="button" href="/console-api/export">Export JSON</a>`,
     ) +
@@ -286,9 +345,18 @@ function formTask(
 }
 function keyModal() {
   if (!data) return;
+  if (!data.agents.some((agent) => agent.active)) {
+    toast("Resume or create an active agent before issuing a key.");
+    return;
+  }
   const dialog = modal(
-    "Give an agent access.",
-    `<p class="small">A test key can request or read payments. It cannot approve spending or change rules.</p><form><label for="key-agent">Agent</label><select name="agent_id" id="key-agent">${data.agents.map((a) => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select><label for="key-name">Key name</label><input id="key-name" name="name" value="Development key" minlength="2" maxlength="60" required/><label class="check"><input name="scopes" type="checkbox" value="payments:read" checked/>Read this agent's payments</label><label class="check"><input name="scopes" type="checkbox" value="payments:write" checked/>Request payments</label><p class="form-error" role="alert"></p><button class="primary" type="submit">Create test key</button></form>`,
+    "Create an agent key",
+    `<p class="small">A test key can request or read payments. It cannot approve spending or change rules.</p><form><label for="key-agent">Agent</label><select name="agent_id" id="key-agent">${data.agents
+      .filter((a) => a.active)
+      .map((a) => `<option value="${a.id}">${esc(a.name)}</option>`)
+      .join(
+        "",
+      )}</select><label for="key-name">Key name</label><input id="key-name" name="name" value="Development key" minlength="2" maxlength="60" required/><label class="check"><input name="scopes" type="checkbox" value="payments:read" checked/>Read this agent's payments</label><label class="check"><input name="scopes" type="checkbox" value="payments:write" checked/>Request payments</label><p class="form-error" role="alert"></p><button class="primary" type="submit">Create test key</button></form>`,
   );
   formTask(dialog.querySelector("form")!, async (f) => {
     const result = await api<{ key: string; id: string }>("/keys", {
@@ -352,9 +420,9 @@ function paymentDetail(id: string) {
   const events = data!.audit
     .filter((x) => (x as { payment_id?: string }).payment_id === id)
     .reverse();
-  modal(
+  const dialog = modal(
     "Payment record",
-    `<div class="between"><h3>${dollars(p.amount)} to ${esc(merchant(p.recipient))}</h3>${badge(p.status)}</div><p>${esc(p.purpose)}</p><div class="detail-grid"><div><small>Requested by</small>${esc(agent(p.agent_id))}</div><div><small>Route</small>${esc(p.route ?? "No eligible route")}</div><div><small>Payment ID</small><code>${esc(p.id)}</code></div><div><small>Idempotency key</small><code>${esc(p.idempotency_key)}</code></div><div><small>Created</small>${time(p.created_at)}</div><div><small>Last update</small>${time(p.updated_at)}</div></div><p class="notice">${esc(p.reasons.join(". "))}</p><p class="small">${p.status === "queued" ? "The durable background worker will process this request even after you close this page." : p.status === "completed" ? "This is an internal ledger receipt. No bank funds or crypto tokens moved." : "Your budget and approval rules determine the next step."}</p><h3>Event history</h3><ol class="timeline">${events
+    `<div class="between"><h3>${dollars(p.amount)} to ${esc(merchant(p.recipient))}</h3>${badge(p.status)}</div><p>${esc(p.purpose)}</p><div class="detail-grid"><div><small>Requested by</small>${esc(agent(p.agent_id))}</div><div><small>Route</small>${esc(p.route ?? "No eligible route")}</div><div><small>Payment ID</small><code>${esc(p.id)}</code></div><div><small>Idempotency key</small><code>${esc(p.idempotency_key)}</code></div><div><small>Created</small>${time(p.created_at)}</div><div><small>Last update</small>${time(p.updated_at)}</div></div><p class="notice">${esc(p.reasons.join(". "))}</p><p class="small">${p.status === "queued" ? "The durable background worker will process this request even after you close this page." : p.status === "completed" ? "This is an internal ledger receipt. No bank funds or crypto tokens moved." : "Your budget and approval rules determine the next step."}</p><div class="actions">${["queued", "pending_approval"].includes(p.status) ? `<button data-cancel="${p.id}" type="button">Cancel request</button>` : ""}${p.status === "completed" ? `<a class="button" href="/console-api/payments/${p.id}/receipt">Download ledger receipt</a>` : ""}</div><h3>Event history</h3><ol class="timeline">${events
       .map((x) => {
         const e = x as { event: string; created_at: string };
         return `<li><p>${esc(human(e.event.replaceAll(".", " ")))}</p><small>${time(e.created_at)}</small></li>`;
@@ -363,6 +431,21 @@ function paymentDetail(id: string) {
         "",
       )}</ol><p class="small">Close this record and refresh to see its latest state.</p>`,
   );
+  dialog
+    .querySelector<HTMLButtonElement>("[data-cancel]")
+    ?.addEventListener("click", async (event) => {
+      const button = event.currentTarget as HTMLButtonElement;
+      button.disabled = true;
+      try {
+        await api(`/payments/${p.id}/cancel`, {});
+        dialog.close();
+        await refresh();
+        toast("Request cancelled. Reserved budget released.");
+      } catch (error) {
+        toast((error as Error).message);
+        button.disabled = false;
+      }
+    });
 }
 function bindCommon() {
   document.querySelectorAll("[data-action=theme]").forEach((b) =>
@@ -382,9 +465,60 @@ function bindCommon() {
   );
 }
 function bindView() {
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-edit-agent]")
+    .forEach((button) =>
+      button.addEventListener("click", () =>
+        editAgentModal(button.dataset.editAgent!),
+      ),
+    );
   document.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((b) =>
     b.addEventListener("click", () => {
       const a = b.dataset.action;
+      if (a === "copy-recovery" && issuedRecovery) void copy(issuedRecovery);
+      if (a === "download-recovery" && issuedRecovery)
+        download(
+          "invisible-horses-recovery.txt",
+          issuedRecovery +
+            "\n\nKeep this key private. It can restore owner access to your workspace.\n",
+        );
+      if (a === "hide-recovery") {
+        issuedRecovery = null;
+        render();
+      }
+      if (a === "replace-recovery") {
+        const dialog = modal(
+          "Replace recovery key",
+          `<p>The previous key will stop working. Save the new key before closing this page.</p><form><p class="form-error" role="alert"></p><button class="primary" type="submit">Create new recovery key</button></form>`,
+        );
+        formTask(dialog.querySelector("form")!, async () => {
+          const result = await api<{ recovery_code: string }>(
+            "/recovery-code",
+            {},
+          );
+          issuedRecovery = result.recovery_code;
+          dialog.close();
+          await refresh();
+          render();
+        });
+      }
+      if (a === "signout") {
+        const dialog = modal(
+          "Sign out",
+          `<p>Save your recovery key first. You will need it to return to this workspace. Owner sessions will be invalidated.</p><form><p class="form-error" role="alert"></p><button type="submit">Sign out of workspace</button></form>`,
+        );
+        formTask(dialog.querySelector("form")!, async () => {
+          await api("/logout", {});
+          dialog.close();
+          data = null;
+          issuedKey = null;
+          issuedKeyId = null;
+          issuedRecovery = null;
+          lastRefresh = 0;
+          location.hash = "";
+          onboarding();
+        });
+      }
       if (a === "refresh") void refresh(true);
       if (a === "key") keyModal();
       if (a === "agent") agentModal();
@@ -490,7 +624,7 @@ async function refresh(showToast = false) {
       issuedKey = null;
       onboarding(
         lastRefresh
-          ? "Your demo session has expired. Create a new workspace to continue."
+          ? "Your session has expired. Restore access with your recovery key or create a workspace."
           : "",
       );
     } else if (!data) onboarding((error as Error).message);

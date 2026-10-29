@@ -173,4 +173,91 @@ describe("console in the actual Cloudflare runtime", () => {
     expect(state.worker.next_run_at).toBeNull();
     expect(state.payments).toHaveLength(1);
   });
+  it("restores access across runtime restart and revokes old owner and agent credentials", async () => {
+    const f = await setup();
+    const created = await f.request("/workspaces", {
+      name: "Recoverable workspace",
+    });
+    const originalCookie = created.headers.get("set-cookie")!.split(";")[0]!;
+    const creation = (await created.json()) as { recovery_code: string };
+    expect(creation.recovery_code).toMatch(/^ih_recovery\./);
+    const state = (await (
+      await f.request("/session", undefined, { Cookie: originalCookie })
+    ).json()) as { agents: { id: string }[] };
+    const key = (await (
+      await f.request(
+        "/keys",
+        {
+          agent_id: state.agents[0]!.id,
+          name: "Recovery test",
+          scopes: ["payments:read", "payments:write"],
+        },
+        { Cookie: originalCookie },
+      )
+    ).json()) as { key: string };
+    const payment = (await (
+      await f.request(
+        "/v1/payments",
+        {
+          recipient: "dataco",
+          amount: "75.00",
+          purpose: "Recovery pending",
+          idempotency_key: "recovery-pending",
+        },
+        { Authorization: `Bearer ${key.key}` },
+      )
+    ).json()) as { id: string };
+    expect(
+      (
+        await f.request(
+          "/recover",
+          { code: creation.recovery_code },
+          { Origin: "https://evil.example" },
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (await f.request("/logout", {}, { Cookie: originalCookie })).status,
+    ).toBe(200);
+    expect(
+      (await f.request("/session", undefined, { Cookie: originalCookie }))
+        .status,
+    ).toBe(401);
+    await f.restart();
+    const restored = await f.request("/recover", {
+      code: creation.recovery_code,
+    });
+    expect(restored.status, await restored.clone().text()).toBe(200);
+    const cookie = restored.headers.get("set-cookie")!.split(";")[0]!;
+    expect(restored.headers.get("set-cookie")).toContain(
+      "HttpOnly; Secure; SameSite=Strict",
+    );
+    expect(
+      (
+        await f.request("/v1/payments", undefined, {
+          Authorization: `Bearer ${key.key}`,
+        })
+      ).status,
+    ).toBe(401);
+    const after = (await (
+      await f.request("/session", undefined, { Cookie: cookie })
+    ).json()) as {
+      payments: { id: string; status: string }[];
+      balance: { reserved: string };
+    };
+    expect(after.payments.find((p) => p.id === payment.id)!.status).toBe(
+      "cancelled",
+    );
+    expect(after.balance.reserved).toBe("0.00");
+    expect(JSON.stringify(after)).not.toContain(creation.recovery_code);
+    const replacement = (await (
+      await f.request("/recovery-code", {}, { Cookie: cookie })
+    ).json()) as { recovery_code: string };
+    expect(
+      (await f.request("/recover", { code: creation.recovery_code })).status,
+    ).toBe(401);
+    expect(
+      (await f.request("/recover", { code: replacement.recovery_code })).status,
+    ).toBe(200);
+  });
 });

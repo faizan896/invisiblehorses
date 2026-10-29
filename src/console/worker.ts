@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { z, ZodError } from "zod";
+import { AppError } from "../errors.js";
 import { DurableSqlite, type DurableStorage } from "../workers/sqlite.js";
 import { ConsoleService } from "./service.js";
 import {
@@ -96,6 +97,27 @@ export class ConsoleWorkspace {
     )
       return response({ error: "Workspace not found" }, 401);
     const service = this.service();
+    if (path === "/__recover" && request.method === "POST") {
+      try {
+        const { code } = z
+          .strictObject({ code: z.string().max(150) })
+          .parse(await request.json());
+        const result = service.recover(code);
+        await this.state.storage.sync();
+        await this.schedule(service);
+        return response(result);
+      } catch (error) {
+        return error instanceof AppError && error.status === 401
+          ? response({ error: "Invalid recovery key" }, 401)
+          : response(
+              {
+                error:
+                  "Access could not be restored. Retry with the same recovery key.",
+              },
+              503,
+            );
+      }
+    }
     const result = await consoleApp(service, this.env.PUBLIC_ORIGIN).fetch(
       request,
     );
@@ -158,6 +180,81 @@ export default {
       });
     if (!url.pathname.startsWith("/console-api/"))
       return response({ error: "Not found" }, 404);
+    if (url.pathname === "/console-api/recover" && request.method === "POST") {
+      if (
+        !allowedOrigin(
+          request.headers.get("Origin") ?? undefined,
+          env.PUBLIC_ORIGIN,
+        )
+      )
+        return response({ error: "Restore access from the dashboard" }, 403);
+      const ip = createHash("sha256")
+        .update(request.headers.get("CF-Connecting-IP") ?? "shared")
+        .digest("hex");
+      const limit = await env.GATE.get(env.GATE.idFromName("creations")).fetch(
+        new Request("https://gate.invalid", { method: "POST", body: ip }),
+      );
+      if (!limit.ok)
+        return response({ error: "Too many attempts. Try again later." }, 429);
+      let code: string;
+      try {
+        if (Number(request.headers.get("Content-Length") ?? 0) > 16384)
+          return response({ error: "Request too large" }, 413);
+        const text = await request.text();
+        if (text.length > 16384)
+          return response({ error: "Request too large" }, 413);
+        code = z
+          .strictObject({
+            code: z
+              .string()
+              .regex(/^ih_recovery\.[0-9a-f-]{36}\.[A-Za-z0-9_-]{43}$/),
+          })
+          .parse(JSON.parse(text)).code;
+      } catch {
+        return response({ error: "Invalid recovery key" }, 401);
+      }
+      const id = code.split(".")[1]!;
+      if (!z.uuid().safeParse(id).success)
+        return response({ error: "Invalid recovery key" }, 401);
+      const result = await env.WORKSPACES.get(
+        env.WORKSPACES.idFromName(id),
+      ).fetch(
+        new Request("https://actor.invalid/__recover", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        }),
+      );
+      if (!result.ok)
+        return result.status === 401
+          ? response({ error: "Invalid recovery key" }, 401)
+          : response(
+              {
+                error:
+                  "Access could not be restored. Retry with the same recovery key.",
+              },
+              503,
+            );
+      const session = (await result.json()) as {
+        secret: string;
+        expires_at: string;
+        recovery_code: string;
+      };
+      return Response.json(
+        {
+          id,
+          expires_at: session.expires_at,
+          recovery_code: session.recovery_code,
+          mode: "demo",
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store",
+            "Set-Cookie": `${cookieName}=${id}.${session.secret}; Path=/console-api; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`,
+          },
+        },
+      );
+    }
     if (
       url.pathname === "/console-api/workspaces" &&
       request.method === "POST"
@@ -208,9 +305,15 @@ export default {
       const session = (await result.json()) as {
         secret: string;
         expires_at: string;
+        recovery_code: string;
       };
       return Response.json(
-        { id, expires_at: session.expires_at, mode: "demo" },
+        {
+          id,
+          expires_at: session.expires_at,
+          recovery_code: session.recovery_code,
+          mode: "demo",
+        },
         {
           status: 201,
           headers: {

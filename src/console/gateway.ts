@@ -1,6 +1,6 @@
 const backend = "https://railgate-console.33fazirana.workers.dev";
 const paths =
-  /^\/console-api\/(?:health|workspaces|session|export|agents|keys(?:\/[a-f0-9-]{36}\/revoke)?|rules|payments\/[a-f0-9-]{36}\/decision|v1\/payments(?:\/[a-f0-9-]{36})?)$/;
+  /^\/console-api\/(?:health|workspaces|recover|recovery-code|logout|session|export|agents(?:\/[a-f0-9-]{36})?|keys(?:\/[a-f0-9-]{36}\/revoke)?|rules|payments\/[a-f0-9-]{36}\/(?:decision|cancel|receipt)|v1\/payments(?:\/[a-f0-9-]{36}(?:\/(?:cancel|receipt))?)?)$/;
 /** Separate, narrowly scoped demo gateway. No owner/payment-backend credentials are forwarded. */
 export function createConsoleGateway(fetcher: typeof fetch = fetch) {
   return async (request: Request) => {
