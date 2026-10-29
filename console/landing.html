@@ -93,26 +93,143 @@
           </div>
           <div class="motion-field">
             <div class="motion-caption">
-              <span>Invisible Horses / A study in motion</span
+              <span>Invisible Horses / In motion</span
               ><button id="motion-toggle" type="button" aria-pressed="false">
                 Pause motion
               </button>
             </div>
             <div class="motion-art">
-              <canvas
-                id="horse-canvas"
-                width="900"
-                height="600"
+              <svg
+                id="horse-logo"
+                viewBox="380 245 750 520"
                 role="img"
-                aria-label="A public-domain motion study of a galloping horse and rider by Eadweard Muybridge."
-              ></canvas
-              ><img
-                id="horse-fallback"
-                src="/brand/horse-study-still.webp"
-                width="300"
-                height="200"
-                alt="A horse and rider photographed by Eadweard Muybridge."
-              />
+                aria-labelledby="horse-logo-title"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title id="horse-logo-title">
+                  The Invisible Horses dashed-line horse, running.
+                </title>
+                <g
+                  id="horse-body"
+                  stroke="currentColor"
+                  stroke-width="9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <g id="horse-tail" stroke-dasharray="22 21">
+                    <path
+                      d="M645 469C637 431 627 407 602 412C572 405 543 424 520 442C493 465 452 453 443 430"
+                    />
+                    <path
+                      d="M642 483C624 449 602 440 579 445C555 444 536 465 514 477C477 499 437 482 431 458"
+                    />
+                    <path
+                      d="M621 478C603 464 583 465 567 478C547 497 529 509 508 513C485 521 459 510 449 500"
+                    />
+                  </g>
+                  <g id="horse-hind-far">
+                    <path
+                      d="M616 614C596 641 576 649 561 666L545 687"
+                      stroke-dasharray="20 20"
+                    />
+                    <path
+                      d="M573 578L548 594C531 596 518 613 506 625"
+                      stroke-dasharray="19 20"
+                    />
+                    <path
+                      d="M481 633C474 628 463 637 458 649L455 656C467 659 478 657 486 651Z"
+                      fill="currentColor"
+                      stroke-width="5"
+                    />
+                  </g>
+                  <g id="horse-front-far">
+                    <path
+                      d="M943 572C973 558 998 558 1019 578C1037 594 1046 614 1054 633"
+                      stroke-dasharray="21 23"
+                    />
+                    <path
+                      d="M1043 647L1060 639C1066 648 1069 660 1065 672C1057 674 1048 669 1043 664Z"
+                      fill="currentColor"
+                      stroke-width="5"
+                    />
+                  </g>
+                  <path
+                    d="M615 564C602 544 610 518 627 502C655 472 687 466 722 470L770 479C803 488 824 476 842 454C858 436 866 407 884 392"
+                    stroke-dasharray="22 23"
+                  />
+                  <path
+                    d="M728 611C772 626 811 630 854 627C886 624 904 607 931 611"
+                    stroke-dasharray="23 24"
+                  />
+                  <g id="horse-neck">
+                    <path
+                      d="M930 560C941 533 940 496 940 468C939 448 941 432 950 418"
+                      stroke-dasharray="20 22"
+                    />
+                    <path
+                      d="M947 416C973 422 996 431 1016 438L1053 446C1073 451 1088 441 1092 428C1096 412 1082 402 1069 395L1034 369C1015 355 1005 339 988 328L973 320"
+                      stroke-dasharray="19 21"
+                    />
+                    <path
+                      d="M972 306C969 291 956 280 947 274C940 277 939 291 941 305"
+                      stroke-dasharray="13 16"
+                    />
+                    <path
+                      d="M985 363C990 380 971 382 968 370"
+                      stroke-dasharray="none"
+                      stroke-width="8"
+                    />
+                    <path d="M1060 424L1067 434" stroke-width="8" />
+                    <g id="horse-mane" stroke-dasharray="21 23">
+                      <path
+                        d="M909 294C888 292 871 306 852 308C836 310 828 304 819 301"
+                      />
+                      <path
+                        d="M919 322C891 323 875 337 854 345C822 360 791 366 772 348"
+                      />
+                      <path
+                        d="M915 350C882 351 866 371 839 384C808 403 776 410 761 395"
+                      />
+                      <path
+                        d="M896 378C873 396 849 421 823 436C807 446 795 445 786 442"
+                      />
+                    </g>
+                  </g>
+                  <g id="horse-hind-near">
+                    <path
+                      d="M718 578C697 616 677 635 643 647L608 662C589 669 581 685 565 704"
+                      stroke-dasharray="22 23"
+                    />
+                    <path
+                      d="M551 709L535 712C529 718 524 728 522 737C536 739 550 734 559 726Z"
+                      fill="currentColor"
+                      stroke-width="5"
+                    />
+                  </g>
+                  <g id="horse-front-near">
+                    <path
+                      d="M939 612C956 614 973 623 984 636C995 650 987 666 975 681L961 697"
+                      stroke-dasharray="20 20"
+                    />
+                    <path
+                      d="M950 699L933 705C935 714 938 720 942 724C951 720 959 711 962 703Z"
+                      fill="currentColor"
+                      stroke-width="5"
+                    />
+                  </g>
+                </g>
+                <g
+                  class="horse-speed"
+                  stroke="currentColor"
+                  stroke-width="6"
+                  stroke-linecap="round"
+                  opacity=".7"
+                >
+                  <path d="M395 702L451 689" />
+                  <path d="M425 723L488 710" />
+                </g>
+              </svg>
             </div>
             <div class="motion-annotation">
               <span class="annotation-cross" aria-hidden="true">+</span>
@@ -127,11 +244,7 @@
             </div>
           </div>
           <div class="motion-credit small">
-            <a
-              href="https://commons.wikimedia.org/wiki/File:Muybridge_race_horse_animated.gif"
-              target="_blank"
-              rel="noopener noreferrer"
-              >Motion study: Eadweard Muybridge / Public domain →</a
+            <span>Agent requests. Owner control.</span
             ><span>For developers building agent payments</span>
           </div>
         </section>

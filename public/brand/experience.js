@@ -1,8 +1,19 @@
 (() => {
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const finePointer = matchMedia("(min-width: 1001px)");
-  const canvas = document.getElementById("horse-canvas");
-  const context = canvas?.getContext("2d");
+  const horse = document.getElementById("horse-logo");
+  const parts = Object.fromEntries(
+    [
+      "body",
+      "tail",
+      "neck",
+      "mane",
+      "hind-far",
+      "hind-near",
+      "front-far",
+      "front-near",
+    ].map((name) => [name, document.getElementById(`horse-${name}`)]),
+  );
   const field = document.querySelector(".motion-field");
   const toggle = document.getElementById("motion-toggle");
   const preview = document.querySelector(".showcase-stage");
@@ -11,8 +22,8 @@
   const map = document.querySelector(".system-map");
   const wordmark = document.querySelector(".footer-brand");
   const chapters = [...document.querySelectorAll("[data-flow-step]")];
-  const sprite = new Image();
-  let loaded = false,
+
+  let loaded = true,
     paused = false,
     visible = true,
     frame = 0,
@@ -26,10 +37,39 @@
     return clamp((innerHeight - box.top) / (innerHeight + box.height));
   };
   function draw(index) {
-    if (!loaded || !context) return;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(sprite, index * 300, 0, 300, 200, 0, 0, 900, 600);
-    canvas.dataset.frame = String(index);
+    const phase = (index / 60) * Math.PI * 2;
+    const swing = Math.sin(phase);
+    const opposite = Math.sin(phase + Math.PI);
+    parts.body.setAttribute(
+      "transform",
+      `translate(0 ${-4 + Math.cos(phase * 2) * 4})`,
+    );
+    parts["hind-near"].setAttribute(
+      "transform",
+      `rotate(${swing * 13} 697 598)`,
+    );
+    parts["hind-far"].setAttribute(
+      "transform",
+      `rotate(${opposite * 11} 602 606)`,
+    );
+    parts["front-near"].setAttribute(
+      "transform",
+      `rotate(${opposite * 13} 940 611)`,
+    );
+    parts["front-far"].setAttribute(
+      "transform",
+      `rotate(${swing * 10} 945 573)`,
+    );
+    parts.neck.setAttribute("transform", `rotate(${swing * 1.2} 941 484)`);
+    parts.tail.setAttribute(
+      "transform",
+      `rotate(${Math.sin(phase - 0.4) * 3} 640 476)`,
+    );
+    parts.mane.setAttribute(
+      "transform",
+      `rotate(${Math.sin(phase + 0.4) * 2} 912 353)`,
+    );
+    horse.dataset.frame = String(index);
   }
   function requestTick() {
     if (!scheduled && !document.hidden) scheduled = requestAnimationFrame(tick);
@@ -105,9 +145,9 @@
       visible &&
       !paused &&
       !reduced.matches &&
-      now - lastFrame >= 100
+      now - lastFrame >= 1000 / 60
     ) {
-      frame = (frame + 1) % 15;
+      frame = (frame + 1) % 60;
       draw(frame);
       lastFrame = now;
     }
@@ -174,14 +214,7 @@
       )
       .forEach((el) => observer.observe(el));
   }
-  sprite.onload = () => {
-    loaded = true;
-    if (context) {
-      field.classList.add("motion-ready");
-      draw(0);
-    }
-    requestTick();
-  };
-  sprite.src = "/brand/horse-study.webp";
+  field.classList.add("motion-ready");
+  draw(0);
   syncPreference();
 })();

@@ -108,26 +108,17 @@
 .motion-art {
   position: relative;
   width: 69%;
-  margin: -50px 0 -40px 2%;
+  margin: 4px 0 8px 2%;
   aspect-ratio: 3/2;
-  mix-blend-mode: multiply;
+
   transform: translateX(var(--horse-drift, 0px));
 }
-#horse-canvas,
-#horse-fallback {
+#horse-logo {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  display: block;
-}
-#horse-canvas {
-  display: none;
-}
-.motion-ready #horse-canvas {
-  display: block;
-}
-.motion-ready #horse-fallback {
-  display: none;
+  overflow: visible;
+  color: #20251b;
 }
 .motion-annotation {
   position: absolute;
