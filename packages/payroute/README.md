@@ -4,7 +4,7 @@
 
 The typed, deterministic routing library used by Invisible Horses. Runs in Node 20+ and browsers. No server, database, MCP runtime or LLM dependency. Test money only; this package plans routes and does not move funds by itself.
 
-[Routing playground](https://invisiblehorses.vercel.app/playground/) · [Playground source](https://github.com/faizan896/railgate/tree/main/packages/payroute/playground) · [Scenario tests](https://github.com/faizan896/railgate/blob/main/packages/payroute/test/scenarios.test.ts) · [MIT license](https://github.com/faizan896/railgate/blob/main/packages/payroute/LICENSE)
+[Routing playground](https://invisiblehorses.vercel.app/playground/) · [Playground source](https://github.com/faizan896/invisiblehorses/tree/main/packages/payroute/playground) · [Scenario tests](https://github.com/faizan896/invisiblehorses/blob/main/packages/payroute/test/scenarios.test.ts) · [MIT license](https://github.com/faizan896/invisiblehorses/blob/main/packages/payroute/LICENSE)
 
 The playground runs the library in the browser with fictional profiles and modeled prices. Local preview and independent deployment instructions are below.
 

@@ -86,7 +86,7 @@ try {
     console.log(`\nPayment ID  ${first.id}`);
     console.log('Ledger      $50.00 spent; exactly two debits ($5 + $45)');
     console.log('Network     No chain transfers and no real notifications\n');
-    console.log('github.com/faizan896/railgate');
+    console.log('github.com/faizan896/invisiblehorses');
   }
   console.log('Offline demo passed. All assertions verified.');
 } finally { store.close(); }
