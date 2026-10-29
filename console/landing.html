@@ -5,51 +5,141 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="Railgate gives software agents scoped payment access, spending rules, owner approvals and durable background processing. Try the working demo."
+      content="Railgate gives AI agents scoped payment access with budgets, human approvals and a traceable payment history. Explore the working test-credit demo."
     />
-    <title>railgate · Payments agents can use. Controls you can trust.</title>
+    <meta name="theme-color" content="#146c4e" />
+    <title>Railgate · Give agents a budget. Keep control.</title>
+    <script>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("payroute-theme") || "";
+      } catch {}
+    </script>
     <style>
       :root {
         color-scheme: light;
-        --bg: #faf8f5;
-        --text: #1a1a1a;
-        --muted: #666;
-        --line: #e8e0d5;
-        --accent: #295f7c;
-        --wash: #ede8e1;
+        --bg: #f6f7f4;
+        --paper: #fff;
+        --text: #172c25;
+        --muted: #60716a;
+        --line: #dce4de;
+        --accent: #146c4e;
+        --wash: #eaf0e9;
+        --ink: #102d23;
+        --on-ink: #eff7ed;
+        --ink-muted: #b8d0c2;
       }
       @media (prefers-color-scheme: dark) {
-        :root {
+        :root:not([data-theme="light"]) {
           color-scheme: dark;
-          --bg: #212226;
-          --text: #e2e4e9;
-          --muted: #b8bcc8;
-          --line: #3c3e47;
-          --accent: #a0b4cc;
-          --wash: #2e3038;
+          --bg: #101b17;
+          --paper: #17251f;
+          --text: #e9f0e9;
+          --muted: #adbbb1;
+          --line: #31443a;
+          --accent: #95d8b5;
+          --wash: #20362a;
         }
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --bg: #101b17;
+        --paper: #17251f;
+        --text: #e9f0e9;
+        --muted: #adbbb1;
+        --line: #31443a;
+        --accent: #95d8b5;
+        --wash: #20362a;
       }
       * {
         box-sizing: border-box;
+      }
+      html {
+        scroll-padding-top: 24px;
       }
       body {
         margin: 0;
         background: var(--bg);
         color: var(--text);
         font:
-          15px/1.7 "Helvetica Neue",
+          15px/1.65 "Helvetica Neue",
           Arial,
           sans-serif;
       }
+      a {
+        color: var(--accent);
+        text-underline-offset: 4px;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      h1,
+      h2,
+      h3 {
+        font:
+          normal 44px/1.12 "Times New Roman",
+          Times,
+          serif;
+        letter-spacing: -1.4px;
+        margin: 0 0 22px;
+      }
+      p {
+        margin: 0 0 18px;
+      }
       .shell {
-        max-width: 1060px;
+        max-width: 1220px;
+        padding: 0 40px;
         margin: auto;
-        padding: 0 28px;
+      }
+      .small,
+      small,
+      .eyebrow,
+      nav,
+      footer,
+      code,
+      .label,
+      .button {
+        font-size: 13px;
+      }
+      .muted,
+      .small,
+      small,
+      .eyebrow {
+        color: var(--muted);
+      }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        margin-bottom: 20px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        font:
+          600 15px "Helvetica Neue",
+          Arial,
+          sans-serif;
+        letter-spacing: -0.4px;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .brand::before {
+        content: "";
+        width: 24px;
+        height: 24px;
+        border: 5px solid var(--accent);
+        border-top-width: 2px;
+        border-bottom-width: 2px;
+        border-radius: 6px;
+        transform: skewY(-12deg);
       }
       header,
       nav,
+      .actions,
       footer,
-      .actions {
+      .between {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -57,181 +147,390 @@
         flex-wrap: wrap;
       }
       header {
-        padding: 26px 0;
+        padding: 24px 0;
         border-bottom: 1px solid var(--line);
       }
-      a {
-        color: var(--accent);
-        text-underline-offset: 4px;
-      }
-      .brand {
-        font:
-          30px "Times New Roman",
-          Times,
-          serif;
-        color: var(--text);
+      nav a {
         text-decoration: none;
-      }
-      nav,
-      small,
-      .small,
-      .eyebrow,
-      footer,
-      code {
-        font-size: 13px;
-      }
-      .small,
-      small,
-      .eyebrow,
-      footer {
         color: var(--muted);
       }
-      h1,
-      h2,
-      h3 {
-        font:
-          normal 30px/1.25 "Times New Roman",
-          Times,
-          serif;
-        margin: 0 0 20px;
+      nav a:hover {
+        color: var(--accent);
       }
-      p {
-        margin: 0 0 18px;
+      .button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 17px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        text-decoration: none;
+        background: var(--paper);
+        color: var(--text);
+        min-height: 44px;
       }
-      .hero {
-        padding: 90px 0 70px;
-        display: grid;
-        grid-template-columns: 1.2fr 1fr;
-        gap: 65px;
+      .primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--bg);
       }
-      .hero > div:first-child {
-        max-width: 520px;
-      }
-      .eyebrow {
-        margin-bottom: 20px;
+      .button:hover {
+        border-color: var(--accent);
       }
       .actions {
         justify-content: flex-start;
         gap: 10px;
-        margin: 26px 0;
+        margin: 28px 0 20px;
       }
-      .button {
-        padding: 10px 16px;
+      .hero {
+        display: grid;
+        grid-template-columns: 1.04fr 1fr;
+        gap: 72px;
+        align-items: center;
+        padding: 90px 0 72px;
+      }
+      .hero h1 {
+        max-width: 470px;
+      }
+      .hero p:not(.eyebrow):not(.small) {
+        max-width: 440px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         border: 1px solid var(--line);
-        border-radius: 3px;
-        text-decoration: none;
-        display: inline-block;
-      }
-      .primary {
-        background: var(--accent);
-        color: var(--bg);
-        border-color: var(--accent);
-      }
-      .example {
-        border: 1px solid var(--line);
-        border-radius: 3px;
-        padding: 24px;
-        align-self: start;
-      }
-      .example p {
-        margin: 8px 0;
-      }
-      .example ol {
-        list-style: none;
-        padding: 0;
-      }
-      .example li {
-        border-left: 1px solid var(--line);
-        padding: 0 0 20px 20px;
-        position: relative;
-      }
-      .example li:before {
-        content: "";
-        position: absolute;
-        left: -4px;
-        top: 9px;
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--accent);
-      }
-      .example code {
-        display: block;
+        border-radius: 30px;
+        padding: 5px 10px;
+        font-size: 13px;
         color: var(--muted);
       }
-      section {
-        padding: 40px 0;
+      .dot {
+        height: 7px;
+        width: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        display: inline-block;
+      }
+      .preview {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 65px #102d230b;
+      }
+      .preview-head {
+        padding: 16px 22px;
+        background: var(--wash);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+      }
+      .preview-body {
+        padding: 26px;
+      }
+      .preview-title {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .preview-amount {
+        font:
+          44px "Times New Roman",
+          Times,
+          serif;
+        letter-spacing: -1px;
+        margin-bottom: 4px;
+      }
+      .preview-vendor {
+        margin-bottom: 26px;
+      }
+      .flow {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .flow li {
+        border-left: 1px solid var(--line);
+        margin-left: 7px;
+        padding: 0 0 24px 25px;
+        position: relative;
+      }
+      .flow li:last-child {
+        padding-bottom: 0;
+      }
+      .flow li::before {
+        content: "";
+        position: absolute;
+        left: -5px;
+        top: 7px;
+        width: 9px;
+        height: 9px;
+        background: var(--accent);
+        border-radius: 50%;
+        box-shadow: 0 0 0 4px var(--paper);
+      }
+      .flow strong {
+        font-weight: 500;
+      }
+      .flow small {
+        display: block;
+        margin-top: 3px;
+      }
+      .preview-foot {
+        padding: 14px 22px;
         border-top: 1px solid var(--line);
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        padding: 22px 0;
+        gap: 30px;
+      }
+      .strip p {
+        margin: 0;
+      }
+      .strip span {
+        color: var(--accent);
+        margin-right: 8px;
+      }
+      .section {
+        padding: 76px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .section-heading {
+        max-width: 650px;
+        margin-bottom: 35px;
+      }
+      .section-heading p {
+        color: var(--muted);
       }
       .features {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 30px;
+        gap: 38px;
       }
-      .features h3 {
+      .feature-index {
+        display: block;
+        color: var(--accent);
+        font-size: 13px;
+        margin-bottom: 22px;
+      }
+      .feature-title {
+        font-weight: 600;
         margin-bottom: 12px;
       }
-      .truth {
-        background: var(--wash);
-        padding: 24px;
-        margin-top: 26px;
+      .features p {
+        color: var(--muted);
       }
-      .flow {
+      .use-cases .features article {
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
+      }
+      .integration {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 40px;
+        gap: 65px;
+        align-items: center;
       }
-      .flow pre {
-        font-size: 13px;
+      .integration ol {
+        padding-left: 20px;
+        color: var(--muted);
+      }
+      .integration li {
+        padding: 0 0 12px 8px;
+      }
+      pre {
+        margin: 0;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
-        padding: 24px;
+        font-size: 13px;
+        line-height: 1.9;
+      }
+      .code-panel {
+        background: var(--ink);
+        color: var(--on-ink);
+        padding: 28px;
+        border-radius: 12px;
+      }
+      .code-panel .label {
+        color: var(--ink-muted);
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ffffff20;
+        margin-bottom: 20px;
+      }
+      .code-accent {
+        color: #a9e6bf;
+      }
+      .planner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 65px;
+        align-items: center;
+      }
+      .planner-visual {
+        padding: 28px;
         background: var(--wash);
-        border-radius: 3px;
-        margin: 0;
+        border: 1px solid var(--line);
+        border-radius: 12px;
       }
-      .flow ol {
-        padding-left: 22px;
+      .route-row {
+        padding: 15px 0;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
       }
-      .flow li {
-        margin-bottom: 14px;
+      .route-row:last-of-type {
+        border: 0;
+      }
+      .route-row span:last-child {
+        color: var(--muted);
+      }
+      .planner-visual p {
+        margin-top: 18px;
+        margin-bottom: 0;
+      }
+      .availability {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 65px;
+      }
+      .availability ul {
+        padding: 0;
+        list-style: none;
+        color: var(--muted);
+      }
+      .availability li {
+        padding: 11px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .availability li::before {
+        content: "→";
+        margin-right: 12px;
+        color: var(--accent);
+      }
+      .closing {
+        padding: 60px 0;
+        text-align: center;
+      }
+      .closing .actions {
+        justify-content: center;
       }
       footer {
-        padding: 28px 0 40px;
+        padding: 26px 0 36px;
+        color: var(--muted);
         border-top: 1px solid var(--line);
-        margin-top: 30px;
+      }
+      footer div {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .text-link {
+        text-decoration: none;
+      }
+      .text-link:hover {
+        text-decoration: underline;
       }
       :focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 4px;
       }
-      @media (max-width: 700px) {
-        .shell {
-          padding: 0 20px;
-        }
+      @media (max-width: 900px) {
         .hero {
-          padding: 50px 0 40px;
-          grid-template-columns: 1fr;
-          gap: 30px;
-        }
-        .features,
-        .flow {
-          grid-template-columns: 1fr;
+          gap: 35px;
+          padding: 60px 0;
         }
         .features {
-          gap: 20px;
+          gap: 24px;
+        }
+        .integration,
+        .planner,
+        .availability {
+          gap: 35px;
+        }
+        .shell {
+          padding: 0 26px;
         }
         nav {
           gap: 14px;
         }
-        .example {
-          padding: 20px;
+      }
+      @media (max-width: 650px) {
+        .shell {
+          padding: 0 20px;
         }
-        section {
-          padding: 30px 0;
+        header {
+          gap: 18px;
+        }
+        nav {
+          width: 100%;
+          justify-content: flex-start;
+          gap: 16px;
+        }
+        .hero {
+          grid-template-columns: 1fr;
+          padding: 46px 0;
+          gap: 32px;
+        }
+        h1,
+        h2,
+        h3 {
+          font-size: 30px;
+          letter-spacing: -0.7px;
+        }
+        .preview-amount {
+          font-size: 30px;
+        }
+        .hero h1 {
+          max-width: 330px;
+        }
+        .strip {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+        .section {
+          padding: 44px 0;
+        }
+        .features,
+        .integration,
+        .planner,
+        .availability {
+          grid-template-columns: 1fr;
+          gap: 28px;
+        }
+        .feature-index {
+          margin-bottom: 10px;
+        }
+        .section-heading {
+          margin-bottom: 28px;
+        }
+        .preview-body,
+        .code-panel,
+        .planner-visual {
+          padding: 22px;
+        }
+        .closing {
+          text-align: left;
+          padding: 44px 0;
+        }
+        .closing .actions {
+          justify-content: flex-start;
         }
         footer {
-          gap: 12px;
+          gap: 16px;
+        }
+        #theme {
+          margin-left: auto;
         }
       }
     </style>
@@ -239,105 +538,180 @@
   <body>
     <div class="shell">
       <header>
-        <a class="brand" href="/">railgate</a>
+        <a class="brand" href="/">Railgate</a>
         <nav aria-label="Main">
-          <a href="/playground/">Routing playground</a
-          ><a href="https://github.com/faizan896/railgate">GitHub ↗</a
-          ><a class="button" href="/app/">Open workspace →</a>
+          <a href="#who-its-for">Who it is for</a>
+          <a href="/playground/">Route planner</a>
+          <a href="#developers">Developers</a>
+          <button
+            class="button"
+            id="theme"
+            type="button"
+            aria-label="Switch color theme"
+          >
+            Dark mode
+          </button>
+          <a class="button primary" href="/app/">Open workspace →</a>
         </nav>
       </header>
       <main>
-        <div class="hero">
+        <section class="hero">
           <div>
-            <p class="eyebrow">Payment controls for software agents</p>
-            <h1>Give agents a budget.<br />Keep control of every payment.</h1>
+            <p class="eyebrow">Spending controls for AI agents</p>
+            <h1>
+              Give agents a budget.<br />Keep control of<br />every payment.
+            </h1>
             <p>
-              Your agent requests a payment. Railgate checks its permissions,
-              reserves the budget, asks for your approval when needed, and
-              finishes accepted work in the background.
+              Your agents request payments. You set the limits, approve the
+              exceptions, and see exactly what happened.
             </p>
             <div class="actions">
               <a class="button primary" href="/app/">Try the working demo →</a
-              ><a
-                class="button"
-                href="https://github.com/faizan896/railgate/blob/main/docs/agent-payments-product.md"
-                >Read the architecture</a
+              ><a class="button" href="/railgate-walkthrough.mp4"
+                >Watch the 51-second demo ▷</a
               >
             </div>
             <p class="small">
-              Private demo workspace. Real API and background processing.<br />Internal
-              test credits. No bank connection required.
+              No bank connection needed. The public demo uses internal test
+              credits.
             </p>
           </div>
-          <div class="example">
-            <p class="small">Example flow, not live transaction data</p>
-            <h2>One request. Every decision recorded.</h2>
-            <ol>
-              <li>
-                Agent requests a vendor payment<code
-                  >POST /console-api/v1/payments</code
-                >
-              </li>
-              <li>
-                Permissions and budget checked<code
-                  >Scoped key · company + agent limits</code
-                >
-              </li>
-              <li>
-                Owner approves when required<code
-                  >Agent keys cannot approve themselves</code
-                >
-              </li>
-              <li>
-                Background worker settles the ledger<code
-                  >Durable record · duplicate-safe request</code
-                >
-              </li>
-            </ol>
-            <p class="small">Close the tab. The server keeps working.</p>
+          <div class="preview" aria-label="Illustrative payment workflow">
+            <div class="preview-head">
+              <span>Railgate / Payment request</span
+              ><span class="pill"><span class="dot"></span>Example</span>
+            </div>
+            <div class="preview-body">
+              <p class="preview-title">Research agent → DataCo</p>
+              <div class="preview-amount">
+                $75.00 <span class="small">USD</span>
+              </div>
+              <p class="small preview-vendor">
+                Illustrative request using demo credits
+              </p>
+              <ol class="flow">
+                <li>
+                  <strong>Agent sends a request</strong
+                  ><small>Its own API key. Access limited to its role.</small>
+                </li>
+                <li>
+                  <strong>Budget and vendor checked</strong
+                  ><small>Company and agent rules both apply.</small>
+                </li>
+                <li>
+                  <strong>You approve the exception</strong
+                  ><small>Requests above your threshold wait for you.</small>
+                </li>
+                <li>
+                  <strong>The worker finishes the job</strong
+                  ><small>One payment. A traceable record.</small>
+                </li>
+              </ol>
+            </div>
+            <div class="preview-foot">Your agent asks. Your rules decide.</div>
           </div>
+        </section>
+        <div class="strip">
+          <p><span>→</span> A separate key for every agent</p>
+          <p><span>→</span> Limits checked before spending</p>
+          <p><span>→</span> Background work with a history</p>
         </div>
-        <section>
-          <p class="eyebrow">Built around the boundaries that matter</p>
+        <section class="section">
+          <div class="section-heading">
+            <p class="eyebrow">From request to receipt</p>
+            <h2>Autonomy, with boundaries.</h2>
+            <p>
+              One place to manage what your agents can spend and when a human
+              needs to step in.
+            </p>
+          </div>
           <div class="features">
             <article>
-              <h3>Access with a scope.</h3>
+              <span class="feature-index">01 / Access</span>
+              <p class="feature-title">Give each agent its own key.</p>
               <p>
-                Give each agent its own API key. Choose read or payment
-                permissions, see when the key was used, and revoke it
-                immediately.
+                Choose payment or read permissions. Revoke a key when its job is
+                done. An agent cannot approve its own requests.
               </p>
             </article>
             <article>
-              <h3>A budget before a balance.</h3>
+              <span class="feature-index">02 / Control</span>
+              <p class="feature-title">Set the budget before the task.</p>
               <p>
-                Company limits, agent limits and vendor allowlists are checked
-                server-side. Pending work reserves budget so simultaneous
-                requests cannot spend it twice.
+                Limit each payment, cap daily spending and choose allowed
+                vendors. Pending requests reserve budget too.
               </p>
             </article>
             <article>
-              <h3>Work that outlives a tab.</h3>
+              <span class="feature-index">03 / Follow through</span>
+              <p class="feature-title">Close the tab. Work continues.</p>
               <p>
-                Durable jobs handle queued requests. The worker rechecks the
-                current rules and records settlement with balanced ledger
-                entries.
+                Accepted requests run in a durable background worker. Retrying
+                the same request does not create a second payment.
               </p>
             </article>
           </div>
         </section>
-        <section class="flow">
-          <div>
-            <h2>An API your agent can use today.</h2>
-            <ol>
-              <li>Create a private demo workspace.</li>
-              <li>Issue a scoped test key to an agent.</li>
-              <li>Send a payment request with an idempotency key.</li>
-              <li>Inspect approvals, payment status and the audit trail.</li>
-            </ol>
-            <a class="button primary" href="/app/">Create your workspace →</a>
+        <section class="section use-cases" id="who-its-for">
+          <div class="section-heading">
+            <p class="eyebrow">Who it is for</p>
+            <h2>Built for teams putting<br />agents to work.</h2>
+            <p>
+              Start with a developer. Keep the spending decisions visible to the
+              people responsible for the budget.
+            </p>
           </div>
-          <pre><code>POST /console-api/v1/payments
+          <div class="features">
+            <article>
+              <p class="feature-title">AI product teams</p>
+              <p>
+                Explore how a research or coding agent could request paid data
+                or compute, within a budget your team controls.
+              </p>
+            </article>
+            <article>
+              <p class="feature-title">Automation agencies</p>
+              <p>
+                Prototype an approval flow for client agents, with a separate
+                key and spending limits for each agent.
+              </p>
+            </article>
+            <article>
+              <p class="feature-title">Finance and operations</p>
+              <p>
+                Review agent requests, approve exceptions and export the payment
+                history. Developers connect the workflow.
+              </p>
+            </article>
+          </div>
+          <p class="small">
+            These are intended use cases. Vendor purchases and external payouts
+            need a connected payment provider. The public demo does not make
+            those purchases.
+          </p>
+        </section>
+        <section class="section integration" id="developers">
+          <div>
+            <p class="eyebrow">Made for your stack</p>
+            <h2>
+              Your agent makes a request.<br />Railgate handles the checks.
+            </h2>
+            <p>
+              No particular model or agent framework required. Call the API from
+              your backend, script or agent tool.
+            </p>
+            <ol>
+              <li>Create a demo workspace and issue a test key.</li>
+              <li>Set the spending rules and approval threshold.</li>
+              <li>Send a request and follow its status.</li>
+            </ol>
+            <a class="text-link" href="/app/#developers"
+              >Open the integration guide →</a
+            >
+          </div>
+          <div class="code-panel">
+            <div class="label">A payment request / REST API</div>
+            <pre><code><span class="code-accent">POST</span> /console-api/v1/payments
 Authorization: Bearer YOUR_TEST_KEY
 Content-Type: application/json
 
@@ -346,41 +720,119 @@ Content-Type: application/json
   "recipient": "dataco",
   "amount": "12.50",
   "purpose": "Research data invoice"
-}
-
-// Read the persisted payment status.
-// Retry the same request without paying twice.</code></pre>
+}</code></pre>
+            <p class="small" style="color: var(--ink-muted); margin: 20px 0 0">
+              An accepted request is recorded first. Read its status to follow
+              approval and internal ledger settlement.
+            </p>
+          </div>
         </section>
-        <section>
-          <h2>Clear about what ships.</h2>
-          <p>
-            This release is a working agent payments control plane with isolated
-            demo workspaces, hashed keys, deterministic policies, owner
-            approvals, durable processing and an append-only audit log.
-          </p>
-          <div class="truth">
+        <section class="section planner">
+          <div class="planner-visual">
+            <p class="eyebrow" style="margin-top: 0">
+              Railgate / Route planner
+            </p>
+            <div class="route-row">
+              <span>Bank transfer</span><span>Bank hours matter</span>
+            </div>
+            <div class="route-row">
+              <span>USDC route</span><span>Offramp costs matter</span>
+            </div>
+            <div class="route-row">
+              <span>Your deadline</span><span>Compare arrival times</span>
+            </div>
+            <p class="small">Planning tool with test data. Not a quote.</p>
+          </div>
+          <div>
+            <p class="eyebrow">One product. A clearer decision.</p>
+            <h2>See the tradeoffs<br />before choosing a route.</h2>
             <p>
-              Payments settle in the internal demo ledger. External bank payouts
-              and crypto transfers are not connected in the public workspace.
-              This is not a licensed payment processor or a production custody
-              service.
+              The Railgate route planner compares modeled costs and arrival
+              times. Inspect the sources, change assumptions and see how bank
+              hours affect your options.
             </p>
             <p class="small">
-              The separate routing playground compares modeled alternatives and
-              shows where every number comes from.
-              <a href="/playground/">Explore the routing model →</a>
+              A planning preview within Railgate. Choosing a route here does not
+              send a payment or configure the demo worker.
             </p>
+            <a class="text-link" href="/playground/"
+              >Explore the route planner →</a
+            >
+          </div>
+        </section>
+        <section class="section availability">
+          <div>
+            <p class="eyebrow">Available today</p>
+            <h2>A working demo.<br />An honest starting point.</h2>
+            <p>
+              Real API requests, saved records, enforced rules and background
+              jobs. Test credits let you explore the complete flow.
+            </p>
+            <a
+              class="text-link"
+              href="https://github.com/faizan896/railgate/blob/main/docs/agent-payments-product.md"
+              >See the architecture and current limits →</a
+            >
+          </div>
+          <div>
+            <ul>
+              <li>Private workspaces and scoped agent keys</li>
+              <li>Spending limits and owner approvals</li>
+              <li>Durable internal ledger and exportable history</li>
+              <li>Bank and USDC payouts: not connected</li>
+              <li>Real vendor purchases: not available in this demo</li>
+            </ul>
+            <p class="small">
+              Railgate is currently a test-credit MVP. It is not a bank or a
+              live payment processing service.
+            </p>
+          </div>
+        </section>
+        <section class="closing">
+          <p class="eyebrow">Start with one agent</p>
+          <h2>A small request.<br />A complete trail.</h2>
+          <div class="actions">
+            <a class="button primary" href="/app/"
+              >Create your demo workspace →</a
+            ><a class="button" href="https://github.com/faizan896/railgate"
+              >Explore the source →</a
+            >
           </div>
         </section>
       </main>
       <footer>
-        <span>railgate · Built by <a href="https://faizan.sh">Faizan</a></span
-        ><span
-          ><a href="https://github.com/faizan896/railgate">Source</a> ·
-          <a href="/app/">Working demo</a> ·
-          <a href="/playground/">Playground</a></span
-        >
+        <span>Railgate · Built by <a href="https://faizan.sh">Faizan</a></span>
+        <div>
+          <a href="/app/">Workspace</a><a href="/playground/">Route planner</a
+          ><a href="https://github.com/faizan896/railgate">GitHub →</a>
+        </div>
       </footer>
     </div>
+    <script>
+      const button = document.getElementById("theme");
+      function isDark() {
+        return (
+          document.documentElement.dataset.theme === "dark" ||
+          (!document.documentElement.dataset.theme &&
+            matchMedia("(prefers-color-scheme:dark)").matches)
+        );
+      }
+      function label() {
+        button.textContent = isDark() ? "Light mode" : "Dark mode";
+      }
+      button.addEventListener("click", () => {
+        const theme = isDark() ? "light" : "dark";
+        document.documentElement.dataset.theme = theme;
+        try {
+          localStorage.setItem("payroute-theme", theme);
+        } catch {}
+        label();
+      });
+      matchMedia("(prefers-color-scheme:dark)").addEventListener(
+        "change",
+        label,
+      );
+      label();
+    </script>
   </body>
 </html>

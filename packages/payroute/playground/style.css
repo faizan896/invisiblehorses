@@ -1,34 +1,34 @@
 :root {
   color-scheme: light;
-  --bg: #faf8f5;
-  --text: #1a1a1a;
-  --muted: #666;
-  --line: #e8e0d5;
-  --accent: #295f7c;
-  --wash: #ede8e1;
-  --field: #fffdfa;
+  --bg: #f6f7f4;
+  --text: #172c25;
+  --muted: #60716a;
+  --line: #dce4de;
+  --accent: #146c4e;
+  --wash: #eaf0e9;
+  --field: #ffffff;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #212226;
-    --text: #e2e4e9;
-    --muted: #b8bcc8;
-    --line: #3c3e47;
-    --accent: #a0b4cc;
-    --wash: #2e3038;
-    --field: #25262b;
+    --bg: #101b17;
+    --text: #e9f0e9;
+    --muted: #adbbb1;
+    --line: #31443a;
+    --accent: #95d8b5;
+    --wash: #20362a;
+    --field: #17251f;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #212226;
-  --text: #e2e4e9;
-  --muted: #b8bcc8;
-  --line: #3c3e47;
-  --accent: #a0b4cc;
-  --wash: #2e3038;
-  --field: #25262b;
+  --bg: #101b17;
+  --text: #e9f0e9;
+  --muted: #adbbb1;
+  --line: #31443a;
+  --accent: #95d8b5;
+  --wash: #20362a;
+  --field: #17251f;
 }
 * {
   box-sizing: border-box;
@@ -56,7 +56,7 @@ button {
   cursor: pointer;
   background: transparent;
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 7px 12px;
 }
 button:hover {
@@ -164,7 +164,7 @@ select {
   width: 100%;
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 10px;
   background: var(--field);
   min-height: 44px;
@@ -173,7 +173,7 @@ select {
   display: flex;
 }
 .amount input {
-  border-radius: 3px 0 0 3px;
+  border-radius: 8px 0 0 3px;
 }
 .amount select {
   width: 85px;
@@ -210,7 +210,7 @@ details {
 .recommendation {
   border: 1px solid var(--line);
   border-left: 3px solid var(--accent);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 26px;
   margin: 20px 0 38px;
 }
@@ -292,7 +292,7 @@ td .source-tag {
   padding: 14px;
   background: var(--field);
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 8px;
   box-shadow: 0 4px 15px #0002;
   font-size: 13px;
   color: var(--text);
@@ -503,4 +503,25 @@ footer {
   bottom: 24px;
   left: 24px;
   max-width: calc(100vw - 48px);
+}
+
+.product-brand {
+  font:
+    30px "Times New Roman",
+    Times,
+    serif;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+.product-brand::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 4px solid var(--accent);
+  border-top-width: 2px;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  transform: skewY(-12deg);
+  margin-right: 10px;
 }

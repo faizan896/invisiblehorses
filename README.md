@@ -1,4 +1,6 @@
-# railgate
+# Railgate
+
+[Product direction, intended users and launch requirements](docs/railgate-product-direction.md)
 
 Spending limits, human approvals and smart rail routing for AI agent payments. Open source, test money only.
 

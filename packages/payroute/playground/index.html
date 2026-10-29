@@ -7,7 +7,7 @@
       name="description"
       content="Compare test payment routes, see their sources and explore editable assumptions."
     />
-    <title>payroute playground</title>
+    <title>Route planner · Railgate</title>
     <script>
       try {
         document.documentElement.dataset.theme =
@@ -18,8 +18,9 @@
   <body>
     <div class="shell">
       <header>
-        <a href="https://faizan.sh">Faizan</a>
-        <nav>
+        <a class="product-brand" href="/">Railgate</a>
+        <nav aria-label="Main">
+          <a href="/app/">Workspace →</a>
           <a
             href="https://github.com/faizan896/railgate/tree/main/packages/payroute"
             >Source ↗</a
@@ -30,12 +31,12 @@
       </header>
       <main>
         <section class="intro">
-          <p class="small">railgate / playground</p>
-          <h1>payroute</h1>
+          <p class="small">Railgate / Route planner</p>
+          <h1>Choose a way to pay.</h1>
           <p>
             Compare ways to send money by cost, arrival time and your deadline.
           </p>
-          <p class="small">Planning tool with test data. Not a quote.</p>
+          <p class="small">Planning tool with test data. Not a quote. Compare routes here; manage agent requests in your <a href="/app/">Railgate workspace</a>.</p>
         </section>
         <div class="scenarios" role="group" aria-label="Example scenarios">
           <button data-scenario="domestic" aria-pressed="true">
@@ -252,7 +253,7 @@
       </main>
       <footer>
         <span>Planning tool with test data. Not a quote.</span
-        ><a href="https://github.com/faizan896/railgate">railgate ↗</a>
+        ><a href="/">Railgate ↗</a>
       </footer>
     </div>
     <script type="module" src="./main.ts"></script>

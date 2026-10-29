@@ -1,5 +1,7 @@
 # Railgate: an agent payments control plane
 
+Railgate is one product. The workspace manages agent spending; the Route planner is its planning preview. See [intended users, design references and launch requirements](railgate-product-direction.md).
+
 [Open the working product](https://railgate-self.vercel.app/app/) · [Routing playground](https://railgate-self.vercel.app/playground/)
 
 [Watch the 51-second product walkthrough](https://railgate-self.vercel.app/railgate-walkthrough.mp4). Captured from the deployed app, with readable captions and the private API key hidden. Shows workspace creation, scoped access, spending rules, a $75 approval, background settlement and the audit record. Internal test credits only.

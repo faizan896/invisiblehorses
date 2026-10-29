@@ -1,34 +1,34 @@
 :root {
   color-scheme: light;
-  --bg: #faf8f5;
-  --paper: #fffdfa;
-  --text: #1a1a1a;
-  --muted: #666;
-  --line: #e8e0d5;
-  --accent: #295f7c;
-  --wash: #ede8e1;
+  --bg: #f6f7f4;
+  --paper: #ffffff;
+  --text: #172c25;
+  --muted: #60716a;
+  --line: #dce4de;
+  --accent: #146c4e;
+  --wash: #eaf0e9;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #212226;
-    --paper: #25262b;
-    --text: #e2e4e9;
-    --muted: #b8bcc8;
-    --line: #3c3e47;
-    --accent: #a0b4cc;
-    --wash: #2e3038;
+    --bg: #101b17;
+    --paper: #17251f;
+    --text: #e9f0e9;
+    --muted: #adbbb1;
+    --line: #31443a;
+    --accent: #95d8b5;
+    --wash: #20362a;
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #212226;
-  --paper: #25262b;
-  --text: #e2e4e9;
-  --muted: #b8bcc8;
-  --line: #3c3e47;
-  --accent: #a0b4cc;
-  --wash: #2e3038;
+  --bg: #101b17;
+  --paper: #17251f;
+  --text: #e9f0e9;
+  --muted: #adbbb1;
+  --line: #31443a;
+  --accent: #95d8b5;
+  --wash: #20362a;
 }
 * {
   box-sizing: border-box;
@@ -58,7 +58,7 @@ button,
   cursor: pointer;
   border: 1px solid var(--line);
   background: var(--paper);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 8px 14px;
   text-decoration: none;
   display: inline-block;
@@ -117,7 +117,7 @@ small,
 }
 .badge {
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 2px 7px;
   white-space: nowrap;
   color: var(--muted);
@@ -150,7 +150,7 @@ small,
 .sidebar nav a {
   padding: 9px 12px;
   color: var(--muted);
-  border-radius: 3px;
+  border-radius: 8px;
   text-decoration: none;
 }
 .sidebar nav a[aria-current="page"] {
@@ -205,7 +205,7 @@ small,
 .notice {
   background: var(--wash);
   padding: 14px 18px;
-  border-radius: 3px;
+  border-radius: 8px;
   font-size: 13px;
   margin: 0 0 28px;
 }
@@ -244,7 +244,7 @@ small,
 }
 .panel {
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 24px;
   margin: 20px 0;
 }
@@ -317,7 +317,7 @@ textarea {
   min-width: 0;
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 10px;
   min-height: 44px;
 }
@@ -388,7 +388,7 @@ pre {
   overflow-wrap: anywhere;
   background: var(--wash);
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: 8px;
   padding: 18px;
   font-size: 13px;
   line-height: 1.7;
@@ -467,7 +467,7 @@ code {
 }
 dialog {
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: 8px;
   background: var(--bg);
   color: var(--text);
   padding: 28px;
@@ -497,7 +497,7 @@ dialog header h2 {
   padding: 13px 18px;
   background: var(--text);
   color: var(--bg);
-  border-radius: 3px;
+  border-radius: 8px;
   z-index: 100;
   font-size: 13px;
 }
@@ -622,5 +622,140 @@ dialog header h2 {
   }
   .mobile-nav {
     display: inline-block;
+  }
+}
+
+/* Railgate: calm surfaces, forest green controls, consistent product identity. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -1px;
+}
+.brand::before {
+  content: "";
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 5px solid var(--accent);
+  border-top-width: 2px;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  transform: skewY(-12deg);
+  flex-shrink: 0;
+}
+.sidebar {
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.sidebar nav a {
+  position: relative;
+  min-height: 40px;
+}
+.sidebar nav a:hover {
+  background: var(--wash);
+  color: var(--text);
+}
+.sidebar nav a[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: inset 3px 0 var(--accent);
+}
+.workspace-name {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+button.primary:hover,
+.button.primary:hover {
+  filter: brightness(1.12);
+}
+.notice {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+}
+.metrics {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  gap: 0;
+  padding: 24px 0;
+}
+.metric {
+  padding: 0 24px;
+  border-bottom: 0;
+  border-right: 1px solid var(--line);
+}
+.metric:last-child {
+  border-right: 0;
+}
+.metric strong {
+  display: block;
+  margin: 10px 0;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.badge.chosen {
+  background: var(--wash);
+}
+.panel {
+  background: var(--paper);
+}
+.table-wrap tbody tr:hover {
+  background: var(--wash);
+}
+.onboarding {
+  max-width: 620px;
+}
+.onboarding .panel {
+  padding: 28px;
+}
+@media (max-width: 900px) {
+  .metric {
+    padding: 16px 24px;
+  }
+  .metric:nth-child(2) {
+    border-right: 0;
+  }
+  .metrics {
+    padding: 8px 0;
+  }
+}
+@media (max-width: 640px) {
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+  .workspace-name {
+    display: none;
+  }
+  .metric {
+    padding: 16px;
+  }
+  .onboarding .panel {
+    padding: 20px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  .button,
+  .sidebar nav a {
+    transition:
+      background-color 0.15s,
+      border-color 0.15s;
+  }
+}
+.sidebar .brand {
+  display: flex;
+  margin-bottom: 12px;
+}
+@media (max-width: 640px) {
+  .sidebar .brand {
+    margin-bottom: 0;
   }
 }
