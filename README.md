@@ -8,11 +8,11 @@ Previously branded Railgate. Repository, package names and API paths remain unch
 
 ## Working product
 
-[Open the private demo workspace](https://railgate-self.vercel.app/app/) · [Product page](https://railgate-self.vercel.app/) · [Architecture and portfolio case study](docs/agent-payments-product.md)
+[Open the private demo workspace](https://invisiblehorses.vercel.app/app/) · [Product page](https://invisiblehorses.vercel.app/) · [Architecture and portfolio case study](docs/agent-payments-product.md)
 
 Create scoped agent keys, set company and agent budgets, approve requests, and watch durable background jobs settle an internal test ledger. Every visitor gets an isolated workspace; all dashboard metrics come from persisted records. External bank and USDC payouts are explicitly not connected in this public demo.
 
-The existing routing playground and testnet runtime are preserved. [Explore the playground](https://railgate-self.vercel.app/playground/) · [Numbers audit](docs/payroute-numbers-audit.md)
+The existing routing playground and testnet runtime are preserved. [Explore the playground](https://invisiblehorses.vercel.app/playground/) · [Numbers audit](docs/payroute-numbers-audit.md)
 
 ![Offline demo: $5 completes, $45 needs simulated owner approval, a $150 cumulative attempt is denied, and a retry creates no second debit](docs/demo.gif)
 
@@ -206,7 +206,7 @@ A rejected simulated bank destination returns principal to the original payer an
 
 The routing engine is also an independent [payroute workspace package](packages/payroute/README.md). It has no railgate server, SQLite or MCP dependency. Railgate imports its core planner, schemas and adapters through compatibility exports, preserving the existing routing tests unchanged.
 
-Try [the routing playground](https://railgate-self.vercel.app/playground/) after deploying this revision, or run `pnpm dev:playground` locally. Enter amount, currencies, deadline, delivery preferences and send time to see normalized quotes, the chosen rail and every rejection reason. Presets cover domestic payments, Monday/Tuesday MXN timing, refunds, weekends and holidays. It runs the actual library entirely in the browser with fictional profiles and modeled/mock pricing; it cannot approve or execute payments.
+Try [the routing playground](https://invisiblehorses.vercel.app/playground/) after deploying this revision, or run `pnpm dev:playground` locally. Enter amount, currencies, deadline, delivery preferences and send time to see normalized quotes, the chosen rail and every rejection reason. Presets cover domestic payments, Monday/Tuesday MXN timing, refunds, weekends and holidays. It runs the actual library entirely in the browser with fictional profiles and modeled/mock pricing; it cannot approve or execute payments.
 
 `pnpm build:playground` builds the static page and stages it under `public/playground/` for the existing Vercel site. The package also includes Vercel/Netlify configs for independent hosting. Its README covers the typed `createRouter({ rails, scoring, context })` API, custom adapters/scoring, standalone installation and test boundaries. `payroute` returned 404 on the public npm registry on 2026-10-27; version 0.1.0 is prepared for the maintainer to publish. After publication, install with `npm i payroute`.
 

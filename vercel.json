@@ -10,6 +10,19 @@
   },
   "routes": [
     {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "railgate-self.vercel.app"
+        }
+      ],
+      "headers": {
+        "Location": "https://invisiblehorses.vercel.app/$1"
+      },
+      "status": 308
+    },
+    {
       "src": "/playground$",
       "headers": {
         "Location": "/playground/"

@@ -25,7 +25,7 @@ The operational product remains an internal test-credit MVP. This design does no
 
 ## Deployment
 
-The existing production address remains [railgate-self.vercel.app](https://railgate-self.vercel.app/). No custom domain has been purchased or connected by this change.
+The production address is [railgate-self.vercel.app](https://invisiblehorses.vercel.app/). No custom domain has been purchased or connected by this change.
 
 ## Validation
 
@@ -45,4 +45,8 @@ The implementation and viewport correction deployed successfully through the exi
 
 [Production verification record](invisible-horses-screenshots/verification.json). Captures contain test-credit records, with no raw API key or session cookie.
 
-The [51-second walkthrough](https://railgate-self.vercel.app/railgate-walkthrough.mp4) was re-recorded against the deployed Invisible Horses UI. It uses actual test-credit operations, updated monochrome captions and a masked private key. Export checked as H.264, 1280×720, 51.00 seconds, approximately 1 MB; complete video decode and key-mask frame review passed. The existing video URL is preserved for compatibility.
+The [51-second walkthrough](https://invisiblehorses.vercel.app/railgate-walkthrough.mp4) was re-recorded against the deployed Invisible Horses UI. It uses actual test-credit operations, updated monochrome captions and a masked private key. Export checked as H.264, 1280×720, 51.00 seconds, approximately 1 MB; complete video decode and key-mask frame review passed. The existing video URL is preserved for compatibility.
+
+## Free domain migration
+
+The verified production domain is now `invisiblehorses.vercel.app`, attached to the existing Vercel project. The console worker’s exact allowed origin was updated to match. The previous `railgate-self.vercel.app` address redirects to the new hostname. Demo owner cookies are scoped to their original hostname, so a visitor opening the new hostname starts a new browser workspace session; agent API key formats and storage remain unchanged. No domain purchase was made.

@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "vars": {
-    "PUBLIC_ORIGIN": "https://railgate-self.vercel.app",
+    "PUBLIC_ORIGIN": "https://invisiblehorses.vercel.app",
   },
   "durable_objects": {
     "bindings": [

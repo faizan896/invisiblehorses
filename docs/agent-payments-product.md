@@ -2,9 +2,9 @@
 
 Invisible Horses, previously branded Railgate, is one product. The workspace manages agent spending; the Route planner is its planning preview. See [intended users and launch requirements](railgate-product-direction.md) and the [current design](invisible-horses-design.md).
 
-[Open the working product](https://railgate-self.vercel.app/app/) · [Route planner](https://railgate-self.vercel.app/playground/)
+[Open the working product](https://invisiblehorses.vercel.app/app/) · [Route planner](https://invisiblehorses.vercel.app/playground/)
 
-[Watch the 51-second product walkthrough](https://railgate-self.vercel.app/railgate-walkthrough.mp4). Captured from the deployed app, with readable captions and the private API key hidden. Shows workspace creation, scoped access, spending rules, a $75 approval, background settlement and the audit record. Internal test credits only.
+[Watch the 51-second product walkthrough](https://invisiblehorses.vercel.app/railgate-walkthrough.mp4). Captured from the deployed app, with readable captions and the private API key hidden. Shows workspace creation, scoped access, spending rules, a $75 approval, background settlement and the audit record. Internal test credits only.
 
 Invisible Horses turns an agent's payment request into an owner-controlled workflow: authenticate a scoped key, check company and agent budgets, reserve spending capacity, collect approval when necessary, settle accepted work in a durable internal ledger, and keep an append-only record.
 
@@ -75,12 +75,12 @@ The landing page is built from `console/landing.html`, and the app from `console
 
 ## API contract
 
-Base URL: `https://railgate-self.vercel.app/console-api`
+Base URL: `https://invisiblehorses.vercel.app/console-api`
 
 ```sh
 export RAILGATE_API_KEY='your_test_key'
 
-curl 'https://railgate-self.vercel.app/console-api/v1/payments' \
+curl 'https://invisiblehorses.vercel.app/console-api/v1/payments' \
   -H "Authorization: Bearer $RAILGATE_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -146,7 +146,7 @@ Release verification: 205 automated tests passed: 180 root tests, 12 payroute te
 
 ## Production walkthrough and screenshots
 
-The deployed product was verified end to end at https://railgate-self.vercel.app/. The browser created a private workspace and scoped key, submitted a payment through the actual dashboard form, closed the only tab, and verified that the durable worker completed it without polling. The walkthrough also verified owner approval, a blocked payment, idempotent replay, an audit export without the raw API key, all seven app views, a separate browser's isolated onboarding, and the preserved routing playground. No uncaught JavaScript errors or page-level horizontal overflow were observed.
+The deployed product was verified end to end at https://invisiblehorses.vercel.app/. The browser created a private workspace and scoped key, submitted a payment through the actual dashboard form, closed the only tab, and verified that the durable worker completed it without polling. The walkthrough also verified owner approval, a blocked payment, idempotent replay, an audit export without the raw API key, all seven app views, a separate browser's isolated onboarding, and the preserved routing playground. No uncaught JavaScript errors or page-level horizontal overflow were observed.
 
 The dedicated production backend also passed an independent API check for background settlement, replay safety and immediate key revocation. Its worker version at release was `31ff6649-5d84-444c-a072-464f37890c2d`; the frontend application commit was `eae18ae`.
 
