@@ -30,3 +30,19 @@ The existing production address remains [railgate-self.vercel.app](https://railg
 ## Validation
 
 Typecheck, ESLint and 192 tests passed: 180 application tests and 12 routing/playground tests. Frontend builds passed. Browser verification covers desktop/mobile, light/dark, example interactions and the full workspace request/approval/background-processing flow.
+
+Additional browser checks passed at 320, 375, 768, 1024, 1280 and 1440 px with no document overflow. Keyboard activation of theme/example controls, theme persistence, clipboard copying and all brand asset responses passed. A tablet/desktop artwork overflow found at 1280 px was corrected before the final production review.
+
+## Production review and screenshots
+
+The implementation and viewport correction deployed successfully through the existing Vercel Git integration (`0a2f249`, `7540dcd`). Production browser checks passed for workspace creation, scoped key issuance, a real agent request, tab-closed settlement, idempotent replay, approval, denial, audit export and all seven workspace views. Homepage example steps, keyboard theme switching and cross-page theme persistence passed. No uncaught browser errors observed.
+
+| Surface       | Desktop light                                                  | Desktop dark                                                  | Mobile light                                                  | Mobile dark                                                  |
+| ------------- | -------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------ |
+| Homepage      | [View](invisible-horses-screenshots/landing-desktop-light.png) | [View](invisible-horses-screenshots/landing-desktop-dark.png) | [View](invisible-horses-screenshots/landing-mobile-light.png) | [View](invisible-horses-screenshots/landing-mobile-dark.png) |
+| Workspace     | [View](invisible-horses-screenshots/desktop-light.png)         | [View](invisible-horses-screenshots/desktop-dark.png)         | [View](invisible-horses-screenshots/mobile-light.png)         | [View](invisible-horses-screenshots/mobile-dark.png)         |
+| Route planner | [View](invisible-horses-screenshots/planner-desktop-light.png) | [View](invisible-horses-screenshots/planner-desktop-dark.png) | [View](invisible-horses-screenshots/planner-mobile-light.png) | [View](invisible-horses-screenshots/planner-mobile-dark.png) |
+
+[Production verification record](invisible-horses-screenshots/verification.json). Captures contain test-credit records, with no raw API key or session cookie.
+
+The [51-second walkthrough](https://railgate-self.vercel.app/railgate-walkthrough.mp4) was re-recorded against the deployed Invisible Horses UI. It uses actual test-credit operations, updated monochrome captions and a masked private key. Export checked as H.264, 1280×720, 51.00 seconds, approximately 1 MB; complete video decode and key-mask frame review passed. The existing video URL is preserved for compatibility.
