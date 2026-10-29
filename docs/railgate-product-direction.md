@@ -92,3 +92,17 @@ The existing 51-second walkthrough records the previous visual styling. Its unde
 - Browser verification covered all seven workspace views, workspace creation, issuing a key, a real API request, settlement after closing the only tab, replay without duplicate payment, owner approval, policy denial, audit export without the raw key, and isolation in another browser context.
 - Landing page, workspace and route planner checked at desktop and mobile widths in light and dark modes. No document overflow or uncaught JavaScript errors observed.
 - The local HTTP browser-check harness needed a browser fetch for the secure owner-cookie export check; production cookies and application code were unchanged.
+
+## Production review
+
+Source commit `e70beee` deployed successfully through the existing Vercel Git integration to [railgate-self.vercel.app](https://railgate-self.vercel.app/). The complete browser flow above was repeated against production, including settlement after closing the tab. The keyboard-operated theme switch and its persistence across homepage, planner and workspace also passed. No uncaught browser errors observed.
+
+Production captures:
+
+| Surface | Desktop light | Desktop dark | Mobile light | Mobile dark |
+| --- | --- | --- | --- | --- |
+| Product page | [View](railgate-product-screenshots/landing-desktop-light.png) | [View](railgate-product-screenshots/landing-desktop-dark.png) | [View](railgate-product-screenshots/landing-mobile-light.png) | [View](railgate-product-screenshots/landing-mobile-dark.png) |
+| Workspace | [View](railgate-product-screenshots/desktop-light.png) | [View](railgate-product-screenshots/desktop-dark.png) | [View](railgate-product-screenshots/mobile-light.png) | [View](railgate-product-screenshots/mobile-dark.png) |
+| Route planner | [View](railgate-product-screenshots/planner-desktop-light.png) | [View](railgate-product-screenshots/planner-desktop-dark.png) | [View](railgate-product-screenshots/planner-mobile-light.png) | [View](railgate-product-screenshots/planner-mobile-dark.png) |
+
+Screenshots contain actual demo workspace records and no API key or session cookie. [Browser verification record](railgate-product-screenshots/verification.json).
