@@ -817,3 +817,252 @@ footer div {
     }
   }
 }
+
+/* Small colour accents and actual product captures give the page its own voice. */
+:root {
+  --cobalt: #354dbe;
+  --preview-ground: #ede7d5;
+  --preview-line: #cfc7b0;
+  --blue-paper: #edf0fb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cobalt: #a9b9ff;
+    --preview-ground: #29281f;
+    --preview-line: #494535;
+    --blue-paper: #1d2235;
+  }
+}
+:root[data-theme="dark"] {
+  --cobalt: #a9b9ff;
+  --preview-ground: #29281f;
+  --preview-line: #494535;
+  --blue-paper: #1d2235;
+}
+.hero {
+  min-height: 570px;
+}
+.hero .eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--cobalt);
+  border-radius: 50%;
+  margin-right: 10px;
+  vertical-align: 1px;
+}
+.field-note {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  color: var(--cobalt);
+  font:
+    italic 15px/1.4 "Times New Roman",
+    Times,
+    serif;
+  transform: rotate(-6deg);
+}
+.field-note::after {
+  content: "";
+  display: block;
+  width: 85%;
+  margin: 3px auto 0;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(2deg);
+}
+.hoof-trail {
+  position: absolute;
+  bottom: 24px;
+  width: 100%;
+  height: 100px;
+  color: var(--cobalt);
+  pointer-events: none;
+  opacity: 0.65;
+}
+.art-caption {
+  bottom: 5px;
+}
+.product-showcase {
+  padding: 60px 0 72px;
+  border-bottom: 1px solid var(--line);
+}
+.preview-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 28px;
+}
+.preview-heading h2 {
+  margin-bottom: 0;
+}
+.preview-heading .eyebrow {
+  margin-bottom: 15px;
+}
+.preview-intro {
+  margin: 0 0 3px;
+  color: var(--muted);
+  max-width: 330px;
+}
+.showcase-stage {
+  background: var(--preview-ground);
+  border: 1px solid var(--preview-line);
+  border-radius: 4px;
+  padding: 20px 28px 0;
+}
+.showcase-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.preview-tabs {
+  display: flex;
+  gap: 4px;
+}
+.preview-tabs button {
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  padding: 9px 15px;
+  font-size: 13px;
+  min-height: 42px;
+}
+.preview-tabs button[aria-selected="true"] {
+  color: #fff;
+  background: #354dbe;
+  border-color: #354dbe;
+}
+.preview-tabs button:hover {
+  border-color: var(--preview-line);
+}
+.capture-label {
+  color: var(--muted);
+  font-size: 13px;
+}
+.app-capture {
+  margin: 0;
+}
+#preview-panel {
+  border: 1px solid var(--preview-line);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px #0000000a;
+  background: var(--paper);
+}
+#app-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.app-capture figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 18px 0;
+  font-size: 13px;
+}
+.app-capture figcaption p {
+  margin: 0;
+  max-width: 650px;
+}
+.app-capture figcaption a {
+  min-height: 30px;
+  white-space: nowrap;
+}
+.capture-disclosure {
+  margin: 14px 0 0;
+}
+.code-window {
+  background: var(--blue-paper);
+}
+.section-label::before {
+  border-color: var(--cobalt);
+}
+.closing {
+  overflow: hidden;
+}
+.closing-track {
+  position: absolute;
+  bottom: 18px;
+  right: 0;
+  width: 42%;
+  height: 65px;
+  color: var(--cobalt);
+  opacity: 0.6;
+  pointer-events: none;
+}
+@media (max-width: 1000px) {
+  .preview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .preview-intro {
+    max-width: none;
+  }
+  .showcase-stage {
+    padding: 18px 20px 0;
+  }
+  .capture-label {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .hero {
+    min-height: 0;
+  }
+  .field-note {
+    top: 8px;
+    right: 15px;
+  }
+  .hoof-trail {
+    bottom: 14px;
+    height: 60px;
+  }
+  .art-caption {
+    bottom: -8px;
+  }
+  .horse-stage {
+    margin-bottom: 12px;
+  }
+  .product-showcase {
+    padding: 42px 0 44px;
+  }
+  .preview-heading {
+    gap: 18px;
+  }
+  .preview-intro br {
+    display: none;
+  }
+  .showcase-stage {
+    padding: 12px 12px 0;
+  }
+  .showcase-toolbar {
+    margin-bottom: 12px;
+  }
+  .preview-tabs {
+    width: 100%;
+  }
+  .preview-tabs button {
+    flex: 1;
+    padding: 9px 10px;
+  }
+  .app-capture figcaption {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 0;
+  }
+  #app-preview {
+    aspect-ratio: 390/844;
+  }
+  .closing-track {
+    width: 55%;
+    height: 50px;
+    bottom: 0;
+  }
+}

@@ -50,3 +50,20 @@ The [51-second walkthrough](https://invisiblehorses.vercel.app/railgate-walkthro
 ## Free domain migration
 
 The verified production domain is now `invisiblehorses.vercel.app`, attached to the existing Vercel project. The console worker’s exact allowed origin was updated to match. The previous `railgate-self.vercel.app` address redirects to the new hostname. Demo owner cookies are scoped to their original hostname, so a visitor opening the new hostname starts a new browser workspace session; agent API key formats and storage remain unchanged. No domain purchase was made.
+
+## Product screenshots and selective colour
+
+Updated 29 October 2026, following the user's [Hermes reference](https://hermes-agent.nousresearch.com/). Its prominent real product view and distinctive illustration informed this change.
+
+- Added a homepage workspace preview with Overview, Approvals and Activity tabs. Each image is a real production screenshot from a purpose-created Fieldwork Studio demo workspace, not a recreated dashboard.
+- Made actual $12.50, $75.00 and $150.00 test-credit requests to record completed, approval-required and denied behavior. The screenshots expose no private API key or owner cookie.
+- Captured desktop and mobile views in both themes. The preview selects the correct view, screen size and theme, with keyboard arrow/Home/End navigation and accessible tab/tabpanel relationships.
+- Labelled the gallery as a production capture, not a live feed. The depicted $75 request was pending when captured; the image does not promise it remains pending now.
+- Kept the neutral base. Added cobalt `#354dbe` to selected preview tabs, a small hero marker and hand-drawn-style horse annotations. A warm paper `#ede7d5` frames the product; the code sample uses a pale blue surface. Dark mode adapts these surfaces.
+- Added a handwritten-style field note, a sparse hoof trail and a closing trail using local SVG/CSS. No heavy illustration or animation library added.
+- All 12 captures use lossless WebP. Only the current responsive image is displayed; other screenshot tabs load when selected. Images are lazy-loaded with intrinsic dimensions.
+- This release changes the homepage and public image assets. Workspace behavior, pricing data, routing logic and payment controls are unchanged.
+
+Browser review passed at 320, 390, 768, 1024, 1280 and 1440 px, with all three views, both colour themes, responsive source selection, keyboard navigation, existing example controls and clipboard copying. No uncaught browser errors observed. Typecheck, ESLint and frontend build passed.
+
+Regression suite: 192 tests passed (180 application, 12 routing/playground).

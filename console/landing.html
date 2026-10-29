@@ -33,7 +33,7 @@
           ><span>Invisible Horses</span></a
         >
         <nav aria-label="Main">
-          <a class="nav-secondary" href="#how-it-works">How it works</a>
+          <a class="nav-secondary" href="#workspace-preview">The workspace</a>
           <a href="/playground/">Route planner</a>
           <a class="nav-secondary" href="#developers">Developers</a>
           <button
@@ -71,6 +71,28 @@
             </p>
           </div>
           <div class="horse-stage">
+            <span class="field-note" aria-hidden="true"
+              >A little room to run.</span
+            >
+            <svg
+              class="hoof-trail"
+              aria-hidden="true"
+              viewBox="0 0 560 120"
+              fill="none"
+            >
+              <path
+                d="M18 94C110 102 152 38 259 70s155 38 274-43"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-dasharray="3 8"
+              />
+              <path
+                d="m393 51 6 7m-1-15 6 7m50-20 6 7m-1-15 6 7"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+            </svg>
             <img
               class="hero-horse"
               src="/brand/invisible-horse.webp"
@@ -87,6 +109,99 @@
           ><span>Your rules, checked on every request</span
           ><span>A record of every decision</span>
         </div>
+        <section
+          class="product-showcase"
+          id="workspace-preview"
+          aria-labelledby="preview-title"
+        >
+          <div class="preview-heading">
+            <div>
+              <p class="eyebrow">Inside the working app</p>
+              <h2 id="preview-title">See what's running.</h2>
+            </div>
+            <p class="preview-intro">
+              The budget, the requests, the decisions.<br />Actual screens from
+              a test-credit workspace.
+            </p>
+          </div>
+          <div class="showcase-stage">
+            <div class="showcase-toolbar">
+              <div
+                class="preview-tabs"
+                role="tablist"
+                aria-label="Workspace screenshots"
+              >
+                <button
+                  id="preview-overview"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="preview-panel"
+                  tabindex="0"
+                  data-preview="overview"
+                >
+                  Overview</button
+                ><button
+                  id="preview-approvals"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="preview-panel"
+                  tabindex="-1"
+                  data-preview="approvals"
+                >
+                  Approvals</button
+                ><button
+                  id="preview-activity"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="preview-panel"
+                  tabindex="-1"
+                  data-preview="activity"
+                >
+                  Activity
+                </button>
+              </div>
+              <span class="capture-label"
+                >Production capture / Test credits</span
+              >
+            </div>
+            <figure class="app-capture">
+              <div
+                id="preview-panel"
+                role="tabpanel"
+                aria-labelledby="preview-overview"
+                tabindex="0"
+              >
+                <picture
+                  ><source
+                    id="preview-mobile"
+                    media="(max-width:700px)"
+                    srcset="/product/overview-mobile-light.webp" />
+                  <img
+                    id="app-preview"
+                    src="/product/overview-desktop-light.webp"
+                    width="1440"
+                    height="980"
+                    alt="Invisible Horses workspace showing actual available demo credits, spending and approval counts."
+                    loading="lazy"
+                    decoding="async"
+                /></picture>
+              </div>
+              <figcaption>
+                <p id="preview-caption" aria-live="polite">
+                  Overview: actual demo balance, reserved spending and requests
+                  waiting for approval.
+                </p>
+                <a class="text-link" href="/app/"
+                  >Try it yourself <span aria-hidden="true">→</span></a
+                >
+              </figcaption>
+            </figure>
+          </div>
+          <p class="small capture-disclosure">
+            Captured from the deployed app, not a live feed. These records use
+            internal test credits.
+          </p>
+        </section>
         <section
           class="section split"
           id="how-it-works"
@@ -364,6 +479,24 @@ Content-Type: application/json
           </div>
         </section>
         <section class="closing">
+          <svg
+            class="closing-track"
+            aria-hidden="true"
+            viewBox="0 0 450 120"
+            fill="none"
+          >
+            <path
+              d="M5 104c74 0 88-84 155-84s74 84 144 84S357 24 440 24"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-dasharray="4 9"
+            />
+            <path
+              d="m419 17 12 7-12 7"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+          </svg>
           <div>
             <p class="eyebrow">Start small. See the whole thing.</p>
             <h2>One agent.<br />A little room to run.</h2>
@@ -394,7 +527,62 @@ Content-Type: application/json
             matchMedia("(prefers-color-scheme:dark)").matches)
         );
       }
+      let previewView = "overview";
+      const previewCopy = {
+        overview: [
+          "Overview: actual demo balance, reserved spending and requests waiting for approval.",
+          "Invisible Horses workspace showing actual available demo credits, spending and approval counts.",
+        ],
+        approvals: [
+          "Approvals: a real $75.00 test-credit request waiting for the workspace owner's decision.",
+          "Invisible Horses approval queue showing an actual 75 dollar test-credit request and owner approval controls.",
+        ],
+        activity: [
+          "Activity: actual request, policy and ledger events recorded by the backend.",
+          "Invisible Horses activity history with recorded agent requests, decisions and internal ledger events.",
+        ],
+      };
+      function updatePreview() {
+        const theme = isDark() ? "dark" : "light";
+        const image = document.getElementById("app-preview");
+        image.src = `/product/${previewView}-desktop-${theme}.webp`;
+        image.alt = previewCopy[previewView][1];
+        document.getElementById("preview-mobile").srcset =
+          `/product/${previewView}-mobile-${theme}.webp`;
+        document.getElementById("preview-caption").textContent =
+          previewCopy[previewView][0];
+      }
+      const previewTabs = [...document.querySelectorAll("[data-preview]")];
+      function choosePreview(tab) {
+        previewView = tab.dataset.preview;
+        previewTabs.forEach((button) => {
+          const active = button === tab;
+          button.setAttribute("aria-selected", String(active));
+          button.tabIndex = active ? 0 : -1;
+        });
+        document
+          .getElementById("preview-panel")
+          .setAttribute("aria-labelledby", tab.id);
+        updatePreview();
+      }
+      previewTabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => choosePreview(tab));
+        tab.addEventListener("keydown", (event) => {
+          let next;
+          if (event.key === "ArrowRight")
+            next = (index + 1) % previewTabs.length;
+          else if (event.key === "ArrowLeft")
+            next = (index + previewTabs.length - 1) % previewTabs.length;
+          else if (event.key === "Home") next = 0;
+          else if (event.key === "End") next = previewTabs.length - 1;
+          else return;
+          event.preventDefault();
+          choosePreview(previewTabs[next]);
+          previewTabs[next].focus();
+        });
+      });
       function themeLabel() {
+        updatePreview();
         themeButton.textContent = isDark() ? "Light mode" : "Dark mode";
         themeButton.setAttribute(
           "aria-label",
