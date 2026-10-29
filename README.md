@@ -1,8 +1,10 @@
-# Railgate
+# Invisible Horses
 
-[Product direction, intended users and launch requirements](docs/railgate-product-direction.md)
+[Product direction and launch requirements](docs/railgate-product-direction.md) · [Invisible Horses design](docs/invisible-horses-design.md)
 
-Spending limits, human approvals and smart rail routing for AI agent payments. Open source, test money only.
+Payment controls for software agents. Spending limits, owner approvals and background processing, with a route planning preview. Open source, test money only.
+
+Previously branded Railgate. Repository, package names and API paths remain unchanged for compatibility.
 
 ## Working product
 
