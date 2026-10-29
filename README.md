@@ -1,14 +1,12 @@
 # Invisible Horses
 
-[Product direction and launch requirements](docs/railgate-product-direction.md) · [Invisible Horses design](docs/invisible-horses-design.md)
-
 Payment controls for software agents. Spending limits, owner approvals and background processing, with a route planning preview. Open source, test money only.
 
 Previously branded Railgate. Repository, package names and API paths remain unchanged for compatibility.
 
 ## Working product
 
-[Open the private demo workspace](https://invisiblehorses.vercel.app/app/) · [Product page](https://invisiblehorses.vercel.app/) · [Architecture and portfolio case study](docs/agent-payments-product.md)
+[Open the private demo workspace](https://invisiblehorses.vercel.app/app/) · [Product page](https://invisiblehorses.vercel.app/) · [Architecture](docs/agent-payments-product.md)
 
 Create scoped agent keys, set company and agent budgets, approve requests, and watch durable background jobs settle an internal test ledger. Every visitor gets an isolated workspace; all dashboard metrics come from persisted records. External bank and USDC payouts are explicitly not connected in this public demo.
 
