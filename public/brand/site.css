@@ -210,12 +210,12 @@ nav a:hover,
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: -20px;
+  margin-right: 0;
 }
 .hero-horse {
   display: block;
-  width: 125%;
-  max-width: none;
+  width: calc(100% + 32px);
+  max-width: calc(100% + 32px);
   height: auto;
   object-fit: contain;
   flex-shrink: 0;
