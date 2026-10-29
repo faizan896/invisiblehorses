@@ -1,12 +1,12 @@
 :root {
   color-scheme: light;
-  --bg: #faf9f6;
+  --bg: #ffffff;
   --paper: #ffffff;
   --text: #191919;
   --muted: #66645f;
   --line: #deddd8;
   --accent: #202020;
-  --wash: #efeeea;
+  --wash: #f5f5f5;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {

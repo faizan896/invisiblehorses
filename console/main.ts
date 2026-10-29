@@ -608,6 +608,12 @@ function bindPayments() {
 async function refresh(showToast = false) {
   if (loading) return;
   loading = true;
+  const refreshButton = document.querySelector<HTMLButtonElement>("[data-action=refresh]");
+  if (showToast && refreshButton) {
+    refreshButton.disabled = true;
+    refreshButton.setAttribute("aria-busy", "true");
+    refreshButton.innerHTML = '<img class="refresh-horse" src="/brand/running-horse.svg" width="28" height="22" alt="" />Refreshing…';
+  }
   try {
     data = await api<Snapshot>("/session");
     lastRefresh = Date.now();
@@ -630,6 +636,11 @@ async function refresh(showToast = false) {
     } else if (!data) onboarding((error as Error).message);
     else toast((error as Error).message);
   } finally {
+    if (refreshButton) {
+      refreshButton.disabled = false;
+      refreshButton.removeAttribute("aria-busy");
+      refreshButton.textContent = "Refresh";
+    }
     loading = false;
   }
 }

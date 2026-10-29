@@ -1,12 +1,12 @@
 :root {
   color-scheme: light;
-  --bg: #faf9f6;
+  --bg: #ffffff;
   --paper: #fff;
   --text: #191919;
   --muted: #66645f;
   --line: #deddd8;
-  --wash: #efeeea;
-  --inverse: #faf9f6;
+  --wash: #f5f5f5;
+  --inverse: #ffffff;
   --ink: #191919;
 }
 @media (prefers-color-scheme: dark) {
@@ -821,8 +821,8 @@ footer div {
 /* Small colour accents and actual product captures give the page its own voice. */
 :root {
   --cobalt: #354dbe;
-  --preview-ground: #ede7d5;
-  --preview-line: #cfc7b0;
+  --preview-ground: #f7f7f7;
+  --preview-line: #dedede;
   --blue-paper: #edf0fb;
 }
 @media (prefers-color-scheme: dark) {

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 84" fill="none">
+<style>
+path{stroke:#191919;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+@media(prefers-reduced-motion:no-preference){.body{animation:stride .65s ease-in-out 4}.front{transform-origin:80px 46px;animation:leg .65s ease-in-out 4 alternate}.back{transform-origin:39px 49px;animation:leg .65s ease-in-out 4 alternate-reverse}.tail{transform-origin:30px 37px;animation:tail .65s ease-in-out 4 alternate}@keyframes stride{50%{transform:translateY(-3px)}}@keyframes leg{to{transform:rotate(-16deg)}}@keyframes tail{to{transform:rotate(12deg)}}}
+</style>
+<g class="body"><path d="M29 40c9-8 23-6 36-4l12-17 3-12 7 7 7-2 4 12 13 11-4 8-17-5-8 13c-12 5-27 4-40 0l-13-11Z" stroke-dasharray="5 5"/><path d="m79 20-9 8m6-12-9 7"/><path class="tail" d="M30 38C15 30 17 48 6 37m23 8C16 39 15 56 3 46" stroke-dasharray="5 5"/><path class="front" d="m82 47 10 11 17 5-2 5-23-6-12-12m5 3 1 13-14 11-4-4 10-12-2-8"/><path class="back" d="m44 50-9 14-19 9-3-4 14-13 4-13m9 7 10 15-4 12h-6l1-11-9-9"/><circle cx="99" cy="29" r="1.7" fill="#191919"/></g>
+<path d="M3 76h9m-6 5h14" stroke-dasharray="4 4"/>
+</svg>

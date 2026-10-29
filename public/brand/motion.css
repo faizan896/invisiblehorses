@@ -1,0 +1,17 @@
+.loading-horse { display: block; margin-bottom: 14px; }
+.refresh-horse { vertical-align: middle; margin-right: 6px; }
+.horse-runway { position: relative; width: 180px; margin: 32px auto 0; border-bottom: 1px dashed var(--line); }
+.horse-runway img { display: block; margin-bottom: -5px; }
+.hero-horse { mix-blend-mode: multiply; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) :is(.loading-horse, .refresh-horse, .horse-runway img) { filter: invert(1); }
+  :root:not([data-theme="light"]) .hero-horse { mix-blend-mode: screen; }
+}
+:root[data-theme="dark"] :is(.loading-horse, .refresh-horse, .horse-runway img) { filter: invert(1); }
+:root[data-theme="dark"] .hero-horse { mix-blend-mode: screen; }
+@media (prefers-reduced-motion: no-preference) {
+  .horse-runway.is-visible img { animation: horse-crossing 1.4s ease-out both; }
+  .brand:hover::before, .brand:focus-visible::before { animation: horse-nod .5s ease-in-out; }
+  @keyframes horse-crossing { from { opacity: 0; transform: translateX(0); } to { opacity: 1; transform: translateX(100px); } }
+  @keyframes horse-nod { 50% { transform: rotate(-9deg) translateY(-2px); } }
+}

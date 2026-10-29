@@ -7,7 +7,7 @@
       name="description"
       content="Invisible Horses gives software agents a budget and keeps you in control of every payment. Explore scoped keys, spending rules and approvals in the working demo."
     />
-    <meta name="theme-color" content="#faf9f6" />
+    <meta name="theme-color" content="#ffffff" />
     <meta
       property="og:title"
       content="Invisible Horses · Payment controls for software agents."
@@ -25,6 +25,7 @@
       } catch {}
     </script>
     <link rel="stylesheet" href="/brand/site.css" />
+      <link rel="stylesheet" href="/brand/motion.css" />
   </head>
   <body>
     <div class="shell">
@@ -542,6 +543,7 @@ Content-Type: application/json
           >
         </section>
       </main>
+      <div class="horse-runway" aria-hidden="true"><img src="/brand/running-horse.svg" width="80" height="56" alt="" loading="lazy" /></div>
       <div class="footer-brand" aria-hidden="true">Invisible Horses.</div>
       <footer>
         <span>Built by <a href="https://faizan.sh">Faizan</a></span>
@@ -553,6 +555,16 @@ Content-Type: application/json
       </footer>
     </div>
     <script>
+      const runway = document.querySelector(".horse-runway");
+      if (runway && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) {
+            runway.classList.add("is-visible");
+            observer.disconnect();
+          }
+        }, { threshold: 0.5 });
+        observer.observe(runway);
+      }
       const themeButton = document.getElementById("theme");
       function isDark() {
         return (
