@@ -26,6 +26,8 @@
     </script>
     <link rel="stylesheet" href="/brand/site.css" />
     <link rel="stylesheet" href="/brand/motion.css" />
+    <link rel="stylesheet" href="/brand/experience.css" />
+    <script src="/brand/experience.js" defer></script>
   </head>
   <body>
     <div class="shell">
@@ -51,88 +53,86 @@
         </nav>
       </header>
       <main>
-        <section class="hero" aria-labelledby="hero-title">
-          <div class="hero-topline">
-            <span class="eyebrow">Payment controls for software agents</span
-            ><span class="release"
-              ><span aria-hidden="true">→</span> Test-credit release</span
+        <section class="opening" aria-labelledby="hero-title">
+          <div class="opening-meta small">
+            <span>Payment controls for software agents</span
+            ><span class="release">Test-credit release</span>
+          </div>
+          <div class="opening-heading">
+            <h1 id="hero-title">
+              Give your agents<br />a <span>budget.</span>
+            </h1>
+            <div class="opening-intro">
+              <p>
+                Issue an agent key, set spending limits and approve larger
+                requests. Accepted work runs in the background and leaves a
+                record.
+              </p>
+              <p class="small">
+                Internal test credits. Bank, card and crypto payments are not
+                connected.
+              </p>
+            </div>
+          </div>
+          <div class="opening-actions">
+            <a class="button primary" href="/app/"
+              >Open a test workspace <span aria-hidden="true">→</span></a
+            ><button class="film-button" type="button" data-play-film>
+              <span class="play-icon" aria-hidden="true"
+                ><svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="currentColor"
+                >
+                  <path d="M2 1 9 5 2 9Z" /></svg></span
+              >Watch the app <span class="muted">/ 58 sec</span></button
+            ><a class="opening-scroll small" href="#workspace-preview"
+              >Scroll to explore <span aria-hidden="true">↓</span></a
             >
           </div>
-          <div class="hero-copy">
-            <h1 id="hero-title">Give your agents<br />a budget.</h1>
-            <p>
-              Issue an agent key, set spending limits and approve larger
-              requests. Every accepted payment runs in the background and leaves
-              a record.
-            </p>
-            <div class="actions">
-              <a class="button primary" href="/app/"
-                >Open a test workspace <span aria-hidden="true">→</span></a
-              ><button class="film-button" type="button" data-play-film>
-                <span class="play-icon" aria-hidden="true"
-                  ><svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 10 10"
-                    fill="currentColor"
-                  >
-                    <path d="M2 1 9 5 2 9Z" /></svg
-                ></span>
-                Watch the app <span class="muted">/ 58 sec</span>
+          <div class="motion-field">
+            <div class="motion-caption">
+              <span>Invisible Horses / A study in motion</span
+              ><button id="motion-toggle" type="button" aria-pressed="false">
+                Pause motion
               </button>
             </div>
-            <p class="hero-disclosure small">
-              Internal test credits. Bank, card and crypto payments are not
-              connected.
-            </p>
-          </div>
-          <div
-            class="horse-stage"
-            aria-label="An illustration of a horse moving through a checked payment route."
-          >
-            <span class="field-coordinate coordinate-top" aria-hidden="true"
-              >IH / 001</span
-            >
-            <svg
-              class="field-route"
-              viewBox="0 0 560 400"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                class="route-base"
-                d="M28 300H125Q150 300 150 275V155Q150 130 175 130H380Q405 130 405 155V260Q405 285 430 285H532"
+            <div class="motion-art">
+              <canvas
+                id="horse-canvas"
+                width="900"
+                height="600"
+                role="img"
+                aria-label="A public-domain motion study of a galloping horse and rider by Eadweard Muybridge."
+              ></canvas
+              ><img
+                id="horse-fallback"
+                src="/brand/horse-study-still.webp"
+                width="300"
+                height="200"
+                alt="A horse and rider photographed by Eadweard Muybridge."
               />
-              <path
-                class="route-ink"
-                d="M28 300H125Q150 300 150 275V155Q150 130 175 130H380Q405 130 405 155V260Q405 285 430 285H532"
-              />
-              <circle cx="28" cy="300" r="4" />
-              <circle cx="532" cy="285" r="4" />
-            </svg>
-            <img
-              class="hero-horse"
-              src="/brand/invisible-horse.webp"
-              width="1536"
-              height="1024"
-              alt="A running horse drawn in dashed ink lines."
-              fetchpriority="high"
-            />
-            <span class="field-label field-start"
-              >Agent request <span aria-hidden="true">→</span></span
-            ><span class="field-label field-end"
-              ><span class="check-mark" aria-hidden="true">✓</span> Your
-              rules</span
-            >
-            <span class="field-coordinate coordinate-bottom" aria-hidden="true"
-              >Request flow / illustration</span
-            >
+            </div>
+            <div class="motion-annotation">
+              <span class="annotation-cross" aria-hidden="true">+</span>
+              <p>Agent requests.<br />You set the limits.</p>
+              <span class="small"
+                >A moving horse.<br />A controlled request.</span
+              >
+            </div>
+            <div class="motion-axis" aria-hidden="true">
+              <span>01 / Request</span><span>02 / Check</span
+              ><span>03 / Approve</span><span>04 / Record</span>
+            </div>
           </div>
-          <div class="hero-bottom small">
-            <span>For developers building agent payments</span
-            ><a href="#workspace-preview"
-              >Explore the workspace <span aria-hidden="true">↓</span></a
-            >
+          <div class="motion-credit small">
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Muybridge_race_horse_animated.gif"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Motion study: Eadweard Muybridge / Public domain →</a
+            ><span>For developers building agent payments</span>
           </div>
         </section>
         <section
@@ -254,80 +254,131 @@
               settlement is limited to the internal test ledger.
             </p>
           </div>
-          <div
-            class="capability-table"
-            tabindex="0"
-            role="region"
-            aria-label="Available features"
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Feature</th>
-                  <th scope="col">Behavior</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Agent access</td>
-                  <td>
-                    Issue scoped keys, edit agent limits, pause an agent and
-                    revoke keys.
-                  </td>
-                </tr>
-                <tr>
-                  <td>Spending rules</td>
-                  <td>
-                    Apply per-payment and daily limits, vendor restrictions and
-                    an approval threshold.
-                  </td>
-                </tr>
-                <tr>
-                  <td>Owner approval</td>
-                  <td>
-                    Review requests above the threshold. Agent keys cannot
-                    approve payments.
-                  </td>
-                </tr>
-                <tr>
-                  <td>Request cancellation</td>
-                  <td>
-                    Cancel a queued or pending request before settlement and
-                    release its reserved budget.
-                  </td>
-                </tr>
-                <tr>
-                  <td>Background processing</td>
-                  <td>
-                    Accepted requests continue after the browser tab is closed.
-                    Current rules are checked again before settlement.
-                  </td>
-                </tr>
-                <tr>
-                  <td>Payment records</td>
-                  <td>
-                    View request history, export audit records and download
-                    balanced internal ledger receipts.
-                  </td>
-                </tr>
-                <tr>
-                  <td>Workspace access</td>
-                  <td>
-                    Restore saved history with a private recovery key, including
-                    after the browser session expires.
-                  </td>
-                </tr>
-                <tr>
-                  <td>Route planning</td>
-                  <td>
-                    Compare modeled costs and arrival times using labelled
-                    sources and editable assumptions. The planner does not
-                    execute payments.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="control-mosaic">
+            <a class="control-tile key-tile" href="/app/#agents"
+              ><span class="tile-kicker">01 / Agent access</span>
+              <h3>A key.<br />A limit.<br />A clear owner.</h3>
+              <div class="key-graphic" aria-hidden="true">
+                <svg viewBox="0 0 200 120" fill="none">
+                  <circle cx="65" cy="60" r="31" />
+                  <circle cx="65" cy="60" r="11" />
+                  <path d="M96 60h80m-20 0v22m-22-22v15" />
+                </svg>
+              </div>
+              <p>Separate credentials and spending limits for every agent.</p>
+              <span class="tile-link"
+                >Manage agents <span aria-hidden="true">→</span></span
+              ></a
+            >
+            <a class="control-tile approval-tile" href="/app/#approvals"
+              ><span class="tile-kicker">02 / Owner approval</span>
+              <div class="approval-graphic" aria-hidden="true">
+                <span class="approval-line"></span
+                ><span class="approval-check">✓</span
+                ><span class="approval-line"></span>
+              </div>
+              <h3>The larger requests<br />wait for you.</h3>
+              <p>Agent keys cannot approve their own payments.</p>
+              <span class="tile-link"
+                >Review requests <span aria-hidden="true">→</span></span
+              ></a
+            >
+            <a class="control-tile record-tile" href="/app/#activity"
+              ><span class="tile-kicker">03 / The record</span>
+              <h3>Every decision.<br />Written down.</h3>
+              <div class="record-graphic" aria-hidden="true">
+                <span>Request received <b>→</b></span
+                ><span>Rules checked <b>✓</b></span
+                ><span>Ledger recorded <b>✓</b></span>
+              </div>
+              <p>
+                Inspect activity, export history and download internal ledger
+                receipts.
+              </p>
+              <span class="tile-link"
+                >Open activity <span aria-hidden="true">→</span></span
+              ></a
+            >
           </div>
+          <details class="feature-details">
+            <summary>
+              See every available feature <span aria-hidden="true">+</span>
+            </summary>
+            <div
+              class="capability-table"
+              tabindex="0"
+              role="region"
+              aria-label="Available features"
+            >
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Feature</th>
+                    <th scope="col">Behavior</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Agent access</td>
+                    <td>
+                      Issue scoped keys, edit agent limits, pause an agent and
+                      revoke keys.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Spending rules</td>
+                    <td>
+                      Apply per-payment and daily limits, vendor restrictions
+                      and an approval threshold.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Owner approval</td>
+                    <td>
+                      Review requests above the threshold. Agent keys cannot
+                      approve payments.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Request cancellation</td>
+                    <td>
+                      Cancel a queued or pending request before settlement and
+                      release its reserved budget.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Background processing</td>
+                    <td>
+                      Accepted requests continue after the browser tab is
+                      closed. Current rules are checked again before settlement.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Payment records</td>
+                    <td>
+                      View request history, export audit records and download
+                      balanced internal ledger receipts.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Workspace access</td>
+                    <td>
+                      Restore saved history with a private recovery key,
+                      including after the browser session expires.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Route planning</td>
+                    <td>
+                      Compare modeled costs and arrival times using labelled
+                      sources and editable assumptions. The planner does not
+                      execute payments.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
         </section>
         <section
           class="section split"
@@ -350,8 +401,33 @@
               >Try a request in your workspace
               <span aria-hidden="true">→</span></a
             >
+            <div class="flow-chapters" aria-label="Payment processing stages">
+              <article data-flow-step="0">
+                <span class="small">01 / Request</span>
+                <p>The agent sends its own key, a vendor and an amount.</p>
+              </article>
+              <article data-flow-step="1">
+                <span class="small">02 / Check</span>
+                <p>
+                  The request must fit the current vendor and spending rules.
+                </p>
+              </article>
+              <article data-flow-step="2">
+                <span class="small">03 / Approve</span>
+                <p>
+                  Above the approval threshold, the owner makes the decision.
+                </p>
+              </article>
+              <article data-flow-step="3">
+                <span class="small">04 / Record</span>
+                <p>
+                  The worker writes balanced entries in the internal test
+                  ledger.
+                </p>
+              </article>
+            </div>
           </div>
-          <div>
+          <div class="flow-display">
             <div
               class="payment-example"
               aria-label="Illustrative payment request"
@@ -498,6 +574,28 @@ Content-Type: application/json
               The public app cannot accept deposits or execute real payments.
               Connecting a company requires more than changing an API key.
             </p>
+          </div>
+          <div
+            class="system-map"
+            role="img"
+            aria-label="Current architecture: agent API key, spending checks, owner approval when required, background worker, internal test ledger. External bank and crypto providers are not connected."
+          >
+            <div class="system-node"><span>01</span>Agent key</div>
+            <i aria-hidden="true"></i>
+            <div class="system-node"><span>02</span>Spending checks</div>
+            <i aria-hidden="true"></i>
+            <div class="system-node">
+              <span>03</span>Owner approval<small>When required</small>
+            </div>
+            <i aria-hidden="true"></i>
+            <div class="system-node"><span>04</span>Background worker</div>
+            <i aria-hidden="true"></i>
+            <div class="system-node ledger-node">
+              <span>05</span>Internal test ledger
+            </div>
+            <div class="disconnected-node">
+              Bank / crypto provider <span>Not connected</span>
+            </div>
           </div>
           <ol class="requirements-list">
             <li>
