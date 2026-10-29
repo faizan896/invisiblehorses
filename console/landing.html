@@ -25,7 +25,7 @@
       } catch {}
     </script>
     <link rel="stylesheet" href="/brand/site.css" />
-      <link rel="stylesheet" href="/brand/motion.css" />
+    <link rel="stylesheet" href="/brand/motion.css" />
   </head>
   <body>
     <div class="shell">
@@ -51,37 +51,87 @@
         </nav>
       </header>
       <main>
-        <section class="hero factual-hero" aria-labelledby="hero-title">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-topline">
+            <span class="eyebrow">Payment controls for software agents</span
+            ><span class="release"
+              ><span aria-hidden="true">→</span> Test-credit release</span
+            >
+          </div>
           <div class="hero-copy">
-            <p class="eyebrow">Invisible Horses / Test-credit release</p>
-            <h1 id="hero-title">Payment controls<br />for software agents.</h1>
+            <h1 id="hero-title">Give your agents<br />a budget.</h1>
             <p>
-              Issue an API key to an agent, set its spending limits and review
-              requests that need approval. Accepted requests run on a background
-              worker and are recorded in a ledger.
+              Issue an agent key, set spending limits and approve larger
+              requests. Every accepted payment runs in the background and leaves
+              a record.
             </p>
             <div class="actions">
               <a class="button primary" href="/app/"
-                >Create a test workspace <span aria-hidden="true">→</span></a
-              ><a class="text-link small" href="#capabilities"
-                >See available features <span aria-hidden="true">→</span></a
-              >
+                >Open a test workspace <span aria-hidden="true">→</span></a
+              ><button class="film-button" type="button" data-play-film>
+                <span class="play-icon" aria-hidden="true"
+                  ><svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="currentColor"
+                  >
+                    <path d="M2 1 9 5 2 9Z" /></svg
+                ></span>
+                Watch the app <span class="muted">/ 58 sec</span>
+              </button>
             </div>
-            <p class="small">
-              The current release uses internal test credits. It does not move
-              bank funds, charge cards or send cryptocurrency.
+            <p class="hero-disclosure small">
+              Internal test credits. Bank, card and crypto payments are not
+              connected.
             </p>
           </div>
-          <div class="horse-stage">
+          <div
+            class="horse-stage"
+            aria-label="An illustration of a horse moving through a checked payment route."
+          >
+            <span class="field-coordinate coordinate-top" aria-hidden="true"
+              >IH / 001</span
+            >
+            <svg
+              class="field-route"
+              viewBox="0 0 560 400"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                class="route-base"
+                d="M28 300H125Q150 300 150 275V155Q150 130 175 130H380Q405 130 405 155V260Q405 285 430 285H532"
+              />
+              <path
+                class="route-ink"
+                d="M28 300H125Q150 300 150 275V155Q150 130 175 130H380Q405 130 405 155V260Q405 285 430 285H532"
+              />
+              <circle cx="28" cy="300" r="4" />
+              <circle cx="532" cy="285" r="4" />
+            </svg>
             <img
               class="hero-horse"
               src="/brand/invisible-horse.webp"
               width="1536"
               height="1024"
-              alt="A dashed outline of a running horse, the Invisible Horses illustration."
+              alt="A running horse drawn in dashed ink lines."
               fetchpriority="high"
-            /><span class="art-caption"
-              >Internal test credits / No external payments</span
+            />
+            <span class="field-label field-start"
+              >Agent request <span aria-hidden="true">→</span></span
+            ><span class="field-label field-end"
+              ><span class="check-mark" aria-hidden="true">✓</span> Your
+              rules</span
+            >
+            <span class="field-coordinate coordinate-bottom" aria-hidden="true"
+              >Request flow / illustration</span
+            >
+          </div>
+          <div class="hero-bottom small">
+            <span>For developers building agent payments</span
+            ><a href="#workspace-preview"
+              >Explore the workspace <span aria-hidden="true">↓</span></a
             >
           </div>
         </section>
@@ -92,12 +142,12 @@
         >
           <div class="preview-heading">
             <div>
-              <p class="eyebrow">Inside the working app</p>
-              <h2 id="preview-title">Workspace screens.</h2>
+              <p class="eyebrow">01 / The workspace</p>
+              <h2 id="preview-title">The controls,<br />up close.</h2>
             </div>
             <p class="preview-intro">
-              The budget, the requests, the decisions.<br />Actual screens from
-              a test-credit workspace.
+              Actual screens from a test-credit workspace. Switch views to see
+              the budget, approvals and activity history.
             </p>
           </div>
           <div class="showcase-stage">
@@ -136,7 +186,22 @@
                   Activity
                 </button>
               </div>
-              <span class="capture-label">App screenshot / Test credits</span>
+              <button
+                class="capture-label film-button"
+                type="button"
+                data-play-film
+              >
+                <span class="play-icon" aria-hidden="true"
+                  ><svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    fill="currentColor"
+                  >
+                    <path d="M2 1 9 5 2 9Z" /></svg
+                ></span>
+                Watch the working app
+              </button>
             </div>
             <figure class="app-capture">
               <div
@@ -182,8 +247,8 @@
           aria-labelledby="capabilities-title"
         >
           <div class="section-heading">
-            <p class="eyebrow">Available in this release</p>
-            <h2 id="capabilities-title">What the app does.</h2>
+            <p class="eyebrow">02 / Available now</p>
+            <h2 id="capabilities-title">Working today.</h2>
             <p>
               These features run against saved workspace data. Payment
               settlement is limited to the internal test ledger.
@@ -270,8 +335,8 @@
           aria-labelledby="how-title"
         >
           <div class="section-copy">
-            <p class="eyebrow">How a request is processed</p>
-            <h2 id="how-title">Policy checks and owner approval.</h2>
+            <p class="eyebrow">03 / The payment flow</p>
+            <h2 id="how-title">From request<br />to record.</h2>
             <p>
               Your agent requests a payment. Invisible Horses checks who is
               asking, what they can spend and whether you need to approve it.
@@ -344,8 +409,8 @@
         </section>
         <section class="section" aria-labelledby="audience-title">
           <div class="section-heading">
-            <p class="eyebrow">Intended users</p>
-            <h2 id="audience-title">For teams testing agent spending.</h2>
+            <p class="eyebrow">04 / Who it is for</p>
+            <h2 id="audience-title">For teams<br />building agents.</h2>
             <p>
               Developers connect the API. The person responsible for the budget
               sets limits and reviews exceptions.
@@ -382,8 +447,8 @@
           aria-labelledby="api-title"
         >
           <div class="section-copy">
-            <p class="eyebrow">API access</p>
-            <h2 id="api-title">Request a payment from your agent.</h2>
+            <p class="eyebrow">05 / The integration</p>
+            <h2 id="api-title">One payment<br />request.</h2>
             <p>
               Call the HTTP API from an agent, script or backend. The API key
               determines which agent is making the request.
@@ -427,8 +492,8 @@ Content-Type: application/json
           aria-labelledby="real-title"
         >
           <div class="section-heading">
-            <p class="eyebrow">External payments</p>
-            <h2 id="real-title">What real-money use still requires.</h2>
+            <p class="eyebrow">06 / The boundary</p>
+            <h2 id="real-title">Before real money.</h2>
             <p>
               The public app cannot accept deposits or execute real payments.
               Connecting a company requires more than changing an API key.
@@ -479,7 +544,10 @@ Content-Type: application/json
           id="questions"
           aria-labelledby="questions-title"
         >
-          <h2 id="questions-title">Questions.</h2>
+          <div class="section-heading">
+            <p class="eyebrow">07 / Good to know</p>
+            <h2 id="questions-title">A few answers.</h2>
+          </div>
           <details>
             <summary>Can I use real cash today?</summary>
             <p>
@@ -534,8 +602,8 @@ Content-Type: application/json
         </section>
         <section class="closing">
           <div>
-            <p class="eyebrow">Try the current release</p>
-            <h2>Create a test workspace.</h2>
+            <p class="eyebrow">Take a look inside</p>
+            <h2>Set the limits.<br />Try a request.</h2>
             <p class="muted">No payment-provider credentials required.</p>
           </div>
           <a class="button primary" href="/app/"
@@ -543,8 +611,19 @@ Content-Type: application/json
           >
         </section>
       </main>
-      <div class="horse-runway" aria-hidden="true"><img src="/brand/running-horse.svg" width="80" height="56" alt="" loading="lazy" /></div>
-      <div class="footer-brand" aria-hidden="true">Invisible Horses.</div>
+      <div class="horse-runway" aria-hidden="true">
+        <img
+          src="/brand/running-horse.svg"
+          width="80"
+          height="56"
+          alt=""
+          loading="lazy"
+        />
+      </div>
+      <div class="footer-brand">
+        <span>Invisible Horses.</span
+        ><span class="small">Payment controls<br />for software agents.</span>
+      </div>
       <footer>
         <span>Built by <a href="https://faizan.sh">Faizan</a></span>
         <div>
@@ -554,15 +633,61 @@ Content-Type: application/json
         <span class="live-status">Working demo / Test credits</span>
       </footer>
     </div>
+    <dialog id="film-dialog" aria-labelledby="film-title">
+      <div class="film-heading">
+        <span id="film-title">Inside Invisible Horses / Recorded demo</span
+        ><button type="button" id="close-film" autofocus>
+          Close <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <video
+        id="product-film"
+        controls
+        playsinline
+        preload="none"
+        aria-label="A 58-second demonstration of the Invisible Horses test-credit workspace"
+      >
+        <source src="/invisible-horses-demo.mp4" type="video/mp4" />
+      </video>
+      <p class="small">
+        Actual app recording. Internal test credits only. No external money
+        moves.
+      </p>
+    </dialog>
     <script>
+      const filmDialog = document.getElementById("film-dialog");
+      const productFilm = document.getElementById("product-film");
+      let filmTrigger;
+      document.querySelectorAll("[data-play-film]").forEach((button) =>
+        button.addEventListener("click", () => {
+          filmTrigger = button;
+          filmDialog.showModal();
+          document.documentElement.classList.add("film-open");
+          productFilm.play().catch(() => {});
+        }),
+      );
+      document
+        .getElementById("close-film")
+        .addEventListener("click", () => filmDialog.close());
+      filmDialog.addEventListener("click", (event) => {
+        if (event.target === filmDialog) filmDialog.close();
+      });
+      filmDialog.addEventListener("close", () => {
+        productFilm.pause();
+        document.documentElement.classList.remove("film-open");
+        filmTrigger?.focus();
+      });
       const runway = document.querySelector(".horse-runway");
       if (runway && "IntersectionObserver" in window) {
-        const observer = new IntersectionObserver(([entry]) => {
-          if (entry.isIntersecting) {
-            runway.classList.add("is-visible");
-            observer.disconnect();
-          }
-        }, { threshold: 0.5 });
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              runway.classList.add("is-visible");
+              observer.disconnect();
+            }
+          },
+          { threshold: 0.5 },
+        );
         observer.observe(runway);
       }
       const themeButton = document.getElementById("theme");
