@@ -2,7 +2,7 @@ import type { Hex } from 'viem';
 import type { PaymentIntent } from '../intent/schema.js';
 export type SignedTransfer = { raw: Hex; hash: Hex };
 export type ReceiptState = 'pending' | 'success' | 'reverted';
-/** Milestone 1 executor only. Multi-rail quoting is a later milestone. */
+/** Guarded testnet transfer execution interface. */
 export interface TestnetExecutor {
   assertTestnet(): Promise<void>;
   prepare(intent: PaymentIntent): Promise<SignedTransfer>;

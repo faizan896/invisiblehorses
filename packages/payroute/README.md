@@ -2,19 +2,15 @@
 
 **One payment intent. Compare rails by cost, deadline and reversibility, with reasons you can inspect.**
 
-A typed, deterministic routing library extracted from [railgate](https://github.com/faizan896/railgate). Runs in Node 20+ and browsers. No server, database, MCP runtime or LLM dependency. Test money only; this package plans routes and does not move funds by itself.
+The typed, deterministic routing library used by Invisible Horses. Runs in Node 20+ and browsers. No server, database, MCP runtime or LLM dependency. Test money only; this package plans routes and does not move funds by itself.
 
-[Routing playground](https://railgate-self.vercel.app/playground/) · [Playground source](https://github.com/faizan896/railgate/tree/main/packages/payroute/playground) · [Scenario tests](https://github.com/faizan896/railgate/blob/main/packages/payroute/test/scenarios.test.ts) · [MIT license](https://github.com/faizan896/railgate/blob/main/packages/payroute/LICENSE)
+[Routing playground](https://invisiblehorses.vercel.app/playground/) · [Playground source](https://github.com/faizan896/railgate/tree/main/packages/payroute/playground) · [Scenario tests](https://github.com/faizan896/railgate/blob/main/packages/payroute/test/scenarios.test.ts) · [MIT license](https://github.com/faizan896/railgate/blob/main/packages/payroute/LICENSE)
 
 The playground runs the library in the browser with fictional profiles and modeled prices. Local preview and independent deployment instructions are below.
 
-## Install and usage
+## Usage
 
-After the maintainer publishes version 0.1.0:
-
-```sh
-npm i payroute
-```
+The application resolves `payroute` as a local workspace dependency.
 
 Save this ten-line, self-contained example as `example.mjs` and run `node example.mjs`. It plans a $10 internal test-ledger payment without keys, external calls or additional fixture files:
 
@@ -30,8 +26,6 @@ const intent = PaymentIntentV2Schema.parse({ payer: 'payer', recipient: 'merchan
 console.log(await router.quote(intent));
 console.log(await router.plan(intent));
 ```
-
-Before publication, the monorepo resolves `payroute` as a workspace dependency. To try the package elsewhere, run `pnpm build && npm pack` in `packages/payroute`, then install the generated tarball. The npm archive contains only compiled `dist` files, this README, the MIT license and required package metadata. Source tests, example fixtures and environment files are excluded.
 
 `context` is trusted **application/owner configuration**, separate from the intent: provide real spent/reserved history and owner-maintained counterparty profiles. The zero-spend history above is only an isolated example. An agent must never supply policy, KYB state, allowlists or spending history. The router resolves this context again after asynchronous quoting to catch policy edits and budget changes; the application must still reserve atomically immediately before execution.
 
@@ -92,26 +86,15 @@ The adapters and profiles are intentionally test-only (`test_money_only`, `test_
 
 Railgate's pre-existing routing, quote and lifecycle tests also exercise this extracted library **unchanged** through compatibility exports. Its server/database wrappers remain in the railgate application.
 
-## Playground and development
-
-From this directory: `pnpm install`, `pnpm build`, `pnpm test`, `pnpm dev`. In this monorepo run `pnpm dev:playground` at the root. The page runs the actual library in the browser with fictional profiles, modeled pricing and no external API requests. It never signs, pays or approves anything.
-
-`pnpm build:playground` generates `playground/dist` (static HTML/CSS/JS). The repository includes [Vercel](https://github.com/faizan896/railgate/blob/main/packages/payroute/vercel.json) and [Netlify](https://github.com/faizan896/railgate/blob/main/packages/payroute/netlify.toml) configs: set the project/base directory to `packages/payroute` in the monorepo, or the package root after moving it into its own repository. Build command `pnpm build:playground`, publish/output directory `playground/dist`. No secrets or backend needed. The monorepo's root build additionally stages this output at `/playground/` beside railgate's existing API gateway.
-
-To split out the project, copy this directory from GitHub as a new repository, install its declared dependencies, then run `pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm build:playground`. Source imports stay inside this package. Examples, tests and deployment configuration live in Git, outside the npm archive. The development toolchain needs Node 20.19+; the compiled library supports Node 20+.
-
-## Name availability
-
-On **2026-10-27**, the public npm registry returned 404 for `payroute`. The name appears unused publicly at that check; a 404 does not reserve it or guarantee npm will allow registration. Version 0.1.0 is prepared for publication. Nothing has been published by this change.
-
-## Publish
+## Development
 
 From the repository root:
 
 ```sh
-cd packages/payroute
-npm login
-npm publish --access public
+pnpm --filter payroute build
+pnpm --filter payroute typecheck
+pnpm --filter payroute test
+pnpm dev:playground
 ```
 
-The `prepublishOnly` hook builds the ESM output and runs the scenario tests before npm publishes. The package metadata sets public access and the npm registry explicitly.
+`pnpm build:playground` builds and stages the browser UI under `public/playground/` for the root Vercel deployment. The UI compares routes using labelled sources and editable assumptions; it does not execute payments.

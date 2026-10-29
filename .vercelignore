@@ -11,3 +11,7 @@ dist/
 coverage/
 .wrangler/
 worker-dist/
+
+work/
+playwright-report/
+test-results/

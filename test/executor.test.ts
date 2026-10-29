@@ -8,7 +8,7 @@ const fixtures: ReturnType<typeof fixture>[] = [];
 const f = (path?: string) => { const v = fixture(path); fixtures.push(v); return v; };
 afterEach(() => { for (const v of fixtures.splice(0)) if (v.store.db.open) v.store.close(); });
 
-describe('Milestone 1 payment and approval workflow', () => {
+describe('Payment and approval workflow', () => {
   it('$5 allowed → $45 approved → $150 daily attempt denied → retry pays once', async () => {
     const v = f(); await v.service.initialize();
     const five = await v.service.request(intent(), agentId);

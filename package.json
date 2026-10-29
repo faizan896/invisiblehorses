@@ -2,7 +2,7 @@
   "name": "railgate",
   "version": "0.1.0",
   "private": true,
-  "description": "Policy-controlled testnet payments for AI agents",
+  "description": "Payment controls for software agents",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -23,7 +23,6 @@
     "test:watch": "vitest",
     "demo": "tsx examples/overspend-demo/live.ts",
     "demo:offline": "tsx examples/overspend-demo/offline.ts",
-    "demo:record": "vhs examples/overspend-demo/railgate.tape",
     "demo:quotes": "tsx examples/quotes-demo.ts",
     "demo:routing": "tsx examples/routing-demo.ts",
     "demo:x402": "tsx examples/x402-server/demo.ts",

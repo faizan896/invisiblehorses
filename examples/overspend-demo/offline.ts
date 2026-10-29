@@ -88,5 +88,5 @@ try {
     console.log('Network     No chain transfers and no real notifications\n');
     console.log('github.com/faizan896/railgate');
   }
-  console.log(present ? 'Offline demo passed. All assertions verified.' : 'Offline demo passed. Real testnet and phone acceptance evidence: docs/milestone-1.md.');
+  console.log('Offline demo passed. All assertions verified.');
 } finally { store.close(); }

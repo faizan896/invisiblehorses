@@ -20,3 +20,7 @@ public/playground/
 console/dist/
 public/app/
 public/index.html
+
+work/
+playwright-report/
+test-results/
