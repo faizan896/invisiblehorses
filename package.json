@@ -38,7 +38,10 @@
     "dev:console-worker": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false wrangler dev --config wrangler.console.jsonc --port 8787 --var PUBLIC_ORIGIN:http://127.0.0.1:8788",
     "build:console-worker": "wrangler deploy --config wrangler.console.jsonc --dry-run --outdir worker-dist/console",
     "deploy:console-worker": "wrangler deploy --config wrangler.console.jsonc",
-    "test:console-worker": "pnpm build:console-worker && vitest run --config vitest.console.config.ts"
+    "test:console-worker": "pnpm build:console-worker && vitest run --config vitest.console.config.ts",
+    "tool-gate:serve": "tsx src/tool-gate/serve.ts",
+    "tool-gate:client": "tsx examples/tool-gate/client.ts",
+    "demo:tool-gate": "tsx examples/tool-gate/demo.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

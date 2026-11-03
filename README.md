@@ -8,6 +8,12 @@ The public app uses internal test credits. External bank and crypto payments are
 
 Owners can edit or pause agents, cancel unsettled requests, download ledger receipts and export complete audit history. A private recovery key restores workspace access after changing browser or session expiry.
 
+## Company pilot
+
+The [self-hosted spending gate](docs/company-pilot.md) adds customer/job budgets, owner approvals and a backend-only fixed-price tool adapter. It is separate from the public test-credit workspace.
+
+Run `pnpm demo:tool-gate` for an end-to-end sandbox request, approval, receipt and budget-denial example. External execution needs a company-configured supplier integration implementing quote, execute and status lookup. Provider confirmations are not bank-settlement proof.
+
 ## Run locally
 
 Use Node.js 24 and pnpm 10.20.0.

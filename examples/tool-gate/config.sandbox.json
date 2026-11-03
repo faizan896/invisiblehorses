@@ -1,0 +1,14 @@
+{
+  "company": {
+    "daily_limit_minor": 10000,
+    "per_request_limit_minor": 1000,
+    "approval_above_minor": 100
+  },
+  "providers": [
+    {
+      "id": "data-search",
+      "mode": "sandbox",
+      "price_minor": 25
+    }
+  ]
+}
