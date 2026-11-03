@@ -1,42 +1,9 @@
 (() => {
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  const finePointer = matchMedia("(min-width: 1001px)");
-  const horse = document.getElementById("horse-logo");
-  const parts = Object.fromEntries(
-    [
-      "body",
-      "tail",
-      "neck",
-      "mane",
-      "hind-far",
-      "hind-near",
-      "front-far",
-      "front-near",
-    ].map((name) => [name, document.getElementById(`horse-${name}`)]),
-  );
-  const field = document.querySelector(".motion-field");
-  const toggle = document.getElementById("motion-toggle");
-  const preview = document.querySelector(".showcase-stage");
-  const previewSection = document.getElementById("workspace-preview");
-  const code = document.querySelector("#developers .code-window");
-  const map = document.querySelector(".system-map");
-  const wordmark = document.querySelector(".footer-brand");
-  const chapters = [...document.querySelectorAll("[data-flow-step]")];
-
-  let loaded = true,
-    paused = false,
-    visible = true,
-    frame = 0,
-    lastFrame = 0;
-  let scheduled = 0,
-    scrollDirty = true,
-    currentChapter = -1;
-  const clamp = (n, low = 0, high = 1) => Math.max(low, Math.min(high, n));
-  const progress = (element) => {
-    const box = element.getBoundingClientRect();
-    return clamp((innerHeight - box.top) / (innerHeight + box.height));
-  };
-  function draw(index) {
+ const root=document.documentElement,reduced=matchMedia("(prefers-reduced-motion: reduce)"),mobile=matchMedia("(max-width:700px)");
+ const horse=document.getElementById("horse-logo"),field=document.querySelector(".motion-field"),toggle=document.getElementById("motion-toggle");
+ const parts=Object.fromEntries(["body","tail","neck","mane","hind-far","hind-near","front-far","front-near"].map(name=>[name,document.getElementById("horse-"+name)]));
+ let paused=false,visible=true,frame=0,lastFrame=0,scheduled=0;
+   function draw(index) {
     const phase = (index / 60) * Math.PI * 2;
     const swing = Math.sin(phase);
     const opposite = Math.sin(phase + Math.PI);
@@ -71,150 +38,24 @@
     );
     horse.dataset.frame = String(index);
   }
-  function requestTick() {
-    if (!scheduled && !document.hidden) scheduled = requestAnimationFrame(tick);
-  }
-  function updateScroll() {
-    const moving = !reduced.matches && !paused;
-    const pageRange = document.documentElement.scrollHeight - innerHeight;
-    document.documentElement.style.setProperty(
-      "--page-progress",
-      String(pageRange > 0 ? scrollY / pageRange : 0),
-    );
-    const p = progress(previewSection);
-    preview.style.setProperty(
-      "--preview-tilt",
-      moving && finePointer.matches ? `${clamp(1 - p * 3) * -7}deg` : "0deg",
-    );
-    preview.style.setProperty(
-      "--preview-scale",
-      moving && finePointer.matches ? String(0.96 + clamp(p * 3) * 0.04) : "1",
-    );
-    field.style.setProperty(
-      "--horse-drift",
-      moving ? `${(progress(field) - 0.5) * 32}px` : "0px",
-    );
-    code.style.setProperty(
-      "--code-rise",
-      moving && finePointer.matches
-        ? `${(progress(code) - 0.5) * -36}px`
-        : "0px",
-    );
-    map.style.setProperty(
-      "--map-draw",
-      moving ? String(clamp(progress(map) * 2.5)) : "1",
-    );
-    wordmark.style.setProperty(
-      "--wordmark-drift",
-      moving ? `${(progress(wordmark) - 0.5) * 22}px` : "0px",
-    );
-    if (finePointer.matches) {
-      let next = -1;
-      let nearest = Infinity;
-      chapters.forEach((chapter, i) => {
-        const box = chapter.getBoundingClientRect();
-        const distance = Math.abs(
-          box.top + box.height / 2 - innerHeight * 0.45,
-        );
-        if (
-          box.top < innerHeight * 0.8 &&
-          box.bottom > 100 &&
-          distance < nearest
-        ) {
-          nearest = distance;
-          next = i;
-        }
-      });
-      if (next !== -1 && next !== currentChapter) {
-        currentChapter = next;
-        chapters.forEach((el, i) =>
-          el.classList.toggle("is-current", i === next),
-        );
-        document.querySelector(`[data-step="${next}"]`)?.click();
-      }
-    }
-  }
-  function tick(now) {
-    scheduled = 0;
-    if (scrollDirty) {
-      updateScroll();
-      scrollDirty = false;
-    }
-    if (
-      loaded &&
-      visible &&
-      !paused &&
-      !reduced.matches &&
-      now - lastFrame >= 1000 / 60
-    ) {
-      frame = (frame + 1) % 60;
-      draw(frame);
-      lastFrame = now;
-    }
-    if (loaded && visible && !paused && !reduced.matches) requestTick();
-  }
-  function onScroll() {
-    scrollDirty = true;
-    requestTick();
-  }
-  function syncPreference() {
-    toggle.disabled = reduced.matches;
-    toggle.textContent = reduced.matches
-      ? "Reduced motion"
-      : paused
-        ? "Play motion →"
-        : "Pause motion";
-    toggle.setAttribute("aria-pressed", String(paused || reduced.matches));
-    if (reduced.matches) draw(0);
-    onScroll();
-  }
-  toggle.addEventListener("click", () => {
-    paused = !paused;
-    document.documentElement.classList.toggle("motion-paused", paused);
-    document
-      .getAnimations()
-      .forEach((animation) => (paused ? animation.pause() : animation.play()));
-    syncPreference();
-  });
-  reduced.addEventListener("change", syncPreference);
-  finePointer.addEventListener("change", onScroll);
-  addEventListener("scroll", onScroll, { passive: true });
-  addEventListener("resize", onScroll, { passive: true });
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) onScroll();
-  });
-  if ("IntersectionObserver" in window) {
-    new IntersectionObserver(
-      ([entry]) => {
-        visible = entry.isIntersecting;
-        requestTick();
-      },
-      { rootMargin: "100px" },
-    ).observe(field);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          if (!reduced.matches && !paused)
-            entry.target.animate(
-              [
-                { opacity: 0.35, transform: "translateY(24px)" },
-                { opacity: 1, transform: "translateY(0)" },
-              ],
-              { duration: 650, easing: "cubic-bezier(.2,.7,.2,1)" },
-            );
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.12 },
-    );
-    document
-      .querySelectorAll(
-        ".preview-heading, .section-heading, .control-tile, .person, .closing",
-      )
-      .forEach((el) => observer.observe(el));
-  }
-  field.classList.add("motion-ready");
-  draw(0);
-  syncPreference();
+
+ function requestTick(){if(!scheduled&&!document.hidden&&!paused&&!reduced.matches&&visible)scheduled=requestAnimationFrame(tick);}
+ function tick(now){scheduled=0;if(now-lastFrame>=1000/60){frame=(frame+1)%60;draw(frame);lastFrame=now;}requestTick();}
+ function syncMotion(){toggle.disabled=reduced.matches;toggle.textContent=reduced.matches?"Reduced motion":paused?"Play motion":"Pause motion";toggle.setAttribute("aria-pressed",String(paused||reduced.matches));if(reduced.matches)draw(0);if(scheduled&&(paused||reduced.matches||!visible)){cancelAnimationFrame(scheduled);scheduled=0;}requestTick();}
+ toggle.addEventListener("click",()=>{paused=!paused;syncMotion();});reduced.addEventListener("change",syncMotion);document.addEventListener("visibilitychange",()=>{if(!document.hidden)requestTick();});
+ if("IntersectionObserver" in window)new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;syncMotion();},{rootMargin:"80px"}).observe(field);
+ draw(0);syncMotion();
+ let previewView="overview";
+ const copy={overview:["Available test credits, reserved spending and requests awaiting approval.","Actual test-credit workspace overview, cropped to show available balance and request controls."],approvals:["An actual test-credit request awaiting its owner's approval.","Actual approval queue with a test-credit request and owner approval controls."],activity:["Saved request, policy and internal ledger events.","Actual activity history showing saved agent requests and decisions."]};
+ function isDark(){return root.dataset.theme==="dark"||(!root.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);}
+ function updatePreview(){const theme=isDark()?"dark":"light",image=document.getElementById("app-preview");image.src=`/product/${previewView}-desktop-${theme}.webp`;image.alt=copy[previewView][1];document.getElementById("preview-mobile").srcset=`/product/${previewView}-mobile-${theme}.webp`;document.getElementById("preview-caption").textContent=copy[previewView][0];const full=mobile.matches?`/product/${previewView}-mobile-${theme}.webp`:`/product/${previewView}-desktop-${theme}-full.webp`;document.getElementById("preview-full").href=full;document.getElementById("preview-image-link").href=full;}
+ const tabs=[...document.querySelectorAll("[data-preview]")];
+ function choose(tab){previewView=tab.dataset.preview;tabs.forEach(button=>{const active=button===tab;button.setAttribute("aria-selected",String(active));button.tabIndex=active?0:-1;});document.getElementById("preview-panel").setAttribute("aria-labelledby",tab.id);updatePreview();}
+ tabs.forEach((tab,index)=>{tab.addEventListener("click",()=>choose(tab));tab.addEventListener("keydown",event=>{let next;if(event.key==="ArrowRight")next=(index+1)%tabs.length;else if(event.key==="ArrowLeft")next=(index+tabs.length-1)%tabs.length;else if(event.key==="Home")next=0;else if(event.key==="End")next=tabs.length-1;else return;event.preventDefault();choose(tabs[next]);tabs[next].focus();});});
+ const themeButton=document.getElementById("theme");
+ function updateTheme(){themeButton.textContent=isDark()?"Light mode":"Dark mode";themeButton.setAttribute("aria-label",isDark()?"Switch to light mode":"Switch to dark mode");updatePreview();}
+ themeButton.addEventListener("click",()=>{root.dataset.theme=isDark()?"light":"dark";try{localStorage.setItem("payroute-theme",root.dataset.theme);}catch{}updateTheme();});matchMedia("(prefers-color-scheme:dark)").addEventListener("change",updateTheme);mobile.addEventListener("change",updatePreview);updateTheme();
+ const dialog=document.getElementById("film-dialog"),video=document.getElementById("product-film");let filmTrigger;
+ document.querySelectorAll("[data-play-film]").forEach(button=>button.addEventListener("click",()=>{filmTrigger=button;dialog.showModal();root.classList.add("film-open");video.play().catch(()=>{});}));
+ document.getElementById("close-film").addEventListener("click",()=>dialog.close());dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close();});dialog.addEventListener("close",()=>{video.pause();root.classList.remove("film-open");filmTrigger?.focus();});
 })();
