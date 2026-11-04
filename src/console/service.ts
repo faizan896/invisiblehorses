@@ -22,6 +22,7 @@ import {
 } from "payroute";
 import type { SqlDatabase } from "../audit/store-core.js";
 import { AppError } from "../errors.js";
+import { CasesService } from "../cases/service.js";
 import catalog from "../../examples/counterparties.json" with { type: "json" };
 
 const profiles = new Counterparties(catalog);
@@ -827,6 +828,9 @@ export class ConsoleService {
     return times.length
       ? Math.max(this.clock().getTime() + 500, Math.min(...times))
       : null;
+  }
+  get cases() {
+    return new CasesService(this.db, this.workspaceId, this.clock);
   }
   exportRecords() {
     const { workspace, rules, agents, payments, balance } = this.snapshot();

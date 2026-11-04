@@ -1,4 +1,5 @@
 import "./style.css";
+import { mountCases } from "./cases.js";
 import type { ConsoleService } from "../src/console/service.js";
 type Snapshot = ReturnType<ConsoleService["snapshot"]>;
 type Payment = Snapshot["payments"][number];
@@ -76,6 +77,7 @@ const nav = [
   ["overview", "Overview"],
   ["payments", "Payments"],
   ["approvals", "Approvals"],
+  ["cases", "Cases"],
   ["agents", "Agents & keys"],
   ["rules", "Spending rules"],
   ["developers", "Developers"],
@@ -134,27 +136,30 @@ function render() {
   if (!data) return;
   const d = data,
     pending = d.payments.filter((p) => p.status === "pending_approval").length;
-  root.innerHTML = `<div class="layout"><aside class="sidebar"><div><a class="brand" href="/">Invisible Horses</a><span class="badge">Private demo</span></div><div class="workspace-name small">${esc(d.workspace.name)}</div><nav aria-label="Workspace">${nav.map(([id, label]) => `<a href="#${id}" ${view() === id ? 'aria-current="page"' : ""}>${label}${id === "approvals" && pending ? ` (${pending})` : ""}</a>`).join("")}</nav><div class="sidebar-bottom"><a href="/playground/">Route planner <span class="small">Preview →</span></a><a href="https://github.com/faizan896/invisiblehorses">Source & architecture →</a><span class="small">Internal demo credits.<br>No external money movement.</span></div></aside><main class="content"><div class="topbar"><p class="small">${esc(d.workspace.name)} / ${esc(nav.find((n) => n[0] === view())?.[1] ?? "Overview")}</p><div class="actions">${themeButton()}<a class="button mobile-nav" href="/playground/">Route planner</a><button data-action="refresh" type="button" aria-label="Refresh workspace">Refresh</button></div></div>${issuedRecovery ? `<div class="notice">Save your recovery key to restore this workspace from another browser. <a href="#security">Open workspace access →</a></div>` : ""}<div class="notice">Internal test credits only. Bank and USDC payouts are not connected.</div><div id="view"></div><footer class="page-footer">Workspace access expires ${time(d.workspace.expires_at)}. Daily budgets reset at 00:00 UTC. <a href="/console-api/export">Export your audit record</a>.</footer></main></div>`;
+  root.innerHTML = `<div class="layout"><aside class="sidebar"><div><a class="brand" href="/">Invisible Horses</a><span class="badge">Private demo</span></div><div class="workspace-name small">${esc(d.workspace.name)}</div><nav aria-label="Workspace">${nav.map(([id, label]) => `<a href="#${id}" ${view() === id ? 'aria-current="page"' : ""}>${label}${id === "approvals" && pending ? ` (${pending})` : ""}</a>`).join("")}</nav><div class="sidebar-bottom"><a href="/playground/">Route planner <span class="small">Preview →</span></a><a href="https://github.com/faizan896/invisiblehorses">Source & architecture →</a><span class="small">Internal demo credits.<br>No external money movement.</span></div></aside><main class="content"><div class="topbar"><p class="small">${esc(d.workspace.name)} / ${esc(nav.find((n) => n[0] === view())?.[1] ?? "Overview")}</p><div class="actions">${themeButton()}<a class="button mobile-nav" href="/playground/">Route planner</a><button data-action="refresh" type="button" aria-label="Refresh workspace">Refresh</button></div></div>${issuedRecovery ? `<div class="notice">Save your recovery key to restore this workspace from another browser. <a href="#security">Open workspace access →</a></div>` : ""}<div class="notice">${view() === "cases" ? "Read-only records. Imports are not independently verified. No payments or refunds are sent." : "Internal test credits only. Bank and USDC payouts are not connected."}</div><div id="view"></div><footer class="page-footer">Workspace access expires ${time(d.workspace.expires_at)}. Daily budgets reset at 00:00 UTC. <a href="/console-api/export">Export your audit record</a>.</footer></main></div>`;
   const target = document.querySelector("#view")!;
   const v = view();
   target.innerHTML =
-    v === "payments"
-      ? paymentsView()
-      : v === "approvals"
-        ? approvalsView()
-        : v === "agents"
-          ? agentsView()
-          : v === "rules"
-            ? rulesView()
-            : v === "developers"
-              ? developersView()
-              : v === "activity"
-                ? activityView()
-                : v === "security"
-                  ? securityView()
-                  : overviewView();
+    v === "cases"
+      ? '<p class="muted">Loading saved cases…</p>'
+      : v === "payments"
+        ? paymentsView()
+        : v === "approvals"
+          ? approvalsView()
+          : v === "agents"
+            ? agentsView()
+            : v === "rules"
+              ? rulesView()
+              : v === "developers"
+                ? developersView()
+                : v === "activity"
+                  ? activityView()
+                  : v === "security"
+                    ? securityView()
+                    : overviewView();
   bindCommon();
   bindView();
+  if (v === "cases") mountCases(target, { workspaceId: d.workspace.id });
 }
 function heading(title: string, description: string, actions = "") {
   return `<div class="heading"><div><h1>${title}</h1><p class="muted">${description}</p></div>${actions ? `<div class="actions">${actions}</div>` : ""}</div>`;
@@ -608,11 +613,14 @@ function bindPayments() {
 async function refresh(showToast = false) {
   if (loading) return;
   loading = true;
-  const refreshButton = document.querySelector<HTMLButtonElement>("[data-action=refresh]");
+  const refreshButton = document.querySelector<HTMLButtonElement>(
+    "[data-action=refresh]",
+  );
   if (showToast && refreshButton) {
     refreshButton.disabled = true;
     refreshButton.setAttribute("aria-busy", "true");
-    refreshButton.innerHTML = '<img class="refresh-horse" src="/brand/running-horse.svg" width="28" height="22" alt="" />Refreshing…';
+    refreshButton.innerHTML =
+      '<img class="refresh-horse" src="/brand/running-horse.svg" width="28" height="22" alt="" />Refreshing…';
   }
   try {
     data = await api<Snapshot>("/session");
@@ -655,7 +663,7 @@ setInterval(() => {
     !data ||
     document.hidden ||
     document.querySelector("dialog[open]") ||
-    ["rules", "agents", "developers"].includes(view())
+    ["rules", "agents", "developers", "cases"].includes(view())
   )
     return;
   const busy = data.payments.some(

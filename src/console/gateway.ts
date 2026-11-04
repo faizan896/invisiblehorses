@@ -1,6 +1,6 @@
 const backend = "https://railgate-console.33fazirana.workers.dev";
 const paths =
-  /^\/console-api\/(?:health|workspaces|recover|recovery-code|logout|session|export|agents(?:\/[a-f0-9-]{36})?|keys(?:\/[a-f0-9-]{36}\/revoke)?|rules|payments\/[a-f0-9-]{36}\/(?:decision|cancel|receipt)|v1\/payments(?:\/[a-f0-9-]{36}(?:\/(?:cancel|receipt))?)?)$/;
+  /^\/console-api\/(?:health|workspaces|recover|recovery-code|logout|session|export|cases(?:\/import|\/demo|\/export)?|agents(?:\/[a-f0-9-]{36})?|keys(?:\/[a-f0-9-]{36}\/revoke)?|rules|payments\/[a-f0-9-]{36}\/(?:decision|cancel|receipt)|v1\/payments(?:\/[a-f0-9-]{36}(?:\/(?:cancel|receipt))?)?)$/;
 /** Separate, narrowly scoped demo gateway. No owner/payment-backend credentials are forwarded. */
 export function createConsoleGateway(fetcher: typeof fetch = fetch) {
   return async (request: Request) => {
@@ -27,9 +27,14 @@ export function createConsoleGateway(fetcher: typeof fetch = fetch) {
     try {
       const body =
         request.method === "POST" ? await request.arrayBuffer() : undefined;
-      if (body && body.byteLength > 16384)
+      const caseImport = url.pathname === "/console-api/cases/import";
+      if (body && body.byteLength > (caseImport ? 1048576 : 16384))
         return Response.json(
-          { error: "Request exceeds 16 KiB" },
+          {
+            error: caseImport
+              ? "Case import exceeds 1 MiB"
+              : "Request exceeds 16 KiB",
+          },
           { status: 413 },
         );
       const result = await fetcher(target, {

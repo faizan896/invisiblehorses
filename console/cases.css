@@ -1,0 +1,478 @@
+#cases-app {
+  --cases-rule: var(--line);
+  margin-top: 4px;
+}
+#cases-app .heading {
+  align-items: flex-start;
+}
+.cases-mode,
+.cases-source {
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  display: inline-block;
+  white-space: nowrap;
+  color: var(--muted);
+  border-radius: 3px;
+}
+.cases-mode {
+  margin-top: 4px;
+}
+.cases-storage {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.cases-storage strong {
+  font-weight: 600;
+  color: var(--text);
+}
+.cases-explanation {
+  max-width: 840px;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 16px 0 22px;
+}
+.cases-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cases-message {
+  min-height: 24px;
+  font-size: 13px;
+  margin: 12px 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.cases-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 22px 0 28px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  gap: 20px;
+}
+.cases-summary dt {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.cases-summary dd {
+  font:
+    normal 30px/1.2 "Times New Roman",
+    Times,
+    serif;
+  margin: 0;
+}
+.cases-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.6fr) repeat(3, minmax(130px, 1fr));
+  gap: 14px;
+  margin: 0 0 16px;
+}
+.cases-filters label,
+.cases-dialog label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.cases-filters input,
+.cases-filters select {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+.cases-list-options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin-bottom: 26px;
+}
+.cases-list-options .check {
+  font-size: 13px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cases-list-options input {
+  margin: 0;
+}
+#cases-result-count {
+  margin-left: auto;
+  color: var(--muted);
+}
+.cases-group {
+  margin: 0 0 30px;
+}
+.cases-group-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+.cases-group-title p {
+  margin: 0 0 3px;
+}
+.cases-group-title h2 {
+  font:
+    600 15px/1.5 Arial,
+    Helvetica,
+    sans-serif;
+  margin: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.cases-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cases-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(240px, 1fr) auto;
+  gap: 26px;
+  align-items: center;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line);
+}
+.cases-row-main {
+  min-width: 0;
+}
+.cases-row-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.cases-row-meta > span:last-child {
+  color: var(--muted);
+}
+.cases-row h3 {
+  font:
+    600 15px/1.5 Arial,
+    Helvetica,
+    sans-serif;
+  margin: 0 0 6px;
+}
+.cases-reason {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 8px;
+  max-width: 650px;
+}
+.cases-reference {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  margin: 0;
+}
+.cases-row-states {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 0;
+  min-width: 0;
+}
+.cases-row-states dt {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+.cases-row-states dd {
+  font-size: 13px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.cases-row-states dd + dd {
+  margin-top: 4px;
+}
+.cases-row > button {
+  white-space: nowrap;
+  min-height: 44px;
+}
+.cases-empty {
+  border-top: 1px solid var(--line);
+  padding: 30px 0;
+  max-width: 800px;
+}
+.cases-empty h2 {
+  font:
+    normal 30px/1.2 "Times New Roman",
+    Times,
+    serif;
+  margin: 0 0 16px;
+}
+.cases-empty p {
+  max-width: 700px;
+}
+.cases-empty .small {
+  color: var(--muted);
+}
+.cases-dialog {
+  width: min(820px, calc(100vw - 40px));
+  max-width: calc(100vw - 40px);
+}
+.cases-dialog > header h2 {
+  font:
+    normal 30px/1.2 "Times New Roman",
+    Times,
+    serif;
+}
+.cases-dialog h3 {
+  font:
+    600 15px/1.5 Arial,
+    Helvetica,
+    sans-serif;
+  margin: 22px 0 10px;
+}
+.cases-dialog .small {
+  font-size: 13px;
+}
+.cases-detail-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+}
+.cases-detail-source > span:last-child {
+  color: var(--muted);
+}
+.cases-next {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin: 22px 0;
+}
+.cases-next h3 {
+  margin: 0 0 8px;
+}
+.cases-next p {
+  margin: 0;
+  font-size: 15px;
+}
+.cases-detail-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 30px;
+  margin: 24px 0;
+}
+.cases-detail-fields div {
+  min-width: 0;
+}
+.cases-detail-fields dt {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+.cases-detail-fields dd {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.cases-timeline {
+  list-style: none;
+  margin: 20px 0 28px;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.cases-timeline li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.cases-timeline li > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 15px;
+}
+.cases-timeline strong {
+  font-weight: 600;
+}
+.cases-timeline p {
+  color: var(--muted);
+  margin: 5px 0;
+}
+.cases-timeline code {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.cases-import-format {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.cases-import-format > div {
+  flex: 1;
+  min-width: 0;
+}
+.cases-import-format select {
+  width: 100%;
+  margin: 0;
+}
+.cases-import-format button {
+  min-height: 44px;
+}
+#cases-import-file {
+  width: 100%;
+  margin: 0 0 18px;
+  max-width: 100%;
+  font-size: 13px;
+}
+#cases-import-json {
+  width: 100%;
+  font: 13px/1.55 monospace;
+  resize: vertical;
+  min-height: 220px;
+  max-height: 42vh;
+}
+#cases-import-error {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1100px) {
+  .cases-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cases-search {
+    grid-column: 1/-1;
+  }
+  .cases-row {
+    grid-template-columns: minmax(180px, 1fr) minmax(210px, 1fr);
+    gap: 18px;
+  }
+  .cases-row > button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+@media (max-width: 700px) {
+  .cases-mode {
+    margin-bottom: 4px;
+  }
+  .cases-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 16px;
+  }
+  .cases-filters {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .cases-filters > div:last-child {
+    grid-column: 1/-1;
+  }
+  .cases-list-options {
+    display: grid;
+    gap: 12px;
+  }
+  #cases-result-count {
+    margin-left: 0;
+  }
+  .cases-group-title {
+    align-items: flex-start;
+  }
+  .cases-group-title > span {
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+  .cases-row {
+    grid-template-columns: 1fr;
+    padding: 20px 0;
+    gap: 18px;
+  }
+  .cases-row-states {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cases-row > button {
+    grid-column: 1;
+    justify-self: start;
+  }
+  .cases-dialog {
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+  }
+  .cases-detail-fields {
+    grid-template-columns: 1fr;
+  }
+  .cases-import-format {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .cases-import-format button {
+    align-self: flex-start;
+  }
+  .cases-detail-source {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .cases-timeline li > div {
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+}
+
+.cases-dialog > header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--paper);
+  padding-bottom: 12px;
+}
+
+.cases-group-title > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  #cases-app .heading {
+    display: block;
+    position: relative;
+    margin-bottom: 20px;
+  }
+  #cases-app .heading h1 {
+    padding-right: 110px;
+  }
+  .cases-mode {
+    position: absolute;
+    right: 0;
+    top: 4px;
+    margin: 0;
+  }
+  .cases-summary {
+    padding: 14px 0;
+    gap: 12px 20px;
+  }
+  .cases-summary > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .cases-summary dt {
+    margin: 0;
+  }
+  .cases-summary dd {
+    font:
+      600 15px/1.5 Arial,
+      Helvetica,
+      sans-serif;
+  }
+  .cases-message:empty {
+    min-height: 0;
+    margin: 12px 0 0;
+  }
+}

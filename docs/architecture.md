@@ -73,3 +73,9 @@ New workspaces receive a private recovery key once. Only its SHA-256 hash is sto
 Owners can edit agent names and budgets or pause an agent. Paused agents cannot authenticate, and queued work is rechecked before settlement. These changes do not modify the routing engine.
 
 Completed receipts contain the payment and two reconciled journal postings. The receipt explicitly identifies internal test-ledger settlement and sets `external_payment: false`. It is not a bank receipt, provider confirmation or refund operation.
+
+## Cases workbench
+
+The workspace includes a read-only [Cases workbench](cases.md) for imported charge and result records. It keeps charge, delivery and refund observations separate and never executes a recovery action. Stripe and Firecrawl file adapters discard unused fields and label imported facts as unverified.
+
+The owner-only Cases API stores facts in SQLite. If the backend has not enabled those routes (initial GET returns 404), the browser uses workspace-scoped IndexedDB and labels that storage. Authentication and server errors do not silently fall back. Browser imports are normalized before API transmission. Normalized exports can be reimported.

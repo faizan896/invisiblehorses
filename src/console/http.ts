@@ -30,13 +30,21 @@ export function allowedOrigin(
 }
 export function consoleApp(service: ConsoleService, publicOrigin: string) {
   const app = new Hono();
-  app.use(
-    "*",
-    bodyLimit({
-      maxSize: 16384,
-      onError: (c) => c.json({ error: "Request exceeds 16 KiB" }, 413),
-    }),
-  );
+  app.use("*", async (c, next) => {
+    const importingCases = c.req.path === "/console-api/cases/import";
+    return bodyLimit({
+      maxSize: importingCases ? 1048576 : 16384,
+      onError: (context) =>
+        context.json(
+          {
+            error: importingCases
+              ? "Case import exceeds 1 MiB"
+              : "Request exceeds 16 KiB",
+          },
+          413,
+        ),
+    })(c, next);
+  });
   app.use("*", async (c, next) => {
     c.header("Cache-Control", "no-store");
     c.header("X-Content-Type-Options", "nosniff");
@@ -85,6 +93,21 @@ export function consoleApp(service: ConsoleService, publicOrigin: string) {
     await next();
   });
   app.get("/console-api/session", (c) => c.json(service.snapshot()));
+  app.get("/console-api/cases", (c) => c.json(service.cases.list()));
+  app.post("/console-api/cases/import", async (c) =>
+    c.json(service.cases.importRecords(await c.req.json())),
+  );
+  app.post("/console-api/cases/demo", async (c) => {
+    z.strictObject({}).parse(await c.req.json());
+    return c.json(service.cases.loadDemo());
+  });
+  app.get("/console-api/cases/export", (c) => {
+    c.header(
+      "Content-Disposition",
+      'attachment; filename="invisible-horses-cases.json"',
+    );
+    return c.json(service.cases.exportRecords());
+  });
   app.post("/console-api/recovery-code", async (c) => {
     z.strictObject({}).parse(await c.req.json());
     return c.json({ recovery_code: service.createRecoveryCode() });
