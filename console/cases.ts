@@ -729,7 +729,7 @@ export function mountCases(
             provider: "all",
             source: "imported_unverified",
             kind: "all",
-            includeClear: result.open_cases === 0,
+            includeClear: true,
           });
           dialog.close();
           await load();
