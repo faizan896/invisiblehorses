@@ -242,17 +242,6 @@ footer,
   background-image: radial-gradient(#96d8d433 0.8px, transparent 1px);
   background-size: 22px 22px;
 }
-.motion-art::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: 10%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  top: 12%;
-  right: 12%;
-  background: var(--ih-red);
-}
 .motion-art::after {
   content: "";
   position: absolute;

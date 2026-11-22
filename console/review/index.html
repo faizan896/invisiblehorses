@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#061721" />
+    <meta
+      name="description"
+      content="Match supplier charges to agent job results by request ID. Review the exceptions and export the evidence in your browser."
+    />
+    <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
+    <title>Spend review · Invisible Horses</title>
+    <script>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("payroute-theme") || "";
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div class="review-page">
+      <header class="review-header">
+        <a class="brand" href="/">Invisible Horses</a>
+        <div>
+          <a href="/app/">Workspace</a
+          ><button type="button" id="theme">Switch theme</button>
+        </div>
+      </header>
+      <main>
+        <section class="review-intro">
+          <div>
+            <p class="kicker">Supplier reconciliation</p>
+            <h1>Spend review.</h1>
+            <p>
+              Which paid calls produced a result? Match one supplier’s billing
+              export to your job log using the request ID.
+            </p>
+          </div>
+          <div class="review-cta">
+            <button class="primary" id="open-import" type="button">
+              Compare my CSVs</button
+            ><small>Files are processed in this tab.</small>
+          </div>
+        </section>
+        <dialog id="import-dialog" aria-labelledby="import-title">
+          <header>
+            <h2 id="import-title">Compare your records</h2>
+            <button type="button" id="close-import">Close</button>
+          </header>
+          <p>
+            Choose one supplier and the same time window in both exports. Use
+            one final row per request ID in each file. IDs match exactly,
+            including case.
+          </p>
+          <form id="import-form">
+            <fieldset>
+              <legend>Supplier billing</legend>
+              <p>
+                Include <code>request_id</code>, <code>amount</code> and
+                <code>unit</code>. Use positive or zero amounts in USD (dollars)
+                or whole provider credits.
+              </p>
+              <label for="billing-file">Billing CSV</label
+              ><input
+                id="billing-file"
+                type="file"
+                accept=".csv,text/csv"
+                required
+              />
+              <a id="billing-example" download="billing-example.csv"
+                >Download billing example</a
+              >
+            </fieldset>
+            <fieldset>
+              <legend>Application job log</legend>
+              <p>
+                Include <code>request_id</code>, <code>customer_id</code>,
+                <code>job_id</code> and <code>result</code>. Use delivered,
+                failed or pending.
+              </p>
+              <label for="jobs-file">Job CSV</label
+              ><input
+                id="jobs-file"
+                type="file"
+                accept=".csv,text/csv"
+                required
+              />
+              <a id="job-example" download="jobs-example.csv"
+                >Download job example</a
+              >
+            </fieldset>
+            <small
+              >UTF-8 CSV · 2 MiB and 10,000 rows per file. Use opaque IDs.
+              Refreshing clears imported rows.</small
+            >
+            <p id="import-error" role="alert"></p>
+            <button id="compare" class="primary" type="submit">
+              Run comparison
+            </button>
+          </form>
+        </dialog>
+        <section aria-labelledby="report-title" class="report">
+          <header class="report-header">
+            <h2 id="report-title" tabindex="-1">Sample review</h2>
+            <button type="button" id="reset" hidden>
+              Clear and show sample
+            </button>
+          </header>
+          <dl class="review-metrics">
+            <div>
+              <dt>Requests compared</dt>
+              <dd id="total">—</dd>
+            </div>
+            <div>
+              <dt>Need review</dt>
+              <dd id="flagged">—</dd>
+            </div>
+            <div>
+              <dt>Charges on flagged requests</dt>
+              <dd id="charges">—</dd>
+            </div>
+          </dl>
+          <p class="small muted">
+            <strong id="coverage"></strong> A flag is a prompt to investigate.
+            The billed amount alone cannot establish a loss or refund.
+          </p>
+          <div class="review-filters">
+            <label
+              >Show<select id="scope">
+                <option value="flagged">Needs review</option>
+                <option value="all">All requests</option>
+              </select></label
+            >
+            <label
+              >Find a record<input
+                id="search"
+                type="search"
+                placeholder="Customer, job or request ID"
+            /></label>
+            <button type="button" id="export">Export filtered CSV</button>
+          </div>
+          <p class="small muted" id="count" role="status"></p>
+          <ol id="records" aria-label="Comparison results"></ol>
+          <div id="pagination" hidden>
+            <button type="button" id="prev">Previous</button
+            ><button type="button" id="next">Next</button>
+          </div>
+        </section>
+      </main>
+      <footer>
+        <span>Invisible Horses</span
+        ><a href="/app/#cases">Open workspace Cases →</a>
+      </footer>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
