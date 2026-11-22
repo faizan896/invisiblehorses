@@ -26,6 +26,8 @@
     </script>
     <link rel="stylesheet" href="/brand/site.css" />
     <script src="/brand/experience.js" defer></script>
+    <link rel="stylesheet" href="/brand/flow.css" />
+    <script src="/brand/flow.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -36,7 +38,8 @@
           ><span>Invisible Horses</span></a
         >
         <nav aria-label="Main">
-          <a href="#workspace">Workspace</a><a href="#system">System</a
+          <a href="#how-it-works">How it works</a
+          ><a href="#workspace">Workspace</a><a href="#system">System</a
           ><a href="#notes">Notes</a
           ><a href="https://github.com/faizan896/invisiblehorses">Source →</a>
         </nav>
@@ -53,8 +56,8 @@
                 Spending rules<br /><em>for software agents.</em>
               </h1>
               <p class="opening-copy">
-                Match supplier charges to the jobs your agents ran. Find paid calls
-                with missing results, then set budgets for the next run.
+                Match supplier charges to the jobs your agents ran. Find paid
+                calls with missing results, then set budgets for the next run.
               </p>
               <div class="opening-actions">
                 <a class="action-link" href="/app/review/"
@@ -75,6 +78,40 @@
                   <title id="horse-logo-title">
                     The Invisible Horses dashed-line horse, running.
                   </title>
+                  <defs>
+                    <path
+                      id="hind-thigh"
+                      d="M718 578C697 616 677 635 643 647"
+                      stroke-dasharray="22 23"
+                    />
+                    <g id="hind-shin">
+                      <path
+                        d="M643 647L608 662C589 669 581 685 565 704"
+                        stroke-dasharray="22 23"
+                      />
+                      <path
+                        d="M551 709L535 712C529 718 524 728 522 737C536 739 550 734 559 726Z"
+                        fill="currentColor"
+                        stroke-width="5"
+                      />
+                    </g>
+                    <path
+                      id="front-thigh"
+                      d="M939 612C956 614 973 623 984 636"
+                      stroke-dasharray="20 20"
+                    />
+                    <g id="front-shin">
+                      <path
+                        d="M984 636C995 650 987 666 975 681L961 697"
+                        stroke-dasharray="20 20"
+                      />
+                      <path
+                        d="M950 699L933 705C935 714 938 720 942 724C951 720 959 711 962 703Z"
+                        fill="currentColor"
+                        stroke-width="5"
+                      />
+                    </g>
+                  </defs>
                   <g
                     id="horse-body"
                     stroke="currentColor"
@@ -93,31 +130,23 @@
                         d="M621 478C603 464 583 465 567 478C547 497 529 509 508 513C485 521 459 510 449 500"
                       />
                     </g>
-                    <g id="horse-hind-far">
-                      <path
-                        d="M616 614C596 641 576 649 561 666L545 687"
-                        stroke-dasharray="20 20"
-                      />
-                      <path
-                        d="M573 578L548 594C531 596 518 613 506 625"
-                        stroke-dasharray="19 20"
-                      />
-                      <path
-                        d="M481 633C474 628 463 637 458 649L455 656C467 659 478 657 486 651Z"
-                        fill="currentColor"
-                        stroke-width="5"
-                      />
+                    <g
+                      opacity=".55"
+                      transform="translate(651 579) scale(.88) translate(-718 -578)"
+                    >
+                      <g id="horse-hind-far">
+                        <use href="#hind-thigh" />
+                        <use href="#hind-shin" data-lower-leg="" />
+                      </g>
                     </g>
-                    <g id="horse-front-far">
-                      <path
-                        d="M943 572C973 558 998 558 1019 578C1037 594 1046 614 1054 633"
-                        stroke-dasharray="21 23"
-                      />
-                      <path
-                        d="M1043 647L1060 639C1066 648 1069 660 1065 672C1057 674 1048 669 1043 664Z"
-                        fill="currentColor"
-                        stroke-width="5"
-                      />
+                    <g
+                      opacity=".55"
+                      transform="translate(925 580) scale(.91) translate(-939 -612)"
+                    >
+                      <g id="horse-front-far">
+                        <use href="#front-thigh" />
+                        <use href="#front-shin" data-lower-leg="" />
+                      </g>
                     </g>
                     <path
                       d="M615 564C602 544 610 518 627 502C655 472 687 466 722 470L770 479C803 488 824 476 842 454C858 436 866 407 884 392"
@@ -162,37 +191,13 @@
                       </g>
                     </g>
                     <g id="horse-hind-near">
-                      <path
-                        d="M718 578C697 616 677 635 643 647L608 662C589 669 581 685 565 704"
-                        stroke-dasharray="22 23"
-                      />
-                      <path
-                        d="M551 709L535 712C529 718 524 728 522 737C536 739 550 734 559 726Z"
-                        fill="currentColor"
-                        stroke-width="5"
-                      />
+                      <use href="#hind-thigh" />
+                      <use href="#hind-shin" data-lower-leg="" />
                     </g>
                     <g id="horse-front-near">
-                      <path
-                        d="M939 612C956 614 973 623 984 636C995 650 987 666 975 681L961 697"
-                        stroke-dasharray="20 20"
-                      />
-                      <path
-                        d="M950 699L933 705C935 714 938 720 942 724C951 720 959 711 962 703Z"
-                        fill="currentColor"
-                        stroke-width="5"
-                      />
+                      <use href="#front-thigh" />
+                      <use href="#front-shin" data-lower-leg="" />
                     </g>
-                  </g>
-                  <g
-                    class="horse-speed"
-                    stroke="currentColor"
-                    stroke-width="6"
-                    stroke-linecap="round"
-                    opacity=".7"
-                  >
-                    <path d="M395 702L451 689" />
-                    <path d="M425 723L488 710" />
                   </g>
                 </svg>
               </div>
@@ -220,6 +225,268 @@
               </div>
             </dl>
           </aside>
+        </section>
+        <section
+          id="how-it-works"
+          class="ruled-section"
+          aria-labelledby="flow-title"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="small-label">How it works</p>
+              <h2 id="flow-title">Follow a paid request.</h2>
+            </div>
+            <p>
+              See how engineering and finance teams use supplier exports and job
+              records to investigate agent spend.
+            </p>
+          </div>
+          <figure
+            class="flow-figure"
+            aria-labelledby="flow-title"
+            data-offscreen
+          >
+            <div class="flow-toolbar">
+              <div
+                class="flow-choices"
+                role="group"
+                aria-label="Example to display"
+                hidden
+              >
+                <button type="button" data-flow="csv" aria-pressed="true">
+                  Billing CSVs
+                </button>
+                <button type="button" data-flow="stripe" aria-pressed="false">
+                  Stripe events
+                </button>
+                <button
+                  type="button"
+                  data-flow="firecrawl"
+                  aria-pressed="false"
+                >
+                  Firecrawl runs
+                </button>
+              </div>
+              <button
+                type="button"
+                class="flow-toggle"
+                aria-pressed="false"
+                hidden
+              >
+                Pause flow
+              </button>
+            </div>
+            <div class="flow-stage">
+              <svg class="flow-symbols" aria-hidden="true" width="0" height="0">
+                <defs>
+                  <symbol id="tile-bill" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <path
+                        d="M10 7H33V34L29 31 26 34 22 31 18 34 14 31 10 34Z"
+                      />
+                      <path d="M15 15H28M15 21H25" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-job" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <rect x="4" y="8" width="36" height="26" rx="2" />
+                      <path d="M4 14H40M10 20 15 24 10 28M19 28H27" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-engineering" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <path d="m15 12-10 9 10 9m14-18 10 9-10 9m-5-23-6 29" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-finance" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <rect x="5" y="7" width="34" height="29" rx="2" />
+                      <path d="M5 16H39M18 16V36M24 22H32M24 28H32" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-review" viewBox="0 0 128 84">
+                    <path
+                      class="hub-base"
+                      d="M3 46 64 16 125 46V50L64 81 3 50Z"
+                    />
+                    <path
+                      class="hub-left"
+                      d="M4 31 64 1 124 31V44L64 74 4 44Z"
+                    />
+                    <path class="hub-right" d="M64 61 124 31V44L64 74Z" />
+                    <path class="hub-top" d="M4 31 64 1 124 31 64 61Z" />
+                    <g
+                      class="hub-mark"
+                      transform="matrix(1 .5 -.94 .47 63 7)"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M10 41c2-10 4-17 11-23l2-11 5 5 4-3 2 12 10 11-4 6-12-6-2 9"
+                        stroke-dasharray="5 3"
+                      />
+                      <path d="M8 29c-2-8 2-17 11-19M7 20l6-8" />
+                    </g>
+                  </symbol>
+                </defs>
+              </svg>
+              <svg
+                class="flow-wires flow-wires-wide"
+                viewBox="0 0 1000 332"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <path
+                    id="wire-wide0"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M160 51H241L370 141H500"
+                  />
+                  <path
+                    id="wire-wide1"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M160 214H250L367 141H500"
+                  />
+                  <path
+                    id="wire-wide2"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 141H627L748 51H840"
+                  />
+                  <path
+                    id="wire-wide3"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 141H627L748 214H840"
+                  />
+                </defs>
+                <use href="#wire-wide0" />
+                <use href="#wire-wide1" />
+                <use href="#wire-wide2" />
+                <use href="#wire-wide3" />
+                <use class="flow-pulse incoming" href="#wire-wide0" />
+                <use class="flow-pulse incoming" href="#wire-wide1" />
+                <use class="flow-pulse outgoing" href="#wire-wide2" />
+                <use class="flow-pulse outgoing" href="#wire-wide3" />
+              </svg>
+              <svg
+                class="flow-wires flow-wires-narrow"
+                viewBox="0 0 1000 440"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <path
+                    id="wire-narrow0"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M250 111V129L500 156V176"
+                  />
+                  <path
+                    id="wire-narrow1"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M750 111V129L500 156V176"
+                  />
+                  <path
+                    id="wire-narrow2"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 269V278L250 306V334"
+                  />
+                  <path
+                    id="wire-narrow3"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 269V278L750 306V334"
+                  />
+                </defs>
+                <use href="#wire-narrow0" />
+                <use href="#wire-narrow1" />
+                <use href="#wire-narrow2" />
+                <use href="#wire-narrow3" />
+                <use class="flow-pulse incoming" href="#wire-narrow0" />
+                <use class="flow-pulse incoming" href="#wire-narrow1" />
+                <use class="flow-pulse outgoing" href="#wire-narrow2" />
+                <use class="flow-pulse outgoing" href="#wire-narrow3" />
+              </svg>
+              <div class="flow-node flow-supplier">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-bill" /></svg
+                ><strong data-flow-label="supplier">Supplier billing</strong
+                ><span data-flow-detail="supplier">$6.40 · req_8042</span>
+              </div>
+              <div class="flow-node flow-app">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-job" /></svg
+                ><strong data-flow-label="app">Application log</strong
+                ><span data-flow-detail="app">Failed · req_8042</span>
+              </div>
+              <div class="flow-node flow-hub">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-review" /></svg
+                ><strong data-flow-label="hub">Spend Review</strong
+                ><span data-flow-detail="hub">Match request IDs</span>
+              </div>
+              <div class="flow-node flow-engineer">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-engineering" /></svg
+                ><strong data-flow-label="engineer">Engineering</strong
+                ><span data-flow-detail="engineer">Trace the failed job</span>
+              </div>
+              <div class="flow-node flow-money">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-finance" /></svg
+                ><strong data-flow-label="money">Finance</strong
+                ><span data-flow-detail="money">Review the $6.40 charge</span>
+              </div>
+            </div>
+            <figcaption class="flow-caption">
+              <p id="flow-description" aria-live="polite">
+                In the sample, both CSVs contain req_8042. Matching the rows
+                reveals a $6.40 supplier charge for a failed research job.
+              </p>
+              <a id="flow-link" href="/app/review/">Try Spend Review →</a>
+            </figcaption>
+          </figure>
         </section>
         <section
           id="workspace"

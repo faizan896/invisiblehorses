@@ -17,65 +17,89 @@
       "front-near",
     ].map((name) => [name, document.getElementById("horse-" + name)]),
   );
+  // Eight poses follow one stride from push-off through landing and recovery.
+  // The lower-leg tracks are angles relative to the body, independent of the thigh.
+  const hindStride = {
+    thigh: [10, 15, 4, -17, -41, -44, -23, 0],
+    shin: [5, 4, -13, -45, -65, -51, -21, 2],
+    hip: "718 578",
+    joint: "643 647",
+  };
+  const frontStride = {
+    thigh: [-14, -32, -26, 8, 34, 46, 32, 6],
+    shin: [9, -50, -67, -30, 26, 69, 80, 47],
+    hip: "939 612",
+    joint: "984 636",
+  };
+  const lift = [-3, -12, -15, -7, 6, 10, 6, 2];
+  const pitch = [-2, -2, -0.5, 1.5, 2, 1, 0, -1];
+  const legs = [
+    [parts["hind-near"], hindStride, 0],
+    [parts["hind-far"], hindStride, 0.16],
+    [parts["front-near"], frontStride, 0],
+    [parts["front-far"], frontStride, 0.16],
+  ].map(([upper, stride, offset]) => ({
+    upper,
+    lower: upper.querySelector("[data-lower-leg]"),
+    stride,
+    offset,
+  }));
+
+  // Periodic cubic interpolation keeps joint velocity continuous across the seam.
+  function pose(track, phase) {
+    const position = ((phase + 1) % 1) * track.length;
+    const i = Math.floor(position),
+      t = position - i;
+    const at = (n) => track[(i + n + track.length) % track.length];
+    const a = at(-1),
+      b = at(0),
+      c = at(1),
+      d = at(2);
+    return (
+      b +
+      0.5 *
+        t *
+        (c - a + t * (2 * a - 5 * b + 4 * c - d + t * (3 * b - 3 * c + d - a)))
+    );
+  }
+  const strideMs = 1200;
   let paused = false,
     visible = true,
-    frame = 0,
-    lastFrame = 0,
+    elapsed = 0,
+    lastTime = null,
     scheduled = 0;
-  function draw(index) {
-    const phase = (index / 60) * Math.PI * 2;
-    const swing = Math.sin(phase);
-    const opposite = Math.sin(phase + Math.PI);
+  function draw(phase) {
     parts.body.setAttribute(
       "transform",
-      `translate(0 ${-4 + Math.cos(phase * 2) * 4})`,
+      `translate(0 ${pose(lift, phase)}) rotate(${pose(pitch, phase)} 800 550)`,
     );
-    parts["hind-near"].setAttribute(
+    for (const { upper, lower, stride, offset } of legs) {
+      const angle = pose(stride.thigh, phase + offset);
+      upper.setAttribute("transform", `rotate(${angle} ${stride.hip})`);
+      lower.setAttribute(
+        "transform",
+        `rotate(${pose(stride.shin, phase + offset) - angle} ${stride.joint})`,
+      );
+    }
+    parts.neck.setAttribute(
       "transform",
-      `rotate(${swing * 13} 697 598)`,
+      `rotate(${pose(pitch, phase - 0.04) * 0.8} 941 484)`,
     );
-    parts["hind-far"].setAttribute(
-      "transform",
-      `rotate(${opposite * 11} 602 606)`,
-    );
-    parts["front-near"].setAttribute(
-      "transform",
-      `rotate(${opposite * 13} 940 611)`,
-    );
-    parts["front-far"].setAttribute(
-      "transform",
-      `rotate(${swing * 10} 945 573)`,
-    );
-    parts.neck.setAttribute("transform", `rotate(${swing * 1.2} 941 484)`);
     parts.tail.setAttribute(
       "transform",
-      `rotate(${Math.sin(phase - 0.4) * 3} 640 476)`,
+      `rotate(${pose(pitch, phase - 0.15) * 2.4} 640 476)`,
     );
     parts.mane.setAttribute(
       "transform",
-      `rotate(${Math.sin(phase + 0.4) * 2} 912 353)`,
+      `rotate(${pose(pitch, phase - 0.1) * 1.1} 912 353)`,
     );
-    horse.dataset.frame = String(index);
-  }
-
-  function requestTick() {
-    if (
-      !scheduled &&
-      !document.hidden &&
-      !paused &&
-      !reduced.matches &&
-      visible
-    )
-      scheduled = requestAnimationFrame(tick);
+    horse.dataset.frame = String(Math.floor(phase * 60));
   }
   function tick(now) {
-    scheduled = 0;
-    if (now - lastFrame >= 1000 / 60) {
-      frame = (frame + 1) % 60;
-      draw(frame);
-      lastFrame = now;
-    }
-    requestTick();
+    if (lastTime !== null) elapsed = (elapsed + now - lastTime) % strideMs;
+    lastTime = now;
+    draw(elapsed / strideMs);
+    scheduled = requestAnimationFrame(tick);
   }
   function syncMotion() {
     toggle.disabled = reduced.matches;
@@ -85,21 +109,22 @@
         ? "Play motion"
         : "Pause motion";
     toggle.setAttribute("aria-pressed", String(paused || reduced.matches));
-    if (reduced.matches) draw(0);
-    if (scheduled && (paused || reduced.matches || !visible)) {
+    if (reduced.matches) {
+      elapsed = 0;
+      draw(0);
+    }
+    if (paused || reduced.matches || document.hidden || !visible) {
       cancelAnimationFrame(scheduled);
       scheduled = 0;
-    }
-    requestTick();
+      lastTime = null;
+    } else if (!scheduled) scheduled = requestAnimationFrame(tick);
   }
   toggle.addEventListener("click", () => {
     paused = !paused;
     syncMotion();
   });
   reduced.addEventListener("change", syncMotion);
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) requestTick();
-  });
+  document.addEventListener("visibilitychange", syncMotion);
   if ("IntersectionObserver" in window)
     new IntersectionObserver(
       ([entry]) => {

@@ -266,9 +266,6 @@ footer,
   color: var(--ih-mint);
   overflow: visible;
 }
-.horse-speed {
-  color: var(--ih-aqua);
-}
 .motion-caption {
   display: flex;
   justify-content: space-between;
