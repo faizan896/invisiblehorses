@@ -92,7 +92,46 @@ function themeButton() {
   return `<button data-action="theme" type="button">${dark ? "Light" : "Dark"} mode</button>`;
 }
 function onboarding(message = "") {
-  root.innerHTML = `<main class="onboarding"><header><a class="brand" href="/">Invisible Horses</a>${themeButton()}</header><p class="kicker">Payment controls for software agents</p><h1>Create a test-credit workspace</h1><p>Create a private demo workspace and try the complete payment flow, from an agent request to a settled internal ledger entry.</p><ul><li>Issue a scoped agent API key.</li><li>Set budgets and require your approval above a limit.</li><li>Let a server-side worker finish accepted payments.</li></ul><div class="panel"><h2>Open your workspace</h2><p class="small">Free public demo. No account or bank connection required.</p><form id="onboard"><label for="workspace-name">Workspace name</label><input id="workspace-name" name="name" placeholder="Acme Studio" minlength="2" maxlength="60" required autocomplete="organization"/><p class="form-error" role="alert">${esc(message)}</p><div class="form-actions"><button class="primary" type="submit">Create demo workspace →</button></div></form></div><p class="small">Your workspace starts with $10,000 in internal demo credits. It is isolated from other visitors. Your access expires after seven days. Access stays in this browser through a secure session cookie.</p><details class="panel"><summary>Restore an existing workspace</summary><form id="recover-form"><label for="recover-key">Recovery key</label><input id="recover-key" type="password" name="code" autocomplete="off" required placeholder="ih_recovery.…"/><p class="small">Restoring access signs out previous owner sessions, revokes agent keys and cancels unsettled requests. Saved history is retained.</p><label class="check"><input type="checkbox" required/>I understand that I will need to issue new agent keys.</label><p class="form-error" role="alert"></p><button type="submit">Restore workspace</button></form></details><footer>Payments use internal test credits. External bank and crypto payments are not connected. <a href="/playground/">Explore the route planner →</a></footer></main>`;
+  root.innerHTML = `<main class="onboarding">
+    <header><a class="brand" href="/">Invisible Horses</a>${themeButton()}</header>
+    <div class="onboarding-grid">
+      <section class="onboarding-intro">
+        <p class="kicker">Payment controls for software agents</p>
+        <h1>Create a test-credit workspace.</h1>
+        <p>Try the payment flow in a private workspace with $10,000 in internal demo credits.</p>
+        <ul>
+          <li>Issue a scoped agent API key.</li>
+          <li>Set a budget and an approval threshold.</li>
+          <li>Track accepted payments in the internal ledger.</li>
+        </ul>
+      </section>
+      <div>
+        <section class="panel">
+          <h2>Open your workspace</h2>
+          <p class="small">Free public demo. No account or bank connection required.</p>
+          <form id="onboard">
+            <label for="workspace-name">Workspace name</label>
+            <input id="workspace-name" name="name" placeholder="Acme Studio" minlength="2" maxlength="60" required autocomplete="organization"/>
+            <p class="form-error" role="alert">${esc(message)}</p>
+            <div class="form-actions"><button class="primary" type="submit">Create demo workspace →</button></div>
+          </form>
+        </section>
+        <p class="small">Access stays in this browser through a secure session cookie and expires after seven days.</p>
+        <details class="panel">
+          <summary>Restore an existing workspace</summary>
+          <form id="recover-form">
+            <label for="recover-key">Recovery key</label>
+            <input id="recover-key" type="password" name="code" autocomplete="off" required placeholder="ih_recovery.…"/>
+            <p class="small">Restoring access signs out previous owner sessions, revokes agent keys and cancels unsettled requests. Saved history is retained.</p>
+            <label class="check"><input type="checkbox" required/>I understand that I will need to issue new agent keys.</label>
+            <p class="form-error" role="alert"></p>
+            <button type="submit">Restore workspace</button>
+          </form>
+        </details>
+      </div>
+    </div>
+    <footer>Payments use internal test credits. External bank and crypto payments are not connected. <a href="/playground/">Explore the route planner →</a></footer>
+  </main>`;
   bindCommon();
   formTask(
     document.querySelector<HTMLFormElement>("#recover-form")!,

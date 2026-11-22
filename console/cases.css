@@ -64,10 +64,7 @@
   margin-bottom: 8px;
 }
 .cases-summary dd {
-  font:
-    normal 30px/1.2 "Times New Roman",
-    Times,
-    serif;
+  font: normal 30px/1.2 var(--ih-display);
   margin: 0;
 }
 .cases-filters {
@@ -208,10 +205,7 @@
   max-width: 800px;
 }
 .cases-empty h2 {
-  font:
-    normal 30px/1.2 "Times New Roman",
-    Times,
-    serif;
+  font: normal 30px/1.2 var(--ih-display);
   margin: 0 0 16px;
 }
 .cases-empty p {
@@ -225,10 +219,7 @@
   max-width: calc(100vw - 40px);
 }
 .cases-dialog > header h2 {
-  font:
-    normal 30px/1.2 "Times New Roman",
-    Times,
-    serif;
+  font: normal 30px/1.2 var(--ih-display);
 }
 .cases-dialog h3 {
   font:

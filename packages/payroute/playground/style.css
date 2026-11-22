@@ -1,29 +1,6 @@
 @import "../../../public/brand/palette.css";
 
 :root {
-  color-scheme: light;
-  --bg: var(--ih-bg);
-  --text: var(--ih-ink);
-  --muted: var(--ih-muted);
-  --line: var(--ih-border);
-  --accent: var(--ih-link);
-  --wash: var(--ih-wash);
-  --field: var(--ih-paper);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: var(--ih-bg);
-    --text: var(--ih-ink);
-    --muted: var(--ih-muted);
-    --line: var(--ih-border);
-    --accent: var(--ih-link);
-    --wash: var(--ih-wash);
-    --field: var(--ih-paper);
-  }
-}
-:root[data-theme="dark"] {
-  color-scheme: dark;
   --bg: var(--ih-bg);
   --text: var(--ih-ink);
   --muted: var(--ih-muted);
@@ -64,11 +41,16 @@ button {
 button:hover {
   border-color: var(--accent);
 }
-button[aria-pressed="true"],
+button[aria-pressed="true"] {
+  background: var(--ih-mint);
+  color: var(--ih-night);
+  border-color: var(--ih-aqua);
+  font-weight: 600;
+}
 .primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
+  background: var(--ih-action);
+  color: var(--ih-on-action);
+  border-color: var(--ih-action);
 }
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -101,14 +83,13 @@ nav {
 h1,
 h2,
 h3 {
-  font:
-    normal 30px/1.2 "Times New Roman",
-    Times,
-    serif;
+  font: normal 30px/1.15 var(--ih-display);
   margin: 0 0 20px;
 }
 h1 {
   margin: 12px 0 18px;
+  font-size: clamp(42px, 5.2vw, 72px);
+  letter-spacing: -0.055em;
 }
 p {
   margin: 10px 0;
@@ -132,6 +113,22 @@ small,
 .intro {
   padding: 56px 0 28px;
   max-width: 650px;
+}
+.intro > .small:first-child {
+  font:
+    11px/1.5 ui-monospace,
+    monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.intro > .small:first-child::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  background: var(--ih-red);
+  margin-right: 8px;
+  vertical-align: middle;
 }
 .scenarios {
   display: flex;
@@ -211,7 +208,8 @@ details {
 }
 .recommendation {
   border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
+  background: var(--ih-soft);
+  border-left: 3px solid var(--ih-aqua);
   border-radius: 4px;
   padding: 26px;
   margin: 20px 0 38px;
@@ -423,7 +421,7 @@ footer {
   margin-top: 20px;
 }
 #assumption-error {
-  color: var(--accent);
+  color: var(--ih-error);
 }
 @media (max-width: 700px) {
   .shell {
