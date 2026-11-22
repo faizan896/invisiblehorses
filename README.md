@@ -2,7 +2,9 @@
 
 Payment controls for software agents. Give each agent a scoped key, set spending limits, approve requests and track payments processed in the background.
 
-[Open the app](https://invisiblehorses.vercel.app/app/) · [Route planner](https://invisiblehorses.vercel.app/playground/)
+[Spend review](https://invisiblehorses.vercel.app/app/review/) · [Demo workspace](https://invisiblehorses.vercel.app/app/) · [Route planner](https://invisiblehorses.vercel.app/playground/)
+
+**For teams running paid tools in customer jobs.** Compare a supplier billing CSV with an application job CSV in the browser. Spend review joins them by request ID, flags gaps and exports the investigation list. The sample works without creating a workspace. [Run a first-team pilot](docs/spend-review.md)
 
 The public app uses internal test credits. External bank and crypto payments are not connected.
 

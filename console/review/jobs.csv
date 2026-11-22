@@ -1,0 +1,6 @@
+request_id,customer_id,job_id,result
+req_8041,atlas,research-17,delivered
+req_8042,atlas,research-17,failed
+req_8044,meridian,enrichment-08,pending
+req_8045,meridian,enrichment-08,delivered
+req_8046,atlas,research-18,delivered

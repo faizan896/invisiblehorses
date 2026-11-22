@@ -51,6 +51,10 @@
       "dest": "/playground/index.html"
     },
     {
+      "src": "/app/review/?",
+      "dest": "/app/review/index.html"
+    },
+    {
       "src": "/app/",
       "dest": "/app/index.html"
     },

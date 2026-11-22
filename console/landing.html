@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="Invisible Horses is an independent software project building spending controls for agents. Try the test-credit workspace or run the self-hosted company pilot."
+      content="Match supplier charges to agent job results in your browser. Review exceptions, export findings and try per-job spending controls."
     />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#061721" />
     <meta
       property="og:title"
       content="Invisible Horses · Spending rules for software agents"
     />
     <meta
       property="og:description"
-      content="Company, agent and job budgets. Owner approval. A record of each request. Public demo uses test credits."
+      content="Review agent spend with two CSVs. Find charged calls with missing results and trace each exception to its request ID."
     />
     <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />
     <title>Invisible Horses · Spending rules for software agents</title>
@@ -26,6 +26,8 @@
     </script>
     <link rel="stylesheet" href="/brand/site.css" />
     <script src="/brand/experience.js" defer></script>
+    <link rel="stylesheet" href="/brand/flow.css" />
+    <script src="/brand/flow.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -36,7 +38,8 @@
           ><span>Invisible Horses</span></a
         >
         <nav aria-label="Main">
-          <a href="#workspace">Workspace</a><a href="#system">System</a
+          <a href="#how-it-works">How it works</a
+          ><a href="#workspace">Workspace</a><a href="#system">System</a
           ><a href="#notes">Notes</a
           ><a href="https://github.com/faizan896/invisiblehorses">Source →</a>
         </nav>
@@ -46,187 +49,442 @@
       </header>
       <main id="main">
         <section class="opening" aria-labelledby="hero-title">
-          <div class="section-meta">
-            <span>Independent software project</span
-            ><span>Agent spending / Open source</span>
-          </div>
           <div class="opening-grid">
-            <div>
-              <h1 id="hero-title">Spending rules<br />for software agents.</h1>
+            <div class="opening-text">
+              <p class="small-label project-label">Open-source software</p>
+              <h1 id="hero-title">
+                Spending rules<br /><em>for software agents.</em>
+              </h1>
               <p class="opening-copy">
-                Give each agent a budget. Check its requests before execution,
-                ask for approval when needed, and keep a record of the outcome.
+                Match supplier charges to the jobs your agents ran. Find paid
+                calls with missing results, then set budgets for the next run.
               </p>
               <div class="opening-actions">
-                <a class="action-link" href="/app/"
-                  >Open demo workspace <span aria-hidden="true">→</span></a
-                ><a
-                  href="https://github.com/faizan896/invisiblehorses/blob/main/docs/company-pilot.md"
-                  >Run the company pilot →</a
-                >
+                <a class="action-link" href="/app/review/"
+                  >Try a spend review <span aria-hidden="true">→</span></a
+                ><a href="/app/">Open demo workspace →</a>
               </div>
             </div>
-            <aside class="project-state" aria-label="Current product state">
-              <p class="small-label">Current state</p>
-              <dl>
-                <div>
-                  <dt>Public workspace</dt>
-                  <dd>Internal test credits</dd>
-                </div>
-                <div>
-                  <dt>Company pilot</dt>
-                  <dd>Self-hosted service</dd>
-                </div>
-                <div>
-                  <dt>External purchases</dt>
-                  <dd>Require your provider adapter</dd>
-                </div>
-              </dl>
-              <p class="state-note">
-                The public demo does not move bank funds, charge cards or send
-                cryptocurrency.
-              </p>
-            </aside>
-          </div>
-          <figure class="motion-field">
-            <div class="motion-art">
-              <svg
-                id="horse-logo"
-                viewBox="380 245 750 520"
-                role="img"
-                aria-labelledby="horse-logo-title"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <title id="horse-logo-title">
-                  The Invisible Horses dashed-line horse, running.
-                </title>
-                <g
-                  id="horse-body"
-                  stroke="currentColor"
-                  stroke-width="9"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+            <figure class="motion-field">
+              <div class="motion-art">
+                <svg
+                  id="horse-logo"
+                  viewBox="380 245 750 520"
+                  role="img"
+                  aria-labelledby="horse-logo-title"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <g id="horse-tail" stroke-dasharray="22 21">
+                  <title id="horse-logo-title">
+                    The Invisible Horses dashed-line horse, running.
+                  </title>
+                  <defs>
                     <path
-                      d="M645 469C637 431 627 407 602 412C572 405 543 424 520 442C493 465 452 453 443 430"
+                      id="hind-thigh"
+                      d="M718 578C697 616 677 635 643 647"
+                      stroke-dasharray="22 23"
                     />
-                    <path
-                      d="M642 483C624 449 602 440 579 445C555 444 536 465 514 477C477 499 437 482 431 458"
-                    />
-                    <path
-                      d="M621 478C603 464 583 465 567 478C547 497 529 509 508 513C485 521 459 510 449 500"
-                    />
-                  </g>
-                  <g id="horse-hind-far">
-                    <path
-                      d="M616 614C596 641 576 649 561 666L545 687"
-                      stroke-dasharray="20 20"
-                    />
-                    <path
-                      d="M573 578L548 594C531 596 518 613 506 625"
-                      stroke-dasharray="19 20"
-                    />
-                    <path
-                      d="M481 633C474 628 463 637 458 649L455 656C467 659 478 657 486 651Z"
-                      fill="currentColor"
-                      stroke-width="5"
-                    />
-                  </g>
-                  <g id="horse-front-far">
-                    <path
-                      d="M943 572C973 558 998 558 1019 578C1037 594 1046 614 1054 633"
-                      stroke-dasharray="21 23"
-                    />
-                    <path
-                      d="M1043 647L1060 639C1066 648 1069 660 1065 672C1057 674 1048 669 1043 664Z"
-                      fill="currentColor"
-                      stroke-width="5"
-                    />
-                  </g>
-                  <path
-                    d="M615 564C602 544 610 518 627 502C655 472 687 466 722 470L770 479C803 488 824 476 842 454C858 436 866 407 884 392"
-                    stroke-dasharray="22 23"
-                  />
-                  <path
-                    d="M728 611C772 626 811 630 854 627C886 624 904 607 931 611"
-                    stroke-dasharray="23 24"
-                  />
-                  <g id="horse-neck">
-                    <path
-                      d="M930 560C941 533 940 496 940 468C939 448 941 432 950 418"
-                      stroke-dasharray="20 22"
-                    />
-                    <path
-                      d="M947 416C973 422 996 431 1016 438L1053 446C1073 451 1088 441 1092 428C1096 412 1082 402 1069 395L1034 369C1015 355 1005 339 988 328L973 320"
-                      stroke-dasharray="19 21"
-                    />
-                    <path
-                      d="M972 306C969 291 956 280 947 274C940 277 939 291 941 305"
-                      stroke-dasharray="13 16"
-                    />
-                    <path
-                      d="M985 363C990 380 971 382 968 370"
-                      stroke-dasharray="none"
-                      stroke-width="8"
-                    />
-                    <path d="M1060 424L1067 434" stroke-width="8" />
-                    <g id="horse-mane" stroke-dasharray="21 23">
+                    <g id="hind-shin">
                       <path
-                        d="M909 294C888 292 871 306 852 308C836 310 828 304 819 301"
+                        d="M643 647L608 662C589 669 581 685 565 704"
+                        stroke-dasharray="22 23"
                       />
                       <path
-                        d="M919 322C891 323 875 337 854 345C822 360 791 366 772 348"
-                      />
-                      <path
-                        d="M915 350C882 351 866 371 839 384C808 403 776 410 761 395"
-                      />
-                      <path
-                        d="M896 378C873 396 849 421 823 436C807 446 795 445 786 442"
+                        d="M551 709L535 712C529 718 524 728 522 737C536 739 550 734 559 726Z"
+                        fill="currentColor"
+                        stroke-width="5"
                       />
                     </g>
-                  </g>
-                  <g id="horse-hind-near">
                     <path
-                      d="M718 578C697 616 677 635 643 647L608 662C589 669 581 685 565 704"
+                      id="front-thigh"
+                      d="M939 612C956 614 973 623 984 636"
+                      stroke-dasharray="20 20"
+                    />
+                    <g id="front-shin">
+                      <path
+                        d="M984 636C995 650 987 666 975 681L961 697"
+                        stroke-dasharray="20 20"
+                      />
+                      <path
+                        d="M950 699L933 705C935 714 938 720 942 724C951 720 959 711 962 703Z"
+                        fill="currentColor"
+                        stroke-width="5"
+                      />
+                    </g>
+                  </defs>
+                  <g
+                    id="horse-body"
+                    stroke="currentColor"
+                    stroke-width="9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <g id="horse-tail" stroke-dasharray="22 21">
+                      <path
+                        d="M645 469C637 431 627 407 602 412C572 405 543 424 520 442C493 465 452 453 443 430"
+                      />
+                      <path
+                        d="M642 483C624 449 602 440 579 445C555 444 536 465 514 477C477 499 437 482 431 458"
+                      />
+                      <path
+                        d="M621 478C603 464 583 465 567 478C547 497 529 509 508 513C485 521 459 510 449 500"
+                      />
+                    </g>
+                    <g
+                      opacity=".55"
+                      transform="translate(651 579) scale(.88) translate(-718 -578)"
+                    >
+                      <g id="horse-hind-far">
+                        <use href="#hind-thigh" />
+                        <use href="#hind-shin" data-lower-leg="" />
+                      </g>
+                    </g>
+                    <g
+                      opacity=".55"
+                      transform="translate(925 580) scale(.91) translate(-939 -612)"
+                    >
+                      <g id="horse-front-far">
+                        <use href="#front-thigh" />
+                        <use href="#front-shin" data-lower-leg="" />
+                      </g>
+                    </g>
+                    <path
+                      d="M615 564C602 544 610 518 627 502C655 472 687 466 722 470L770 479C803 488 824 476 842 454C858 436 866 407 884 392"
                       stroke-dasharray="22 23"
                     />
                     <path
-                      d="M551 709L535 712C529 718 524 728 522 737C536 739 550 734 559 726Z"
-                      fill="currentColor"
-                      stroke-width="5"
+                      d="M728 611C772 626 811 630 854 627C886 624 904 607 931 611"
+                      stroke-dasharray="23 24"
                     />
+                    <g id="horse-neck">
+                      <path
+                        d="M930 560C941 533 940 496 940 468C939 448 941 432 950 418"
+                        stroke-dasharray="20 22"
+                      />
+                      <path
+                        d="M947 416C973 422 996 431 1016 438L1053 446C1073 451 1088 441 1092 428C1096 412 1082 402 1069 395L1034 369C1015 355 1005 339 988 328L973 320"
+                        stroke-dasharray="19 21"
+                      />
+                      <path
+                        d="M972 306C969 291 956 280 947 274C940 277 939 291 941 305"
+                        stroke-dasharray="13 16"
+                      />
+                      <path
+                        d="M985 363C990 380 971 382 968 370"
+                        stroke-dasharray="none"
+                        stroke-width="8"
+                      />
+                      <path d="M1060 424L1067 434" stroke-width="8" />
+                      <g id="horse-mane" stroke-dasharray="21 23">
+                        <path
+                          d="M909 294C888 292 871 306 852 308C836 310 828 304 819 301"
+                        />
+                        <path
+                          d="M919 322C891 323 875 337 854 345C822 360 791 366 772 348"
+                        />
+                        <path
+                          d="M915 350C882 351 866 371 839 384C808 403 776 410 761 395"
+                        />
+                        <path
+                          d="M896 378C873 396 849 421 823 436C807 446 795 445 786 442"
+                        />
+                      </g>
+                    </g>
+                    <g id="horse-hind-near">
+                      <use href="#hind-thigh" />
+                      <use href="#hind-shin" data-lower-leg="" />
+                    </g>
+                    <g id="horse-front-near">
+                      <use href="#front-thigh" />
+                      <use href="#front-shin" data-lower-leg="" />
+                    </g>
                   </g>
-                  <g id="horse-front-near">
-                    <path
-                      d="M939 612C956 614 973 623 984 636C995 650 987 666 975 681L961 697"
-                      stroke-dasharray="20 20"
-                    />
-                    <path
-                      d="M950 699L933 705C935 714 938 720 942 724C951 720 959 711 962 703Z"
-                      fill="currentColor"
-                      stroke-width="5"
-                    />
-                  </g>
-                </g>
-                <g
-                  class="horse-speed"
-                  stroke="currentColor"
-                  stroke-width="6"
-                  stroke-linecap="round"
-                  opacity=".7"
-                >
-                  <path d="M395 702L451 689" />
-                  <path d="M425 723L488 710" />
-                </g>
-              </svg>
+                </svg>
+              </div>
+              <figcaption class="motion-caption">
+                <span>Invisible Horses</span
+                ><button id="motion-toggle" type="button" aria-pressed="false">
+                  Pause motion
+                </button>
+              </figcaption>
+            </figure>
+          </div>
+          <aside class="project-state" aria-label="Current product state">
+            <dl>
+              <div>
+                <dt>Public workspace</dt>
+                <dd>Internal test credits</dd>
+              </div>
+              <div>
+                <dt>Company pilot</dt>
+                <dd>Self-hosted service</dd>
+              </div>
+              <div>
+                <dt>External purchases</dt>
+                <dd>Require your provider adapter</dd>
+              </div>
+            </dl>
+          </aside>
+        </section>
+        <section
+          id="how-it-works"
+          class="ruled-section"
+          aria-labelledby="flow-title"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="small-label">How it works</p>
+              <h2 id="flow-title">Follow a paid request.</h2>
             </div>
-            <figcaption class="motion-caption">
-              <span>Fig. 01 / Invisible Horses</span
-              ><button id="motion-toggle" type="button" aria-pressed="false">
-                Pause motion
+            <p>
+              See how engineering and finance teams use supplier exports and job
+              records to investigate agent spend.
+            </p>
+          </div>
+          <figure
+            class="flow-figure"
+            aria-labelledby="flow-title"
+            data-offscreen
+          >
+            <div class="flow-toolbar">
+              <div
+                class="flow-choices"
+                role="group"
+                aria-label="Example to display"
+                hidden
+              >
+                <button type="button" data-flow="csv" aria-pressed="true">
+                  Billing CSVs
+                </button>
+                <button type="button" data-flow="stripe" aria-pressed="false">
+                  Stripe events
+                </button>
+                <button
+                  type="button"
+                  data-flow="firecrawl"
+                  aria-pressed="false"
+                >
+                  Firecrawl runs
+                </button>
+              </div>
+              <button
+                type="button"
+                class="flow-toggle"
+                aria-pressed="false"
+                hidden
+              >
+                Pause flow
               </button>
+            </div>
+            <div class="flow-stage">
+              <svg class="flow-symbols" aria-hidden="true" width="0" height="0">
+                <defs>
+                  <symbol id="tile-bill" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <path
+                        d="M10 7H33V34L29 31 26 34 22 31 18 34 14 31 10 34Z"
+                      />
+                      <path d="M15 15H28M15 21H25" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-job" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <rect x="4" y="8" width="36" height="26" rx="2" />
+                      <path d="M4 14H40M10 20 15 24 10 28M19 28H27" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-engineering" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <path d="m15 12-10 9 10 9m14-18 10 9-10 9m-5-23-6 29" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-finance" viewBox="0 0 128 84">
+                    <path
+                      class="tile-left"
+                      d="M4 35 64 5 124 35 124 47 64 78 4 47Z"
+                    />
+                    <path class="tile-right" d="M64 65 124 35V47L64 78Z" />
+                    <path class="tile-top" d="M4 35 64 5 124 35 64 65Z" />
+                    <g
+                      class="tile-glyph"
+                      transform="matrix(1 .50 -1 .50 64 13)"
+                    >
+                      <rect x="5" y="7" width="34" height="29" rx="2" />
+                      <path d="M5 16H39M18 16V36M24 22H32M24 28H32" />
+                    </g>
+                  </symbol>
+                  <symbol id="tile-review" viewBox="0 0 128 84">
+                    <path
+                      class="hub-base"
+                      d="M3 46 64 16 125 46V50L64 81 3 50Z"
+                    />
+                    <path
+                      class="hub-left"
+                      d="M4 31 64 1 124 31V44L64 74 4 44Z"
+                    />
+                    <path class="hub-right" d="M64 61 124 31V44L64 74Z" />
+                    <path class="hub-top" d="M4 31 64 1 124 31 64 61Z" />
+                    <g
+                      class="hub-mark"
+                      transform="matrix(1 .5 -.94 .47 63 7)"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M10 41c2-10 4-17 11-23l2-11 5 5 4-3 2 12 10 11-4 6-12-6-2 9"
+                        stroke-dasharray="5 3"
+                      />
+                      <path d="M8 29c-2-8 2-17 11-19M7 20l6-8" />
+                    </g>
+                  </symbol>
+                </defs>
+              </svg>
+              <svg
+                class="flow-wires flow-wires-wide"
+                viewBox="0 0 1000 332"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <path
+                    id="wire-wide0"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M160 51H241L370 141H500"
+                  />
+                  <path
+                    id="wire-wide1"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M160 214H250L367 141H500"
+                  />
+                  <path
+                    id="wire-wide2"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 141H627L748 51H840"
+                  />
+                  <path
+                    id="wire-wide3"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 141H627L748 214H840"
+                  />
+                </defs>
+                <use href="#wire-wide0" />
+                <use href="#wire-wide1" />
+                <use href="#wire-wide2" />
+                <use href="#wire-wide3" />
+                <use class="flow-pulse incoming" href="#wire-wide0" />
+                <use class="flow-pulse incoming" href="#wire-wide1" />
+                <use class="flow-pulse outgoing" href="#wire-wide2" />
+                <use class="flow-pulse outgoing" href="#wire-wide3" />
+              </svg>
+              <svg
+                class="flow-wires flow-wires-narrow"
+                viewBox="0 0 1000 440"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <path
+                    id="wire-narrow0"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M250 111V129L500 156V176"
+                  />
+                  <path
+                    id="wire-narrow1"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M750 111V129L500 156V176"
+                  />
+                  <path
+                    id="wire-narrow2"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 269V278L250 306V334"
+                  />
+                  <path
+                    id="wire-narrow3"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                    d="M500 269V278L750 306V334"
+                  />
+                </defs>
+                <use href="#wire-narrow0" />
+                <use href="#wire-narrow1" />
+                <use href="#wire-narrow2" />
+                <use href="#wire-narrow3" />
+                <use class="flow-pulse incoming" href="#wire-narrow0" />
+                <use class="flow-pulse incoming" href="#wire-narrow1" />
+                <use class="flow-pulse outgoing" href="#wire-narrow2" />
+                <use class="flow-pulse outgoing" href="#wire-narrow3" />
+              </svg>
+              <div class="flow-node flow-supplier">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-bill" /></svg
+                ><strong data-flow-label="supplier">Supplier billing</strong
+                ><span data-flow-detail="supplier">$6.40 · req_8042</span>
+              </div>
+              <div class="flow-node flow-app">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-job" /></svg
+                ><strong data-flow-label="app">Application log</strong
+                ><span data-flow-detail="app">Failed · req_8042</span>
+              </div>
+              <div class="flow-node flow-hub">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-review" /></svg
+                ><strong data-flow-label="hub">Spend Review</strong
+                ><span data-flow-detail="hub">Match request IDs</span>
+              </div>
+              <div class="flow-node flow-engineer">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-engineering" /></svg
+                ><strong data-flow-label="engineer">Engineering</strong
+                ><span data-flow-detail="engineer">Trace the failed job</span>
+              </div>
+              <div class="flow-node flow-money">
+                <svg aria-hidden="true" viewBox="0 0 128 84">
+                  <use href="#tile-finance" /></svg
+                ><strong data-flow-label="money">Finance</strong
+                ><span data-flow-detail="money">Review the $6.40 charge</span>
+              </div>
+            </div>
+            <figcaption class="flow-caption">
+              <p id="flow-description" aria-live="polite">
+                In the sample, both CSVs contain req_8042. Matching the rows
+                reveals a $6.40 supplier charge for a failed research job.
+              </p>
+              <a id="flow-link" href="/app/review/">Try Spend Review →</a>
             </figcaption>
           </figure>
         </section>
@@ -237,7 +495,7 @@
         >
           <div class="section-heading">
             <div>
-              <p class="small-label">01 / The working interface</p>
+              <p class="small-label">The working interface</p>
               <h2 id="workspace-title">Inside the workspace.</h2>
             </div>
             <p>
@@ -351,7 +609,7 @@
         >
           <div class="section-heading">
             <div>
-              <p class="small-label">02 / The system</p>
+              <p class="small-label">The system</p>
               <h2 id="system-title">Permission before execution.</h2>
             </div>
             <p>
@@ -400,7 +658,7 @@
         >
           <div class="section-heading">
             <div>
-              <p class="small-label">03 / Use and scope</p>
+              <p class="small-label">Use and scope</p>
               <h2 id="company-title">For teams building paid agent tools.</h2>
             </div>
             <p>
@@ -473,7 +731,7 @@
         <section id="notes" class="ruled-section" aria-labelledby="notes-title">
           <div class="section-heading">
             <div>
-              <p class="small-label">04 / Technical notes</p>
+              <p class="small-label">Technical notes</p>
               <h2 id="notes-title">The implementation is open.</h2>
             </div>
             <p>
@@ -484,7 +742,7 @@
           <div class="note-list">
             <a
               href="https://github.com/faizan896/invisiblehorses/blob/main/docs/architecture.md"
-              ><span class="note-number">01</span>
+            >
               <div>
                 <h3>Architecture and API</h3>
                 <p>
@@ -496,7 +754,7 @@
             >
             <a
               href="https://github.com/faizan896/invisiblehorses/blob/main/docs/company-pilot.md"
-              ><span class="note-number">02</span>
+            >
               <div>
                 <h3>Running a company pilot</h3>
                 <p>
@@ -508,7 +766,7 @@
             >
             <a
               href="https://github.com/faizan896/invisiblehorses/blob/main/docs/payroute-numbers-audit.md"
-              ><span class="note-number">03</span>
+            >
               <div>
                 <h3>Where the planner’s numbers come from</h3>
                 <p>
@@ -520,12 +778,24 @@
             >
             <a
               href="https://github.com/faizan896/invisiblehorses/blob/main/docs/x402-testnet.md"
-              ><span class="note-number">04</span>
+            >
               <div>
                 <h3>The separate x402 testnet runtime</h3>
                 <p>
                   A guarded paid-resource example on Base Sepolia. Mainnet is
                   refused.
+                </p>
+              </div>
+              <span aria-hidden="true">→</span></a
+            >
+            <a
+              href="https://github.com/faizan896/invisiblehorses/blob/main/docs/cases.md"
+            >
+              <div>
+                <h3>Cases: charge and result records</h3>
+                <p>
+                  Supported imports, storage modes and the limits of imported
+                  evidence.
                 </p>
               </div>
               <span aria-hidden="true">→</span></a
@@ -541,18 +811,6 @@
       </main>
       <footer>
         <a class="footer-brand" href="/">Invisible Horses.</a>
-        <a
-          href="https://github.com/faizan896/invisiblehorses/blob/main/docs/cases.md"
-          ><span class="note-number">05</span>
-          <div>
-            <h3>Cases: charge and result records</h3>
-            <p>
-              Supported imports, storage modes and the limits of imported
-              evidence.
-            </p>
-          </div>
-          <span aria-hidden="true">→</span></a
-        >
         <div>
           <span>Built by <a href="https://faizan.sh">Faizan</a></span
           ><a href="https://github.com/faizan896/invisiblehorses">Source →</a
@@ -575,8 +833,8 @@
         <source src="/invisible-horses-demo.mp4" type="video/mp4" />
       </video>
       <p>
-        Actual app recording. Internal test credits only. No external money
-        moves.
+        Earlier workspace recording. Internal test credits only. No external
+        money moves.
       </p>
     </dialog>
   </body>

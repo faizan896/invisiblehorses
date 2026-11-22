@@ -1,29 +1,6 @@
 @import "../public/brand/palette.css";
 
 :root {
-  color-scheme: light;
-  --bg: var(--ih-bg);
-  --paper: var(--ih-paper);
-  --text: var(--ih-ink);
-  --muted: var(--ih-muted);
-  --line: var(--ih-border);
-  --accent: var(--ih-link);
-  --wash: var(--ih-wash);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: var(--ih-bg);
-    --paper: var(--ih-paper);
-    --text: var(--ih-ink);
-    --muted: var(--ih-muted);
-    --line: var(--ih-border);
-    --accent: var(--ih-link);
-    --wash: var(--ih-wash);
-  }
-}
-:root[data-theme="dark"] {
-  color-scheme: dark;
   --bg: var(--ih-bg);
   --paper: var(--ih-paper);
   --text: var(--ih-ink);
@@ -76,9 +53,10 @@ button:disabled {
 }
 button.primary,
 .button.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
+  background: var(--ih-action);
+  border-color: var(--ih-action);
+  color: var(--ih-on-action);
+  font-weight: 600;
 }
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -87,10 +65,7 @@ button.primary,
 h1,
 h2,
 h3 {
-  font:
-    normal 30px/1.2 "Times New Roman",
-    Times,
-    serif;
+  font: normal 30px/1.15 var(--ih-display);
   margin: 0 0 18px;
 }
 p {
@@ -202,6 +177,8 @@ small,
 }
 .heading h1 {
   margin-bottom: 8px;
+  font-size: clamp(34px, 3.6vw, 52px);
+  letter-spacing: -0.045em;
 }
 .actions {
   justify-content: flex-start;
@@ -230,10 +207,7 @@ small,
   margin: 0 0 8px;
 }
 .metric strong {
-  font:
-    normal 30px/1.2 "Times New Roman",
-    Times,
-    serif;
+  font: normal 30px/1.15 var(--ih-display);
 }
 .section {
   padding: 28px 0;
@@ -354,7 +328,7 @@ textarea {
   min-height: 17px;
 }
 .form-error {
-  color: var(--accent);
+  color: var(--ih-error);
   margin: 12px 0;
 }
 .onboarding {
@@ -630,7 +604,7 @@ dialog header h2 {
   }
 }
 
-/* Invisible Horses: monochrome workspace with restrained controls. */
+/* Navigation stays ink in both themes. */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -648,7 +622,15 @@ dialog header h2 {
 }
 
 .sidebar {
-  background: var(--paper);
+  --text: #f1f7f5;
+  --muted: #adc2c6;
+  --accent: var(--ih-mint);
+  --wash: #17353d;
+  --line: #345059;
+  --bg: var(--ih-night);
+  background: var(--ih-night);
+  color: var(--text);
+  overflow-y: auto;
   position: sticky;
   top: 0;
   height: 100vh;
@@ -662,9 +644,9 @@ dialog header h2 {
   color: var(--text);
 }
 .sidebar nav a[aria-current="page"] {
-  color: var(--accent);
+  background: var(--ih-mint);
+  color: var(--ih-night);
   font-weight: 600;
-  box-shadow: inset 3px 0 var(--accent);
 }
 .workspace-name {
   padding: 10px 12px;
@@ -674,12 +656,13 @@ dialog header h2 {
 }
 button.primary:hover,
 .button.primary:hover {
-  filter: brightness(1.12);
+  background: var(--ih-link);
+  border-color: var(--ih-link);
 }
 .notice {
-  background: var(--paper);
+  background: var(--ih-soft);
   border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--ih-aqua);
   color: var(--muted);
 }
 .metrics {
@@ -713,9 +696,51 @@ button.primary:hover,
   background: var(--wash);
 }
 .onboarding {
-  max-width: 620px;
+  width: min(1090px, 100%);
+  max-width: none;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px) 30px;
+}
+.onboarding header {
+  min-height: 82px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: clamp(30px, 7vw, 90px);
+}
+.onboarding-grid {
+  display: grid;
+  grid-template-columns: 1.04fr 1fr;
+  gap: clamp(32px, 6vw, 84px);
+  align-items: start;
+}
+.onboarding-intro h1 {
+  font-size: clamp(40px, 5vw, 68px);
+  letter-spacing: -0.055em;
+  line-height: 1.04;
+}
+.onboarding-intro > p:not(.kicker) {
+  color: var(--muted);
+  font-size: 17px;
+}
+.onboarding-intro ul {
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.onboarding-intro li {
+  padding: 10px 0;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+}
+.onboarding-intro li::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 12px;
+  background: var(--ih-aqua);
 }
 .onboarding .panel {
+  margin-top: 0;
   padding: 28px;
 }
 @media (max-width: 900px) {
@@ -739,6 +764,10 @@ button.primary:hover,
   }
   .metric {
     padding: 16px;
+  }
+  .onboarding-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
   .onboarding .panel {
     padding: 20px;
@@ -771,18 +800,35 @@ button.primary:hover,
   border-radius: 3px;
 }
 .badge.chosen {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+  background: var(--ih-soft);
+  color: var(--ih-link);
+  border-color: var(--line);
 }
 .metric strong {
   color: var(--text);
 }
-.notice {
-  border-left-width: 1px;
+.metric:first-child strong {
+  color: var(--ih-link);
 }
-.sidebar nav a[aria-current="page"] {
-  box-shadow: inset 2px 0 var(--text);
+.metric strong {
+  letter-spacing: -0.04em;
+}
+.kicker,
+.onboarding-intro .kicker {
+  font:
+    11px/1.5 ui-monospace,
+    monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.kicker::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 8px;
+  background: var(--ih-red);
+  vertical-align: middle;
 }
 @media (max-width: 640px) {
   .sidebar > div:first-child {
